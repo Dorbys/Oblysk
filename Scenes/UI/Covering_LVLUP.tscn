@@ -1,0 +1,49 @@
+[gd_scene load_steps=4 format=3 uid="uid://dyxi37xxloi5e"]
+
+[ext_resource type="Script" path="res://Script/UI_layer/Covering_LVLUP.gd" id="1_46gok"]
+[ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="2_fm15n"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_42gmq"]
+font = ExtResource("2_fm15n")
+font_size = 64
+
+[node name="Covering" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1920.0
+offset_bottom = -1080.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_46gok")
+
+[node name="CoverTop" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 530.0
+color = Color(0, 0, 0, 0)
+
+[node name="CoverBot" type="ColorRect" parent="."]
+layout_mode = 0
+offset_top = 940.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0, 0, 0, 0)
+
+[node name="CoverTop2" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 190.0
+color = Color(0, 0, 0, 0.521569)
+
+[node name="targeting_what" type="Label" parent="CoverTop2"]
+layout_mode = 0
+offset_left = 3.0
+offset_right = 1920.0
+offset_bottom = 190.0
+text = "Leveling up heroes, right-click to cancel"
+label_settings = SubResource("LabelSettings_42gmq")
+horizontal_alignment = 1
+vertical_alignment = 1

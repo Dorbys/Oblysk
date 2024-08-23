@@ -1,0 +1,104 @@
+[gd_scene load_steps=3 format=3 uid="uid://dh7fu0rygacyt"]
+
+[ext_resource type="Script" path="res://Script/UI_layer/Graveyard_showcase.gd" id="1_nciih"]
+[ext_resource type="Script" path="res://Script/UI_layer/Grave.gd" id="2_ppjy0"]
+
+[node name="Graveyard_showcase" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -126.0
+offset_right = -126.0
+scale = Vector2(1.2, 1.2)
+script = ExtResource("1_nciih")
+
+[node name="Graveyard_sc_panel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(126, 76)
+layout_mode = 0
+offset_right = 126.0
+offset_bottom = 76.0
+
+[node name="Dead_showcase" type="VBoxContainer" parent="Graveyard_sc_panel"]
+self_modulate = Color(0.101961, 0.141176, 1, 1)
+custom_minimum_size = Vector2(12, 72)
+layout_direction = 3
+layout_mode = 2
+alignment = 2
+
+[node name="Abarena_dshowcase" type="HBoxContainer" parent="Graveyard_sc_panel/Dead_showcase"]
+unique_name_in_owner = true
+self_modulate = Color(0.752941, 0.513726, 0.305882, 1)
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+
+[node name="Grave1" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Abarena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Grave2" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Abarena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Grave3" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Abarena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Grave4" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Abarena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Grave5" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Abarena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Arena_dshowcase" type="HBoxContainer" parent="Graveyard_sc_panel/Dead_showcase"]
+unique_name_in_owner = true
+self_modulate = Color(0.266667, 1, 1, 1)
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+
+[node name="Grave1" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Arena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Grave2" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Arena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Grave3" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Arena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Grave4" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Arena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Grave5" type="TextureRect" parent="Graveyard_sc_panel/Dead_showcase/Arena_dshowcase"]
+layout_mode = 2
+expand_mode = 3
+script = ExtResource("2_ppjy0")
+
+[node name="Dead_heroes" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = -1.0
+offset_top = 91.0
+offset_right = 39.0
+offset_bottom = 131.0
+
+[node name="Dead_heroesB" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = 75.0
+offset_top = 87.0
+offset_right = 115.0
+offset_bottom = 127.0

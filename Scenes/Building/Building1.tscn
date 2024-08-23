@@ -1,0 +1,91 @@
+[gd_scene load_steps=9 format=3 uid="uid://bf2q3e12e0l6w"]
+
+[ext_resource type="Script" path="res://Script/Building/Building1.gd" id="1_k5i7w"]
+[ext_resource type="PackedScene" uid="uid://dtog3glf6s2wx" path="res://Scenes/Building/Building1Preview.tscn" id="2_g1ihk"]
+[ext_resource type="PackedScene" uid="uid://b7gbw82r5j1vq" path="res://Scenes/Building/Building1CardInHandPreview.tscn" id="3_s5dbl"]
+[ext_resource type="Texture2D" uid="uid://byp5tyg4fcg1r" path="res://Assets/SPELL.png" id="4_tt8oh"]
+[ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="5_ohdjr"]
+[ext_resource type="LabelSettings" uid="uid://cacnbuvsrroxp" path="res://Setts/Labels/SpellCost.tres" id="6_r82l2"]
+[ext_resource type="LabelSettings" uid="uid://ctfo46o3ttwir" path="res://Setts/Labels/SpellXP.tres" id="8_gir2x"]
+[ext_resource type="LabelSettings" uid="uid://bl6gn28cpr4ki" path="res://Setts/Labels/CardDescription.tres" id="9_7bkda"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_k5i7w")
+Scene = ExtResource("2_g1ihk")
+PreviewScene = ExtResource("3_s5dbl")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+texture = ExtResource("4_tt8oh")
+expand_mode = 1
+
+[node name="NAME" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 216.0
+offset_bottom = 38.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "Baraakh"
+label_settings = ExtResource("5_ohdjr")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="COST" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 39.0
+offset_bottom = 39.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("6_r82l2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CARD_JPEG" type="TextureRect" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 216.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+mouse_filter = 2
+expand_mode = 1
+
+[node name="XP" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -2.0
+offset_top = 35.0
+offset_right = 38.0
+offset_bottom = 74.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("8_gir2x")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Card_description" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 216.0
+offset_right = 216.0
+offset_bottom = 360.0
+text = "In da haus"
+label_settings = ExtResource("9_7bkda")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[connection signal="mouse_entered" from="TextureRect" to="." method="_on_texture_rect_mouse_entered"]
+[connection signal="mouse_exited" from="TextureRect" to="." method="_on_texture_rect_mouse_exited"]

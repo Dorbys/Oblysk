@@ -1,0 +1,314 @@
+[gd_scene load_steps=27 format=3 uid="uid://bayidy5c8jqm4"]
+
+[ext_resource type="Script" path="res://Script/Unit1.gd" id="1_58f8m"]
+[ext_resource type="PackedScene" uid="uid://dmaqk1n41c6o5" path="res://Scenes/EFFECTS/SEffect.tscn" id="2_jshfr"]
+[ext_resource type="PackedScene" uid="uid://d3jknhi2o25m5" path="res://Scenes/EFFECTS/IEffect.tscn" id="3_thguv"]
+[ext_resource type="PackedScene" uid="uid://cn3mcrn6nii3q" path="res://Scenes/EFFECTS/ATEffect.tscn" id="4_y51pp"]
+[ext_resource type="PackedScene" uid="uid://b8hsptennfo6k" path="res://Scenes/EFFECTS/LVLUPEFFECT.tscn" id="5_h3hi2"]
+[ext_resource type="Script" path="res://Script/UNITS/Ability_1.gd" id="6_7tni5"]
+[ext_resource type="PackedScene" uid="uid://1qxt0o7ufabr" path="res://Scenes/UI/Covering.tscn" id="6_diytq"]
+[ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="6_xyfb1"]
+[ext_resource type="LabelSettings" uid="uid://c3htsyeddmmay" path="res://Setts/Labels/Stats.tres" id="7_mya13"]
+[ext_resource type="Texture2D" uid="uid://bxn2mkbkberl1" path="res://Assets/CardsPNGS/CardUI/Inventory sword.png" id="8_kj6o8"]
+[ext_resource type="Texture2D" uid="uid://da11g0qs7vep1" path="res://icon.svg" id="8_xaqce"]
+[ext_resource type="Texture2D" uid="uid://cyabcdh11jaxs" path="res://Assets/CardsPNGS/CardUI/Inventory special.png" id="9_qrgby"]
+[ext_resource type="Texture2D" uid="uid://dpnulmevfgww4" path="res://Assets/CardsPNGS/CardUI/Inventory shield.png" id="10_otp25"]
+[ext_resource type="Texture2D" uid="uid://cebjpxdc1cwq7" path="res://Assets/CardsPNGS/CardUI/Ability_frame.png" id="10_q7bmo"]
+[ext_resource type="Script" path="res://Script/UNITS/Arrow_combat.gd" id="10_wsnbo"]
+[ext_resource type="Script" path="res://Script/UI_layer/Tooltip.gd" id="12_8wtn5"]
+[ext_resource type="LabelSettings" uid="uid://ucthkrf481c6" path="res://Setts/Labels/Cooldown.tres" id="12_jtwlf"]
+[ext_resource type="Texture2D" uid="uid://f6k8coqa3pyq" path="res://Assets/Boardstuff/arrow_target2.png" id="13_06qur"]
+[ext_resource type="Script" path="res://Script/UNITS/Unit_Lane_auras.gd" id="13_iuwco"]
+[ext_resource type="PackedScene" uid="uid://blvlp7vt2ydtm" path="res://Scenes/UI/Tooltip_container.tscn" id="13_u8fq3"]
+[ext_resource type="FontFile" uid="uid://ctencmtygnfkv" path="res://Assets/Font source/RobotoMono-Italic.ttf" id="15_ceog3"]
+[ext_resource type="Texture2D" uid="uid://mx5vriwhyhxd" path="res://Assets/CardsUI/grim-reaper.png" id="16_rwel1"]
+[ext_resource type="Script" path="res://Script/UNITS/DraggingRect.gd" id="17_ef5kf"]
+[ext_resource type="Script" path="res://Script/UNITS/Item_slot.gd" id="21_nustg"]
+[ext_resource type="PackedScene" uid="uid://cenvkv14icjac" path="res://Scenes/UNIT/UnitEmptyPreview.tscn" id="23_sgdew"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_owja7"]
+font = ExtResource("15_ceog3")
+font_size = 34
+font_color = Color(1, 0, 0.262745, 1)
+outline_size = 37
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Control" type="Control"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_58f8m")
+EFFECT = ExtResource("2_jshfr")
+IEFFECT = ExtResource("3_thguv")
+ATEFFECT = ExtResource("4_y51pp")
+LVLUPEFFECT = ExtResource("5_h3hi2")
+COVERING = ExtResource("6_diytq")
+
+[node name="Slacksus" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+texture = ExtResource("6_xyfb1")
+expand_mode = 1
+
+[node name="ATK" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 302.0
+offset_right = 55.0
+offset_bottom = 359.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("7_mya13")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AR" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+offset_left = 81.0
+offset_top = 302.0
+offset_right = 136.0
+offset_bottom = 359.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("7_mya13")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HP" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 160.0
+offset_top = 303.0
+offset_right = 216.0
+offset_bottom = 360.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("7_mya13")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="UNIT_JPEG" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 303.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+mouse_filter = 2
+expand_mode = 4
+
+[node name="Ability1" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+z_index = 1
+layout_mode = 0
+offset_left = 7.0
+offset_top = 235.0
+offset_right = 65.0
+offset_bottom = 293.0
+mouse_filter = 2
+mouse_default_cursor_shape = 2
+texture = ExtResource("8_xaqce")
+expand_mode = 1
+script = ExtResource("6_7tni5")
+
+[node name="Ability_field" type="TextureRect" parent="Slacksus/Ability1" node_paths=PackedStringArray("owner_node")]
+unique_name_in_owner = true
+show_behind_parent = true
+layout_mode = 0
+offset_left = -7.0
+offset_top = -7.0
+offset_right = 65.0
+offset_bottom = 65.0
+mouse_filter = 0
+texture = ExtResource("10_q7bmo")
+expand_mode = 1
+script = ExtResource("12_8wtn5")
+visuals_res = ExtResource("13_u8fq3")
+owner_node = NodePath(".")
+show_delay = 0.3
+follow_mouse = false
+
+[node name="Cooldown" type="Label" parent="Slacksus/Ability1"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 62.0
+offset_bottom = 62.0
+text = "3"
+label_settings = ExtResource("12_jtwlf")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Arrow_combat" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = -0.103
+anchor_right = 0.5
+anchor_bottom = -0.103
+offset_left = -30.0
+offset_top = 0.0800018
+offset_right = 30.0
+offset_bottom = 40.08
+pivot_offset = Vector2(30, 0)
+mouse_filter = 2
+texture = ExtResource("13_06qur")
+expand_mode = 1
+script = ExtResource("10_wsnbo")
+
+[node name="DMG_TBT" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+z_index = 1
+layout_mode = 0
+offset_left = 144.0
+offset_top = 261.0
+offset_right = 212.0
+offset_bottom = 314.0
+text = "26"
+label_settings = SubResource("LabelSettings_owja7")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="DEATH" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+visibility_layer = 2
+layout_mode = 0
+offset_left = -16.0
+offset_top = 49.0
+offset_right = 246.0
+offset_bottom = 311.0
+mouse_filter = 2
+texture = ExtResource("16_rwel1")
+expand_mode = 1
+
+[node name="Lane_auras" type="Control" parent="Slacksus"]
+unique_name_in_owner = true
+anchors_preset = 0
+script = ExtResource("13_iuwco")
+
+[node name="Position_auras" type="Control" parent="Slacksus"]
+unique_name_in_owner = true
+anchors_preset = 0
+
+[node name="weapon_slot" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -108.0
+offset_right = -38.0
+offset_bottom = 70.0
+mouse_filter = 2
+texture = ExtResource("8_kj6o8")
+expand_mode = 1
+script = ExtResource("21_nustg")
+
+[node name="weapon_CD" type="Label" parent="weapon_slot"]
+visible = false
+layout_mode = 0
+offset_right = 70.0
+offset_bottom = 70.0
+text = "3"
+label_settings = ExtResource("12_jtwlf")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="weapon_tooltipper" type="Control" parent="weapon_slot" node_paths=PackedStringArray("owner_node")]
+anchors_preset = 0
+offset_right = 70.0
+offset_bottom = 70.0
+mouse_filter = 2
+script = ExtResource("12_8wtn5")
+visuals_res = ExtResource("13_u8fq3")
+owner_node = NodePath(".")
+follow_mouse = false
+
+[node name="special_slot" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -35.0
+offset_right = 35.0
+offset_bottom = 70.0
+mouse_filter = 2
+texture = ExtResource("9_qrgby")
+expand_mode = 1
+script = ExtResource("21_nustg")
+
+[node name="special_CD" type="Label" parent="special_slot"]
+visible = false
+layout_mode = 0
+offset_right = 70.0
+offset_bottom = 70.0
+text = "3"
+label_settings = ExtResource("12_jtwlf")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="special_tooltipper" type="Control" parent="special_slot" node_paths=PackedStringArray("owner_node")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 70.0
+offset_bottom = 70.0
+mouse_filter = 2
+script = ExtResource("12_8wtn5")
+visuals_res = ExtResource("13_u8fq3")
+owner_node = NodePath(".")
+follow_mouse = false
+
+[node name="armor_slot" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 38.0
+offset_right = 108.0
+offset_bottom = 70.0
+mouse_filter = 2
+texture = ExtResource("10_otp25")
+expand_mode = 1
+script = ExtResource("21_nustg")
+
+[node name="armor_CD" type="Label" parent="armor_slot"]
+visible = false
+layout_mode = 0
+offset_right = 70.0
+offset_bottom = 70.0
+text = "3"
+label_settings = ExtResource("12_jtwlf")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="armor_tooltipper" type="Control" parent="armor_slot" node_paths=PackedStringArray("owner_node")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 70.0
+offset_bottom = 70.0
+mouse_filter = 2
+script = ExtResource("12_8wtn5")
+visuals_res = ExtResource("13_u8fq3")
+owner_node = NodePath(".")
+follow_mouse = false
+
+[node name="DraggingRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+script = ExtResource("17_ef5kf")
+SCENE = ExtResource("23_sgdew")
+
+[connection signal="mouse_entered" from="Slacksus" to="." method="_on_slacksus_mouse_entered"]
+[connection signal="mouse_exited" from="Slacksus" to="." method="_on_slacksus_mouse_exited"]
+[connection signal="gui_input" from="weapon_slot" to="weapon_slot" method="_on_gui_input"]
+[connection signal="gui_input" from="special_slot" to="special_slot" method="_on_gui_input"]
+[connection signal="gui_input" from="armor_slot" to="armor_slot" method="_on_gui_input"]

@@ -1,0 +1,32 @@
+[gd_scene load_steps=4 format=3 uid="uid://ddbbx287ako64"]
+
+[ext_resource type="Texture2D" uid="uid://daxicg4y62pu5" path="res://Assets/PREUI/No_mana_warning.jpg" id="1_n7oce"]
+[ext_resource type="Script" path="res://Script/UI_layer/No_mana_warning.gd" id="2_kssvw"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_nlwki"]
+font_size = 72
+font_color = Color(0, 0, 0, 1)
+outline_size = 19
+outline_color = Color(1, 0, 0.188235, 1)
+
+[node name="TextureRect" type="TextureRect"]
+offset_left = 545.0
+offset_top = 101.0
+offset_right = 1039.0
+offset_bottom = 595.0
+scale = Vector2(1.5, 1.5)
+mouse_filter = 2
+texture = ExtResource("1_n7oce")
+expand_mode = 1
+script = ExtResource("2_kssvw")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 59.3333
+offset_top = 337.333
+offset_right = 442.333
+offset_bottom = 439.334
+text = "no mana"
+label_settings = SubResource("LabelSettings_nlwki")
+horizontal_alignment = 1
+vertical_alignment = 1

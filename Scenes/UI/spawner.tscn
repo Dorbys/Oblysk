@@ -1,0 +1,93 @@
+[gd_scene load_steps=5 format=3 uid="uid://dwwrxkxhppb77"]
+
+[ext_resource type="Script" path="res://Script/UI_layer/LaneDeployRect.gd" id="1_4rkcp"]
+[ext_resource type="Script" path="res://Script/UI_layer/SpawnRect.gd" id="2_l25vf"]
+[ext_resource type="PackedScene" uid="uid://c4np20856wsq8" path="res://Scenes/Building/BuildingMain.tscn" id="2_vjyy1"]
+[ext_resource type="PackedScene" uid="uid://clrltqfiak7yu" path="res://Scenes/UNIT/UnitDeploypreview.tscn" id="5_tdt42"]
+
+[node name="Spawner" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="SpawnRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -650.0
+offset_right = 650.0
+offset_bottom = 250.0
+pivot_offset = Vector2(690, 0)
+color = Color(0, 0, 0.368627, 0.87451)
+script = ExtResource("2_l25vf")
+BUILDING_SCENE = ExtResource("2_vjyy1")
+
+[node name="FirstLaneDeployRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+self_modulate = Color(0.658824, 0.337255, 1, 0)
+layout_mode = 0
+offset_left = -957.0
+offset_top = -714.0
+offset_right = -341.0
+offset_bottom = -174.0
+script = ExtResource("1_4rkcp")
+UNIT_SCENE = ExtResource("5_tdt42")
+
+[node name="MidLaneDeployRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+self_modulate = Color(0.658824, 0.337255, 1, 0)
+layout_mode = 0
+offset_left = -336.0
+offset_top = -714.0
+offset_right = 280.0
+offset_bottom = -174.0
+script = ExtResource("1_4rkcp")
+UNIT_SCENE = ExtResource("5_tdt42")
+
+[node name="LastLaneDeployRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+self_modulate = Color(0.658824, 0.337255, 1, 0)
+layout_mode = 0
+offset_left = 287.0
+offset_top = -714.0
+offset_right = 903.0
+offset_bottom = -174.0
+script = ExtResource("1_4rkcp")
+UNIT_SCENE = ExtResource("5_tdt42")
+
+[node name="BetaFirstLaneDeployRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+self_modulate = Color(0.658824, 0.337255, 1, 0)
+layout_mode = 0
+offset_left = -957.0
+offset_top = -1280.0
+offset_right = -341.0
+offset_bottom = -740.0
+mouse_filter = 2
+script = ExtResource("1_4rkcp")
+UNIT_SCENE = ExtResource("5_tdt42")
+
+[node name="BetaMidLaneDeployRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+self_modulate = Color(0.658824, 0.337255, 1, 0)
+layout_mode = 0
+offset_left = -336.0
+offset_top = -1280.0
+offset_right = 280.0
+offset_bottom = -740.0
+mouse_filter = 2
+script = ExtResource("1_4rkcp")
+UNIT_SCENE = ExtResource("5_tdt42")
+
+[node name="BetaLastLaneDeployRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+self_modulate = Color(0.658824, 0.337255, 1, 0)
+layout_mode = 0
+offset_left = 287.0
+offset_top = -1280.0
+offset_right = 903.0
+offset_bottom = -740.0
+mouse_filter = 2
+script = ExtResource("1_4rkcp")
+UNIT_SCENE = ExtResource("5_tdt42")
+
+[connection signal="child_entered_tree" from="SpawnRect" to="SpawnRect" method="_on_child_entered_tree"]
+[connection signal="child_order_changed" from="SpawnRect" to="SpawnRect" method="_on_child_order_changed"]

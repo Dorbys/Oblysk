@@ -1,0 +1,92 @@
+[gd_scene load_steps=9 format=3 uid="uid://damy2dodvfesh"]
+
+[ext_resource type="Script" path="res://Script/LVLUP/Lvlup_spellCardInHandPreview.gd" id="1_4vqct"]
+[ext_resource type="Texture2D" uid="uid://byp5tyg4fcg1r" path="res://Assets/SPELL.png" id="2_ob0qs"]
+[ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="3_uxrqr"]
+[ext_resource type="LabelSettings" uid="uid://cacnbuvsrroxp" path="res://Setts/Labels/SpellCost.tres" id="4_o384r"]
+[ext_resource type="Texture2D" uid="uid://cilnphaq26mvp" path="res://Assets/CardsPNGS/Spells/Dorbystrike.jpg" id="5_tc40s"]
+[ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="6_xfrs5"]
+[ext_resource type="LabelSettings" uid="uid://ctfo46o3ttwir" path="res://Setts/Labels/SpellXP.tres" id="7_umf7p"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_a4jf7"]
+font = ExtResource("6_xfrs5")
+font_size = 20
+font_color = Color(0, 0, 0, 1)
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_4vqct")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+mouse_filter = 2
+texture = ExtResource("2_ob0qs")
+expand_mode = 1
+
+[node name="NAME" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 216.0
+offset_bottom = 38.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "Dorbystrike"
+label_settings = ExtResource("3_uxrqr")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="COST" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 39.0
+offset_bottom = 39.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("4_o384r")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SPELL_JPEG" type="TextureRect" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 216.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+mouse_filter = 2
+texture = ExtResource("5_tc40s")
+expand_mode = 1
+
+[node name="Card_description" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 216.0
+offset_right = 216.0
+offset_bottom = 360.0
+text = "Deal 8 damage to a unit"
+label_settings = SubResource("LabelSettings_a4jf7")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="XP" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -110.0
+offset_top = 35.0
+offset_right = -70.0
+offset_bottom = 74.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("7_umf7p")
+horizontal_alignment = 1
+vertical_alignment = 1

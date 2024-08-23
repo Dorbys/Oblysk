@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dsgvtftwjma2y"
+path="res://.godot/imported/Skibidi Bop cut Yes Yes Yes x Bloody Mary _ Wednesday Dance (320kbps).mp3-bb66f154cdaab107da0172a2c391ff74.mp3str"
+
+[deps]
+
+source_file="res://Assets/Sounds/Skibidi Bop cut Yes Yes Yes x Bloody Mary _ Wednesday Dance (320kbps).mp3"
+dest_files=["res://.godot/imported/Skibidi Bop cut Yes Yes Yes x Bloody Mary _ Wednesday Dance (320kbps).mp3-bb66f154cdaab107da0172a2c391ff74.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

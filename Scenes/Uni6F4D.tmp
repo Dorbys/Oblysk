@@ -1,0 +1,75 @@
+[gd_scene load_steps=5 format=3 uid="uid://cauryrpdbrtky"]
+
+[ext_resource type="Script" path="res://Script/UnitCIH.gd" id="1_y1qsa"]
+[ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="2_spngg"]
+[ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="3_inv4a"]
+[ext_resource type="LabelSettings" uid="uid://c3htsyeddmmay" path="res://Setts/Labels/Stats.tres" id="4_wf6aj"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+script = ExtResource("1_y1qsa")
+
+[node name="Slacksus" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 216.0
+offset_bottom = 360.0
+texture = ExtResource("2_spngg")
+expand_mode = 1
+
+[node name="NAME" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 216.0
+offset_bottom = 38.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "SLACKSUS"
+label_settings = ExtResource("3_inv4a")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ATK" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 303.0
+offset_right = 53.0
+offset_bottom = 360.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("4_wf6aj")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HP" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 161.0
+offset_top = 303.0
+offset_right = 216.0
+offset_bottom = 359.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("4_wf6aj")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HERO_JPEG" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = -1.0
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 303.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+expand_mode = 1
+
+[connection signal="tree_exited" from="." to="." method="_on_tree_exited"]

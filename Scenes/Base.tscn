@@ -1,0 +1,83 @@
+[gd_scene load_steps=9 format=3 uid="uid://b1u0py0ci1rgi"]
+
+[ext_resource type="Texture2D" uid="uid://dgxd1byus3b4i" path="res://Assets/Maps/L1.png" id="1_qrtex"]
+[ext_resource type="Script" path="res://Script/Lane_background.gd" id="2_wwcp0"]
+[ext_resource type="Script" path="res://Script/Card_layer.gd" id="3_htty0"]
+[ext_resource type="PackedScene" uid="uid://bpjm166rvmupf" path="res://Scenes/Arena_rect.tscn" id="5_lscxd"]
+[ext_resource type="PackedScene" uid="uid://b1pqox3lfu6m3" path="res://Scenes/Abarena_rect.tscn" id="6_hdrlq"]
+[ext_resource type="Script" path="res://Script/Signal_Hub.gd" id="7_kvow1"]
+[ext_resource type="Script" path="res://Script/Lane_picker.gd" id="8_luqhd"]
+[ext_resource type="PackedScene" uid="uid://bd5cypnf78qdj" path="res://Scenes/Tower1.tscn" id="9_qf3s2"]
+
+[node name="B" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Background_layer" type="Control" parent="."]
+anchors_preset = 0
+
+[node name="Lane_background" type="TextureRect" parent="Background_layer"]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("1_qrtex")
+expand_mode = 1
+script = ExtResource("2_wwcp0")
+
+[node name="Card_layer" type="Control" parent="."]
+anchors_preset = 0
+script = ExtResource("3_htty0")
+
+[node name="SCROLLA" parent="Card_layer" instance=ExtResource("5_lscxd")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 150.0
+offset_top = 455.0
+offset_right = 2150.0
+offset_bottom = 1255.0
+
+[node name="SCROLLB" parent="Card_layer" instance=ExtResource("6_hdrlq")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 150.0
+offset_top = -60.0
+offset_right = 2150.0
+offset_bottom = 665.0
+
+[node name="Tower_layer" type="Control" parent="."]
+anchors_preset = 0
+script = ExtResource("7_kvow1")
+
+[node name="TowerA" parent="Tower_layer" instance=ExtResource("9_qf3s2")]
+unique_name_in_owner = true
+offset_left = 826.0
+offset_top = 827.0
+offset_right = 999.0
+offset_bottom = 950.0
+
+[node name="TowerB" parent="Tower_layer" instance=ExtResource("9_qf3s2")]
+unique_name_in_owner = true
+offset_left = 826.0
+offset_top = 25.0
+offset_right = 999.0
+offset_bottom = 148.0
+
+[node name="Click_to_zoom_here" type="TextureButton" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="Lane_picker" type="TextureButton" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+script = ExtResource("8_luqhd")
+
+[connection signal="pressed" from="Click_to_zoom_here" to="Tower_layer" method="_on_click_to_zoom_here_pressed"]
+[connection signal="mouse_entered" from="Lane_picker" to="Lane_picker" method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Lane_picker" to="Lane_picker" method="_on_mouse_exited"]
+[connection signal="pressed" from="Lane_picker" to="Lane_picker" method="_on_pressed"]

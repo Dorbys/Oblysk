@@ -1,0 +1,82 @@
+[gd_scene load_steps=7 format=3 uid="uid://r785avsyfdxf"]
+
+[ext_resource type="Script" path="res://Script/UI_layer/Player_HP.gd" id="1_l3q7a"]
+[ext_resource type="Texture2D" uid="uid://dbrik7o5nd31y" path="res://Assets/Antag.png" id="2_2p88f"]
+[ext_resource type="LabelSettings" uid="uid://d0suxobd3mvgd" path="res://Setts/Labels/Player_HP.tres" id="3_vgq2f"]
+[ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="4_6wx0a"]
+[ext_resource type="Texture2D" uid="uid://iftr6f2txht8" path="res://Assets/Life in lifeing room.jpg" id="5_6ncok"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_mrgus"]
+font = ExtResource("4_6wx0a")
+font_size = 55
+font_color = Color(1, 0, 0, 1)
+outline_size = 40
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Player_HP" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+scale = Vector2(0.66, 0.66)
+script = ExtResource("1_l3q7a")
+
+[node name="Beta_pfp" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 240.0
+texture = ExtResource("2_2p88f")
+expand_mode = 1
+
+[node name="Beta_player_HP" type="Label" parent="Beta_pfp"]
+layout_mode = 0
+offset_top = 200.0
+offset_right = 240.0
+offset_bottom = 309.0
+text = "20"
+label_settings = ExtResource("3_vgq2f")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Beta_dmg" type="Label" parent="Beta_pfp"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 118.0
+offset_top = 165.0
+offset_right = 300.0
+offset_bottom = 376.0
+text = "2"
+label_settings = SubResource("LabelSettings_mrgus")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Alpha_pfp" type="TextureRect" parent="."]
+layout_mode = 0
+offset_top = 480.0
+offset_right = 240.0
+offset_bottom = 720.0
+texture = ExtResource("5_6ncok")
+expand_mode = 1
+
+[node name="Alpha_player_HP" type="Label" parent="Alpha_pfp"]
+layout_mode = 0
+offset_top = 200.0
+offset_right = 240.0
+offset_bottom = 309.0
+text = "20"
+label_settings = ExtResource("3_vgq2f")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Alpha_dmg" type="Label" parent="Alpha_pfp"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 118.0
+offset_top = 165.0
+offset_right = 300.0
+offset_bottom = 376.0
+text = "2
+"
+label_settings = SubResource("LabelSettings_mrgus")
+horizontal_alignment = 1
+vertical_alignment = 1

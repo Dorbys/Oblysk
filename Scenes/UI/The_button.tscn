@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://bx1fm7gym1b2x"]
+
+[ext_resource type="Texture2D" uid="uid://cegtjh03emal6" path="res://Assets/PREUI/Pass_texture_edge.jpg" id="1_dw0bk"]
+[ext_resource type="Texture2D" uid="uid://0r4y8x7j6row" path="res://Assets/PREUI/PASS_texture_elsewhere.jpg" id="2_t6aig"]
+[ext_resource type="Script" path="res://Script/UI_layer/The_button.gd" id="2_yiu82"]
+[ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="3_fs7r1"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_uuwvb"]
+font = ExtResource("3_fs7r1")
+font_size = 70
+font_color = Color(1, 0.486275, 0, 1)
+
+[node name="THE_BUTTON" type="TextureButton"]
+offset_right = 259.0
+offset_bottom = 168.0
+texture_normal = ExtResource("1_dw0bk")
+texture_disabled = ExtResource("2_t6aig")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("2_yiu82")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_right = 259.0
+offset_bottom = 168.0
+text = "PASS"
+label_settings = SubResource("LabelSettings_uuwvb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]

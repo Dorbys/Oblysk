@@ -1,0 +1,8 @@
+[gd_resource type="Theme" format=3 uid="uid://k8fg2sxs4p6k"]
+
+[resource]
+HScrollBar/styles/grabber = null
+HScrollBar/styles/grabber_highlight = null
+HScrollBar/styles/grabber_pressed = null
+HScrollBar/styles/scroll = null
+HScrollBar/styles/scroll_focus = null

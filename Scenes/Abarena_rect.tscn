@@ -1,0 +1,71 @@
+[gd_scene load_steps=12 format=3 uid="uid://b1pqox3lfu6m3"]
+
+[ext_resource type="Theme" uid="uid://k8fg2sxs4p6k" path="res://Themes/Empty H scrollbar.tres" id="1_iqqg2"]
+[ext_resource type="Script" path="res://Script/SCROLLB/SCROLLB.gd" id="2_7nj7x"]
+[ext_resource type="Script" path="res://Script/SCROLLA/Arena.gd" id="3_d46hy"]
+[ext_resource type="Script" path="res://Script/SCROLLA/ArenaRect.gd" id="4_elkfd"]
+[ext_resource type="PackedScene" uid="uid://bayidy5c8jqm4" path="res://Scenes/UNIT/Unit1.tscn" id="5_4ifcu"]
+[ext_resource type="PackedScene" uid="uid://c4np20856wsq8" path="res://Scenes/Building/BuildingMain.tscn" id="5_rpdgj"]
+[ext_resource type="PackedScene" uid="uid://fa87ub5cj205" path="res://Scenes/Empty_shadow.tscn" id="6_a8g5i"]
+[ext_resource type="PackedScene" uid="uid://dmaqk1n41c6o5" path="res://Scenes/EFFECTS/SEffect.tscn" id="7_6hfbd"]
+[ext_resource type="PackedScene" uid="uid://b8getkkagqaqq" path="res://Scenes/Empty_VOID.tscn" id="8_0bm4r"]
+[ext_resource type="PackedScene" uid="uid://d3jknhi2o25m5" path="res://Scenes/EFFECTS/IEffect.tscn" id="8_iv4nc"]
+[ext_resource type="Script" path="res://Script/SCROLLA/ArenaRoof.gd" id="9_3ggqj"]
+
+[node name="SCROLLB" type="ScrollContainer"]
+offset_left = 100.0
+offset_top = -50.0
+offset_right = 2000.0
+offset_bottom = 675.0
+scale = Vector2(0.8, 0.8)
+mouse_filter = 2
+theme = ExtResource("1_iqqg2")
+follow_focus = true
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 0
+scroll_deadzone = 10
+script = ExtResource("2_7nj7x")
+
+[node name="Abarena" type="BoxContainer" parent="."]
+self_modulate = Color(1, 1, 1, 0)
+clip_children = 1
+custom_minimum_size = Vector2(1150, 615)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+script = ExtResource("3_d46hy")
+
+[node name="SIZECHECK" type="PanelContainer" parent="Abarena"]
+self_modulate = Color(1, 0, 0.901961, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="ArenaRoof" type="ColorRect" parent="Abarena/SIZECHECK"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.654902, 0.443137, 1, 0)
+script = ExtResource("9_3ggqj")
+BUILDING_SCENE = ExtResource("5_rpdgj")
+
+[node name="ArenaMid" type="ColorRect" parent="Abarena/SIZECHECK"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(1, 0.670588, 0.521569, 0)
+
+[node name="ArenaRect" type="ColorRect" parent="Abarena/SIZECHECK"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.227451, 0.227451, 0)
+script = ExtResource("4_elkfd")
+CARD = ExtResource("5_4ifcu")
+SHADOW = ExtResource("6_a8g5i")
+EFFECT = ExtResource("7_6hfbd")
+IEFFECT = ExtResource("8_iv4nc")
+VOID = ExtResource("8_0bm4r")
+
+[connection signal="mouse_entered" from="Abarena/SIZECHECK/ArenaRoof" to="Abarena/SIZECHECK/ArenaRect" method="_on_arena_roof_mouse_entered"]
+[connection signal="mouse_exited" from="Abarena/SIZECHECK/ArenaRoof" to="Abarena/SIZECHECK/ArenaRect" method="_on_arena_roof_mouse_exited"]
+[connection signal="child_entered_tree" from="Abarena/SIZECHECK/ArenaRect" to="Abarena" method="_on_arena_rect_child_entered_tree"]
+[connection signal="child_exiting_tree" from="Abarena/SIZECHECK/ArenaRect" to="Abarena" method="_on_arena_rect_child_exiting_tree"]

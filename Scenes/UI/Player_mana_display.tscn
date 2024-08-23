@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3 uid="uid://bhaer715oasq3"]
+
+[ext_resource type="Texture2D" uid="uid://hesws5dpv16t" path="res://Assets/PREUI/PlayerMana.png" id="1_ccyf7"]
+[ext_resource type="Script" path="res://Script/UI_layer/Player_mana_display.gd" id="1_nmo1j"]
+[ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="2_khkhs"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_e1rxr"]
+font = ExtResource("2_khkhs")
+font_size = 62
+outline_color = Color(0, 0, 1, 1)
+
+[node name="Player_mana_display" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+scale = Vector2(0.79, 0.79)
+script = ExtResource("1_nmo1j")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 150.0
+offset_bottom = 150.0
+texture = ExtResource("1_ccyf7")
+expand_mode = 1
+
+[node name="PLAYER_MANA" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 17.0
+offset_right = 133.0
+offset_bottom = 136.0
+text = "11"
+label_settings = SubResource("LabelSettings_e1rxr")
+horizontal_alignment = 1
+vertical_alignment = 1

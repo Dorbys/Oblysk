@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://blvlp7vt2ydtm"]
+
+[ext_resource type="Theme" uid="uid://bp3y766ps6k06" path="res://Themes/Tooltip_container.tres" id="1_1x336"]
+[ext_resource type="Script" path="res://Script/UI_layer/Tooltip_itself.gd" id="1_jo2fr"]
+
+[node name="Tooltip_container" type="PanelContainer"]
+offset_right = 400.0
+offset_bottom = 60.0
+mouse_filter = 2
+script = ExtResource("1_jo2fr")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Text_node" type="RichTextLabel" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme = ExtResource("1_1x336")
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false

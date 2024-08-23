@@ -1,0 +1,67 @@
+[gd_scene load_steps=11 format=3 uid="uid://bpjm166rvmupf"]
+
+[ext_resource type="Theme" uid="uid://k8fg2sxs4p6k" path="res://Themes/Empty H scrollbar.tres" id="1_rwa2n"]
+[ext_resource type="PackedScene" uid="uid://fa87ub5cj205" path="res://Scenes/Empty_shadow.tscn" id="2_ks0je"]
+[ext_resource type="PackedScene" uid="uid://bayidy5c8jqm4" path="res://Scenes/Unit1.tscn" id="2_onkbn"]
+[ext_resource type="Script" path="res://Script/SCROLLA/SCROLLA.gd" id="2_p58ki"]
+[ext_resource type="Script" path="res://Script/SCROLLA/Arena.gd" id="3_6kukc"]
+[ext_resource type="Script" path="res://Script/SCROLLA/ArenaRect.gd" id="4_sj4ya"]
+[ext_resource type="PackedScene" uid="uid://dmaqk1n41c6o5" path="res://Scenes/SEffect.tscn" id="7_34qi1"]
+[ext_resource type="PackedScene" uid="uid://d3jknhi2o25m5" path="res://Scenes/IEffect.tscn" id="8_irk6b"]
+[ext_resource type="Script" path="res://Script/SCROLLA/ArenaRoof.gd" id="8_kdq13"]
+[ext_resource type="PackedScene" uid="uid://b8getkkagqaqq" path="res://Scenes/Empty_VOID.tscn" id="8_ste1a"]
+
+[node name="SCROLLA" type="ScrollContainer"]
+offset_right = 1920.0
+offset_bottom = 360.0
+mouse_filter = 2
+theme = ExtResource("1_rwa2n")
+follow_focus = true
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 0
+scroll_deadzone = 10
+script = ExtResource("2_p58ki")
+
+[node name="Arena" type="BoxContainer" parent="."]
+self_modulate = Color(1, 1, 1, 0)
+clip_children = 1
+clip_contents = true
+custom_minimum_size = Vector2(1150, 360)
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("3_6kukc")
+
+[node name="SIZECHECK" type="PanelContainer" parent="Arena"]
+self_modulate = Color(0.376471, 1, 0.901961, 0.278431)
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="ArenaRect" type="ColorRect" parent="Arena/SIZECHECK"]
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0, 0.227451, 0.227451, 0)
+script = ExtResource("4_sj4ya")
+CARD = ExtResource("2_onkbn")
+SHADOW = ExtResource("2_ks0je")
+EFFECT = ExtResource("7_34qi1")
+IEFFECT = ExtResource("8_irk6b")
+VOID = ExtResource("8_ste1a")
+
+[node name="ArenaMid" type="ColorRect" parent="Arena/SIZECHECK"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(1, 0.670588, 0.521569, 0)
+
+[node name="ArenaRoof" type="ColorRect" parent="Arena/SIZECHECK"]
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.654902, 0.443137, 1, 0)
+script = ExtResource("8_kdq13")
+
+[connection signal="child_entered_tree" from="Arena/SIZECHECK/ArenaRect" to="Arena" method="_on_arena_rect_child_entered_tree"]
+[connection signal="child_exiting_tree" from="Arena/SIZECHECK/ArenaRect" to="Arena" method="_on_arena_rect_child_exiting_tree"]
+[connection signal="mouse_entered" from="Arena/SIZECHECK/ArenaRoof" to="Arena/SIZECHECK/ArenaRect" method="_on_arena_roof_mouse_entered"]
+[connection signal="mouse_exited" from="Arena/SIZECHECK/ArenaRoof" to="Arena/SIZECHECK/ArenaRect" method="_on_arena_roof_mouse_exited"]

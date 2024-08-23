@@ -1,0 +1,82 @@
+[gd_scene load_steps=9 format=3 uid="uid://dseoec0oq6vju"]
+
+[ext_resource type="Script" path="res://Script/Weapon1.gd" id="1_bhjtx"]
+[ext_resource type="PackedScene" uid="uid://b3qfc6jckj4pu" path="res://Scenes/WeaponPreview.tscn" id="2_e62he"]
+[ext_resource type="PackedScene" uid="uid://1f232kkcqccc" path="res://Scenes/WeaponCardInHandPreview.tscn" id="3_4qde0"]
+[ext_resource type="Texture2D" uid="uid://byp5tyg4fcg1r" path="res://Assets/SPELL.png" id="3_kuunk"]
+[ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="4_bop8o"]
+[ext_resource type="LabelSettings" uid="uid://cacnbuvsrroxp" path="res://Setts/Labels/SpellCost.tres" id="6_cekdc"]
+[ext_resource type="Texture2D" uid="uid://lvow2ua22ts4" path="res://Assets/Items/Weapons/OBLYSK.png" id="6_vs17g"]
+[ext_resource type="LabelSettings" uid="uid://bl6gn28cpr4ki" path="res://Setts/Labels/CardDescription.tres" id="6_ymfu5"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_bhjtx")
+Scene = ExtResource("2_e62he")
+PreviewScene = ExtResource("3_4qde0")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+texture = ExtResource("3_kuunk")
+expand_mode = 1
+
+[node name="NAME" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 216.0
+offset_bottom = 38.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "Oblysk"
+label_settings = ExtResource("4_bop8o")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="STATS" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 216.0
+offset_right = 216.0
+offset_bottom = 327.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "Wielder yee"
+label_settings = ExtResource("6_ymfu5")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="COST" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 172.0
+offset_top = 321.0
+offset_right = 212.0
+offset_bottom = 360.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("6_cekdc")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WEAPON_JPEG" type="TextureRect" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 216.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+mouse_filter = 2
+texture = ExtResource("6_vs17g")
+expand_mode = 1
+
+[connection signal="mouse_entered" from="TextureRect" to="." method="_on_texture_rect_mouse_entered"]
+[connection signal="mouse_exited" from="TextureRect" to="." method="_on_texture_rect_mouse_exited"]

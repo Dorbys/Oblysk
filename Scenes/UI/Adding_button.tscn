@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://bpbmblkyxomck"]
+
+[ext_resource type="Texture2D" uid="uid://qstkfe47nvhw" path="res://Assets/PREUI/tldr.jpg" id="1_ba0tq"]
+[ext_resource type="Script" path="res://Script/ADD_Unit.gd" id="2_xv4qh"]
+
+[node name="TextureButton" type="TextureButton"]
+offset_right = 200.0
+offset_bottom = 200.0
+size_flags_horizontal = 6
+size_flags_vertical = 6
+texture_normal = ExtResource("1_ba0tq")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("2_xv4qh")
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]

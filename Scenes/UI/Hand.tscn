@@ -1,0 +1,55 @@
+[gd_scene load_steps=9 format=3 uid="uid://bj3bixoxwqodu"]
+
+[ext_resource type="Script" path="res://Script/SCROLLH/SCROLLH.gd" id="1_5wwpp"]
+[ext_resource type="Script" path="res://Script/SCROLLH/HANDA.gd" id="2_l65n7"]
+[ext_resource type="Script" path="res://Script/SCROLLH/Hand.gd" id="3_2ocrk"]
+[ext_resource type="PackedScene" uid="uid://cauryrpdbrtky" path="res://Scenes/UNIT/UnitCIH.tscn" id="4_yxy3t"]
+[ext_resource type="PackedScene" uid="uid://bab3q2vggpesl" path="res://Scenes/Spell/Spell1.tscn" id="5_i3k8w"]
+[ext_resource type="PackedScene" uid="uid://dseoec0oq6vju" path="res://Scenes/Weapon1.tscn" id="6_hreuf"]
+[ext_resource type="PackedScene" uid="uid://bf2q3e12e0l6w" path="res://Scenes/Building/Building1.tscn" id="7_1thut"]
+[ext_resource type="PackedScene" uid="uid://7eoa2041ee0t" path="res://Scenes/LVLUPS/Lvlup_spells/Lvlup_spell.tscn" id="8_7mg4y"]
+
+[node name="SCROLLH" type="ScrollContainer"]
+offset_left = 343.0
+offset_top = 69.0
+offset_right = 1543.0
+offset_bottom = 789.0
+size_flags_vertical = 8
+mouse_filter = 2
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 0
+script = ExtResource("1_5wwpp")
+
+[node name="HANDA" type="BoxContainer" parent="."]
+self_modulate = Color(1, 1, 1, 0)
+clip_children = 1
+custom_minimum_size = Vector2(1150, 360)
+layout_direction = 1
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 10
+mouse_filter = 2
+script = ExtResource("2_l65n7")
+
+[node name="SIZECHECK" type="PanelContainer" parent="HANDA"]
+self_modulate = Color(0.376471, 1, 0.901961, 0)
+layout_direction = 1
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="HandRect" type="ColorRect" parent="HANDA/SIZECHECK"]
+unique_name_in_owner = true
+layout_direction = 1
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.627451, 1, 0.627451, 0)
+script = ExtResource("3_2ocrk")
+Unit_scene = ExtResource("4_yxy3t")
+Spell_scene = ExtResource("5_i3k8w")
+Item_scene = ExtResource("6_hreuf")
+Building_scene = ExtResource("7_1thut")
+LVLUP_spell_scene = ExtResource("8_7mg4y")
+
+[connection signal="child_entered_tree" from="HANDA/SIZECHECK/HandRect" to="HANDA" method="_on_hand_rect_child_entered_tree"]
+[connection signal="child_exiting_tree" from="HANDA/SIZECHECK/HandRect" to="HANDA" method="_on_hand_rect_child_exiting_tree"]

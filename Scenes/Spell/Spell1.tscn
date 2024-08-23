@@ -1,0 +1,93 @@
+[gd_scene load_steps=10 format=3 uid="uid://bab3q2vggpesl"]
+
+[ext_resource type="Script" path="res://Script/SPELLS/Spell1.gd" id="1_g8v5x"]
+[ext_resource type="PackedScene" uid="uid://cd4pcuuc64j7o" path="res://Scenes/Spell/Spell1Preview.tscn" id="2_0as2w"]
+[ext_resource type="PackedScene" uid="uid://ji0ds5rcwesv" path="res://Scenes/Spell/Spell1CardInHandPreview.tscn" id="3_s2l26"]
+[ext_resource type="Texture2D" uid="uid://byp5tyg4fcg1r" path="res://Assets/SPELL.png" id="4_crosh"]
+[ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="5_pg7gb"]
+[ext_resource type="LabelSettings" uid="uid://cacnbuvsrroxp" path="res://Setts/Labels/SpellCost.tres" id="6_e2ln4"]
+[ext_resource type="Texture2D" uid="uid://cilnphaq26mvp" path="res://Assets/CardsPNGS/Spells/Dorbystrike.jpg" id="7_7od4g"]
+[ext_resource type="LabelSettings" uid="uid://ctfo46o3ttwir" path="res://Setts/Labels/SpellXP.tres" id="8_orlg7"]
+[ext_resource type="LabelSettings" uid="uid://bl6gn28cpr4ki" path="res://Setts/Labels/CardDescription.tres" id="9_4biyk"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_g8v5x")
+Scene = ExtResource("2_0as2w")
+PreviewScene = ExtResource("3_s2l26")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+texture = ExtResource("4_crosh")
+expand_mode = 1
+
+[node name="NAME" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 216.0
+offset_bottom = 38.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "17:00"
+label_settings = ExtResource("5_pg7gb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="COST" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 39.0
+offset_bottom = 39.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("6_e2ln4")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SPELL_JPEG" type="TextureRect" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 216.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+mouse_filter = 2
+texture = ExtResource("7_7od4g")
+expand_mode = 1
+
+[node name="XP" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -2.0
+offset_top = 35.0
+offset_right = 38.0
+offset_bottom = 74.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("8_orlg7")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Card_description" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 216.0
+offset_right = 216.0
+offset_bottom = 360.0
+text = "Deal 8 damage to a unit"
+label_settings = ExtResource("9_4biyk")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[connection signal="mouse_entered" from="TextureRect" to="." method="_on_texture_rect_mouse_entered"]
+[connection signal="mouse_exited" from="TextureRect" to="." method="_on_texture_rect_mouse_exited"]

@@ -1,0 +1,131 @@
+[gd_scene load_steps=11 format=3 uid="uid://cauryrpdbrtky"]
+
+[ext_resource type="Script" path="res://Script/UNIT/UnCIHERR.gd" id="1_ju3x6"]
+[ext_resource type="Script" path="res://Script/UNIT/UnitCIH.gd" id="2_27idv"]
+[ext_resource type="PackedScene" uid="uid://ev4s6r8o0qsf" path="res://Scenes/UNIT/UnitPreview.tscn" id="3_uju4r"]
+[ext_resource type="PackedScene" uid="uid://dlw1m0ncyr2sg" path="res://Scenes/UNIT/UnitCihPreview.tscn" id="4_b3voe"]
+[ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="4_bp3rg"]
+[ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="5_dnkr0"]
+[ext_resource type="LabelSettings" uid="uid://c3htsyeddmmay" path="res://Setts/Labels/Stats.tres" id="6_21o0c"]
+[ext_resource type="LabelSettings" uid="uid://c6k6apdugj728" path="res://Setts/Labels/StatsPreview.tres" id="6_e02ao"]
+[ext_resource type="Texture2D" uid="uid://da11g0qs7vep1" path="res://icon.svg" id="8_nwo76"]
+[ext_resource type="Texture2D" uid="uid://cebjpxdc1cwq7" path="res://Assets/CardsPNGS/CardUI/Ability_frame.png" id="9_epv66"]
+
+[node name="Controlor" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_ju3x6")
+
+[node name="Control" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+anchors_preset = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2_27idv")
+Scene = ExtResource("3_uju4r")
+PreviewScene = ExtResource("4_b3voe")
+
+[node name="Slacksus" type="TextureRect" parent="Control"]
+layout_mode = 0
+offset_right = 216.0
+offset_bottom = 360.0
+mouse_filter = 2
+texture = ExtResource("4_bp3rg")
+expand_mode = 1
+
+[node name="NAME" type="Label" parent="Control/Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 216.0
+offset_bottom = 38.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "SLACKSUS"
+label_settings = ExtResource("5_dnkr0")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ATK" type="Label" parent="Control/Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 303.0
+offset_right = 53.0
+offset_bottom = 360.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("6_e02ao")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AR" type="Label" parent="Control/Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 81.0
+offset_top = 302.0
+offset_right = 134.0
+offset_bottom = 359.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("6_21o0c")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HP" type="Label" parent="Control/Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 161.0
+offset_top = 303.0
+offset_right = 216.0
+offset_bottom = 359.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("6_e02ao")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HERO_JPEG" type="TextureRect" parent="Control/Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = -1.0
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 303.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+mouse_filter = 2
+expand_mode = 1
+
+[node name="Ability1" type="TextureRect" parent="Control/Slacksus"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 5.0
+offset_top = 235.0
+offset_right = 67.0
+offset_bottom = 297.0
+mouse_filter = 2
+texture = ExtResource("8_nwo76")
+expand_mode = 1
+
+[node name="TextureRect" type="TextureRect" parent="Control/Slacksus/Ability1"]
+show_behind_parent = true
+layout_mode = 0
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 67.0
+offset_bottom = 67.0
+mouse_filter = 2
+texture = ExtResource("9_epv66")
+expand_mode = 1
+
+[connection signal="mouse_entered" from="Control" to="Control" method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Control" to="Control" method="_on_mouse_exited"]

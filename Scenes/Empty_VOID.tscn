@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8getkkagqaqq"]
+
+[ext_resource type="Script" path="res://Script/Empty_VOID.gd" id="1_tx5ob"]
+
+[node name="Control" type="Control"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_tx5ob")
+
+[node name="EMPTY_VOID" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+mouse_filter = 2
+color = Color(0, 0, 0, 0.607843)

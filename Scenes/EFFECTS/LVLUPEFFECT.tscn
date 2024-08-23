@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8hsptennfo6k"]
+
+[ext_resource type="Texture2D" uid="uid://kfymxxsg8nw3" path="res://Assets/Effects/LVLUPEFFECT.png" id="1_jwc2q"]
+
+[node name="ControlOfEffect" type="Control"]
+z_index = 3
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Effect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+mouse_filter = 2
+texture = ExtResource("1_jwc2q")
+expand_mode = 1

@@ -1,0 +1,147 @@
+[gd_scene load_steps=10 format=3 uid="uid://biouc223p35ra"]
+
+[ext_resource type="Texture2D" uid="uid://dikj7ujrhrsrv" path="res://Assets/PREUI/Victory_screen_texture.jpg" id="1_a5wb1"]
+[ext_resource type="Script" path="res://Script/UI_layer/Game_over.gd" id="1_qmgp1"]
+[ext_resource type="LabelSettings" uid="uid://bqrwlmos42tsw" path="res://Setts/Labels/GAMEOVER_WIN_BIG.tres" id="3_s5dcw"]
+[ext_resource type="LabelSettings" uid="uid://82ia0gjoygmy" path="res://Setts/Labels/GAMEOVER_WIN_SMALL.tres" id="4_r8jiw"]
+[ext_resource type="LabelSettings" uid="uid://c6magtbsbs2wv" path="res://Setts/Labels/GAMEOVER_LOSE_SMALL.tres" id="5_08kwg"]
+[ext_resource type="LabelSettings" uid="uid://b5d6c2pjww613" path="res://Setts/Labels/GAMEOVER_WIN_TINY.tres" id="6_46d5j"]
+[ext_resource type="LabelSettings" uid="uid://dmagp224lai2r" path="res://Setts/Labels/GAMEOVER_LOSE_BIG.tres" id="7_fi2nm"]
+[ext_resource type="LabelSettings" uid="uid://e78qqgl0naw5" path="res://Setts/Labels/GAMEOVER_LOSE_TINY.tres" id="8_wgfwi"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_61hi8"]
+font_size = 21
+
+[node name="Game_over" type="Control"]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qmgp1")
+
+[node name="Texture" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("1_a5wb1")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_right = 90.0
+offset_bottom = 43.0
+text = "hit Esc"
+label_settings = SubResource("LabelSettings_61hi8")
+
+[node name="YOU_WIN" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+
+[node name="WYOU" type="Label" parent="YOU_WIN"]
+layout_mode = 0
+offset_left = 490.0
+offset_top = 162.0
+offset_right = 1549.0
+offset_bottom = 493.0
+rotation = 0.523599
+text = "YOU"
+label_settings = ExtResource("3_s5dcw")
+
+[node name="WWIN" type="Label" parent="YOU_WIN"]
+layout_mode = 0
+offset_left = 1114.0
+offset_top = 515.0
+offset_right = 2173.0
+offset_bottom = 846.0
+rotation = 0.523599
+text = "WIN"
+label_settings = ExtResource("3_s5dcw")
+
+[node name="Wyou" type="Label" parent="YOU_WIN"]
+layout_mode = 0
+offset_left = 1176.0
+offset_top = 23.0
+offset_right = 1739.0
+offset_bottom = 262.0
+rotation = 0.261799
+text = "YOU"
+label_settings = ExtResource("4_r8jiw")
+
+[node name="Wbob" type="Label" parent="YOU_WIN"]
+layout_mode = 0
+offset_left = 432.0
+offset_top = 906.0
+offset_right = 1437.0
+offset_bottom = 1216.0
+rotation = -0.410152
+text = "BOB"
+label_settings = ExtResource("5_08kwg")
+
+[node name="Wez" type="Label" parent="YOU_WIN"]
+layout_mode = 0
+offset_left = 1834.0
+offset_top = 1011.0
+offset_right = 2893.0
+offset_bottom = 1342.0
+text = "(ez)"
+label_settings = ExtResource("6_46d5j")
+
+[node name="YOU_LOSE" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+offset_left = 196.0
+offset_top = -75.0
+offset_right = 196.0
+offset_bottom = -75.0
+
+[node name="Lbob" type="Label" parent="YOU_LOSE"]
+layout_mode = 0
+offset_left = 980.0
+offset_top = 77.0
+offset_right = 2039.0
+offset_bottom = 408.0
+rotation = 0.261799
+text = "BOB"
+label_settings = ExtResource("5_08kwg")
+
+[node name="LYOU" type="Label" parent="YOU_LOSE"]
+layout_mode = 0
+offset_left = 256.0
+offset_top = 259.0
+offset_right = 1315.0
+offset_bottom = 590.0
+rotation = 0.523599
+text = "YOU"
+label_settings = ExtResource("7_fi2nm")
+
+[node name="LLOSE" type="Label" parent="YOU_LOSE"]
+layout_mode = 0
+offset_left = 897.0
+offset_top = 625.0
+offset_right = 1956.0
+offset_bottom = 956.0
+rotation = 0.523599
+text = "LOSE"
+label_settings = ExtResource("7_fi2nm")
+
+[node name="Lyou" type="Label" parent="YOU_LOSE"]
+layout_mode = 0
+offset_left = 218.0
+offset_top = 980.0
+offset_right = 1277.0
+offset_bottom = 1311.0
+rotation = -0.410152
+text = "YOU"
+label_settings = ExtResource("4_r8jiw")
+
+[node name="Llol" type="Label" parent="YOU_LOSE"]
+layout_mode = 0
+offset_left = 1641.0
+offset_top = 1089.0
+offset_right = 2700.0
+offset_bottom = 1420.0
+text = "(lol)"
+label_settings = ExtResource("8_wgfwi")

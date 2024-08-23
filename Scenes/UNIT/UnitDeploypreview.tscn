@@ -1,0 +1,147 @@
+[gd_scene load_steps=10 format=3 uid="uid://clrltqfiak7yu"]
+
+[ext_resource type="Script" path="res://Script/UNITS/UnitDeployPreview.gd" id="1_65qft"]
+[ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="2_uk4d5"]
+[ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="3_6evxk"]
+[ext_resource type="LabelSettings" uid="uid://c6k6apdugj728" path="res://Setts/Labels/StatsPreview.tres" id="4_m07hc"]
+[ext_resource type="LabelSettings" uid="uid://c0vgp6y2n46xr" path="res://Setts/Labels/StatsARMOR.tres" id="5_3cw6v"]
+[ext_resource type="Texture2D" uid="uid://da11g0qs7vep1" path="res://icon.svg" id="6_014ng"]
+[ext_resource type="Texture2D" uid="uid://cebjpxdc1cwq7" path="res://Assets/CardsPNGS/CardUI/Ability_frame.png" id="7_0viy0"]
+[ext_resource type="LabelSettings" uid="uid://cacnbuvsrroxp" path="res://Setts/Labels/SpellCost.tres" id="8_tbmr6"]
+[ext_resource type="LabelSettings" uid="uid://ctfo46o3ttwir" path="res://Setts/Labels/SpellXP.tres" id="9_ttwwj"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+script = ExtResource("1_65qft")
+
+[node name="Slacksus" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+mouse_filter = 2
+texture = ExtResource("2_uk4d5")
+expand_mode = 1
+
+[node name="NAME" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 216.0
+offset_bottom = 38.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "SLACKSUS"
+label_settings = ExtResource("3_6evxk")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ATK" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 303.0
+offset_right = 53.0
+offset_bottom = 360.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("4_m07hc")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AR" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+offset_left = 81.0
+offset_top = 302.0
+offset_right = 134.0
+offset_bottom = 359.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("5_3cw6v")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HP" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 161.0
+offset_top = 303.0
+offset_right = 216.0
+offset_bottom = 359.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("4_m07hc")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HERO_JPEG" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = -1.0
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 303.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+mouse_filter = 2
+expand_mode = 1
+
+[node name="Ability1" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 5.0
+offset_top = 235.0
+offset_right = 67.0
+offset_bottom = 297.0
+mouse_filter = 2
+texture = ExtResource("6_014ng")
+expand_mode = 1
+
+[node name="TextureRect" type="TextureRect" parent="Slacksus/Ability1"]
+show_behind_parent = true
+layout_mode = 0
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 67.0
+offset_bottom = 67.0
+mouse_filter = 2
+texture = ExtResource("7_0viy0")
+expand_mode = 1
+
+[node name="COST" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 47.0
+offset_bottom = 39.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("8_tbmr6")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="XP" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -110.0
+offset_top = 35.0
+offset_right = -70.0
+offset_bottom = 74.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("9_ttwwj")
+horizontal_alignment = 1
+vertical_alignment = 1

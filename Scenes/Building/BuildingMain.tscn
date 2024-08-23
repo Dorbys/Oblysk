@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://c4np20856wsq8"]
+
+[ext_resource type="Script" path="res://Script/Building/BuildingMain.gd" id="1_uab3g"]
+[ext_resource type="Script" path="res://Script/UI_layer/Tooltip.gd" id="2_x30bw"]
+[ext_resource type="PackedScene" uid="uid://blvlp7vt2ydtm" path="res://Scenes/UI/Tooltip_container.tscn" id="3_l7hbw"]
+
+[node name="TextureRect" type="TextureRect"]
+offset_right = 100.0
+offset_bottom = 100.0
+mouse_filter = 2
+expand_mode = 1
+script = ExtResource("1_uab3g")
+
+[node name="Affection" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+
+[node name="Tooltipper" type="Control" parent="." node_paths=PackedStringArray("owner_node")]
+anchors_preset = 0
+offset_right = 100.0
+offset_bottom = 100.0
+mouse_filter = 1
+script = ExtResource("2_x30bw")
+visuals_res = ExtResource("3_l7hbw")
+owner_node = NodePath(".")
+follow_mouse = false

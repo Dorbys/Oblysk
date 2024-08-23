@@ -1,0 +1,79 @@
+[gd_scene load_steps=7 format=3 uid="uid://b3qfc6jckj4pu"]
+
+[ext_resource type="Script" path="res://Script/WeaponPreview.gd" id="1_40tf4"]
+[ext_resource type="Texture2D" uid="uid://byp5tyg4fcg1r" path="res://Assets/SPELL.png" id="2_581n3"]
+[ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="3_vbcb2"]
+[ext_resource type="LabelSettings" uid="uid://cacnbuvsrroxp" path="res://Setts/Labels/SpellCost.tres" id="4_ctv0e"]
+[ext_resource type="Texture2D" uid="uid://lvow2ua22ts4" path="res://Assets/Items/Weapons/OBLYSK.png" id="5_h40q4"]
+[ext_resource type="LabelSettings" uid="uid://bl6gn28cpr4ki" path="res://Setts/Labels/CardDescription.tres" id="6_0q7ow"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_top = 70.0
+offset_bottom = 70.0
+script = ExtResource("1_40tf4")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_top = -70.0
+offset_right = 108.0
+offset_bottom = 290.0
+texture = ExtResource("2_581n3")
+expand_mode = 1
+
+[node name="NAME" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 216.0
+offset_bottom = 38.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "Oblysk"
+label_settings = ExtResource("3_vbcb2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="COST" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 176.0
+offset_top = 320.0
+offset_right = 216.0
+offset_bottom = 359.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("4_ctv0e")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WEAPON_JPEG" type="TextureRect" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 216.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+texture = ExtResource("5_h40q4")
+expand_mode = 1
+
+[node name="STATS" type="Label" parent="TextureRect"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 216.0
+offset_right = 216.0
+offset_bottom = 327.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "Wielder yo"
+label_settings = ExtResource("6_0q7ow")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[connection signal="tree_exited" from="." to="." method="_on_tree_exited"]

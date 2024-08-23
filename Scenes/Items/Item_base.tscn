@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://bxkp85bmvv2x4"]
+
+[ext_resource type="Script" path="res://Script/ITEMS/Item_base_storage.gd" id="1_p8h0e"]
+[ext_resource type="PackedScene" uid="uid://1qxt0o7ufabr" path="res://Scenes/UI/Covering.tscn" id="3_50s8y"]
+
+[node name="Item_base" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Storage" type="Control" parent="."]
+anchors_preset = 0
+script = ExtResource("1_p8h0e")
+COVERING = ExtResource("3_50s8y")

@@ -1,0 +1,107 @@
+[gd_scene load_steps=10 format=3 uid="uid://bd5cypnf78qdj"]
+
+[ext_resource type="Script" path="res://Script/TOWER_HP_DISPLAY.gd" id="2_k0ois"]
+[ext_resource type="Texture2D" uid="uid://u6qf2spmmadb" path="res://Assets/Boardstuff/Towerr - kopie.jpg" id="2_pbq7b"]
+[ext_resource type="LabelSettings" uid="uid://5a0inadmx84s" path="res://Setts/Labels/TowerHP.tres" id="2_tff1w"]
+[ext_resource type="LabelSettings" uid="uid://h0cv0gkneiti" path="res://Setts/Labels/TowerMana.tres" id="4_i2uh8"]
+[ext_resource type="Script" path="res://Script/Max_mana.gd" id="5_bh4el"]
+[ext_resource type="Script" path="res://Script/Current_mana.gd" id="6_m1brs"]
+[ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="7_iy82y"]
+[ext_resource type="Script" path="res://Script/Building/BuildingsOnTower.gd" id="8_cbyqh"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_njhnx"]
+font = ExtResource("7_iy82y")
+font_size = 32
+font_color = Color(0, 0, 0, 1)
+outline_size = 7
+outline_color = Color(0.847059, 0, 0, 1)
+
+[node name="C_Tower" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 174.0
+offset_bottom = 120.0
+script = ExtResource("2_k0ois")
+
+[node name="Tower_png" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.028
+anchor_right = 0.028
+offset_left = 48.9
+offset_right = 168.9
+offset_bottom = 120.0
+size_flags_horizontal = 6
+size_flags_vertical = 6
+texture = ExtResource("2_pbq7b")
+expand_mode = 1
+
+[node name="TOWER_HP" type="Label" parent="Tower_png"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = 15.0
+offset_right = 60.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "16/16"
+label_settings = ExtResource("2_tff1w")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Mana_display" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+offset_left = -0.228001
+offset_right = 53.772
+offset_bottom = 120.0
+color = Color(0, 0, 1, 0.360784)
+
+[node name="Current_mana" type="Label" parent="Mana_display"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 54.0
+offset_bottom = 60.0
+text = "12"
+label_settings = ExtResource("4_i2uh8")
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("6_m1brs")
+
+[node name="Max_mana" type="Label" parent="Mana_display"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 60.0
+offset_right = 54.0
+offset_bottom = 120.0
+text = "10"
+label_settings = ExtResource("4_i2uh8")
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("5_bh4el")
+
+[node name="DMG_TBT" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 152.5
+offset_top = 9.99999
+offset_right = 245.5
+offset_bottom = 107.0
+text = "26"
+label_settings = SubResource("LabelSettings_njhnx")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Buildings" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 180.0
+offset_right = 180.0
+script = ExtResource("8_cbyqh")
+
+[connection signal="child_exiting_tree" from="Buildings" to="Buildings" method="_on_child_exiting_tree"]
