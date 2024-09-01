@@ -36,8 +36,8 @@ func drawing():
 		add_child(created_card)
 		
 	else:
-		print("sus card in deck")
-		print(Base.PlayerDeck[CardsDrawn% len(Base.PlayerDeck)][0])
+		push_error("sus card in deck")
+		push_error(Base.PlayerDeck[CardsDrawn% len(Base.PlayerDeck)][0])
 		
 	#this could be done by match
 	
@@ -111,11 +111,11 @@ func create_building(ID):
 
 func draw_a_lvlup_card(ID, LVLUP_type):
 	if LVLUP_type == 10:
-		print("make lvlup units bruh")
+		push_error("make lvlup units bruh")
 	elif LVLUP_type == 11:
 		var card =	create_lvlup_spell(ID)
 		add_child(card)
-	else: print("uknown card_type attempted to be drawn through lvlup")
+	else: push_error("uknown card_type attempted to be drawn through lvlup")
 	collide_cards()
 		
 		
@@ -195,7 +195,7 @@ func collide_cards():
 			0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 			
 	else:
-		print("number of cards in hand is neither odd nor even")
+		push_error("number of cards in hand is neither odd nor even")
 
 
 

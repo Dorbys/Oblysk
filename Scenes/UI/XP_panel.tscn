@@ -1,15 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://3hwcj8w7v8io"]
+[gd_scene load_steps=7 format=3 uid="uid://3hwcj8w7v8io"]
 
 [ext_resource type="Script" path="res://Script/UI_layer/XP_panel.gd" id="1_b685o"]
 [ext_resource type="LabelSettings" uid="uid://diptopk45kn1x" path="res://Setts/Labels/XP_Panel_XP.tres" id="2_6o23c"]
 [ext_resource type="PackedScene" uid="uid://dyxi37xxloi5e" path="res://Scenes/UI/Covering_LVLUP.tscn" id="2_rrefg"]
 [ext_resource type="Texture2D" uid="uid://bwrv2au3kpysq" path="res://Assets/PREUI/Hover_XP_Heroes.jpg" id="3_jrw3h"]
-[ext_resource type="Texture2D" uid="uid://dw5mh205dasfq" path="res://Assets/CardsSMALLS/Kimmedi_small.png" id="4_d5rr8"]
 [ext_resource type="LabelSettings" uid="uid://idlo8sks3m3i" path="res://Setts/Labels/XP_Hover_XP.tres" id="5_n7xmy"]
-[ext_resource type="Texture2D" uid="uid://b6rdfbkv3wnkd" path="res://Assets/CardsSMALLS/Kajus_small.png" id="7_n0g03"]
-[ext_resource type="Texture2D" uid="uid://dyqkvy3o18rso" path="res://Assets/CardsSMALLS/Plott_small.jpg" id="8_hxcsa"]
-[ext_resource type="Texture2D" uid="uid://d4h1p0gv08wqa" path="res://Assets/CardsSMALLS/Acamar_small.png" id="9_sulxf"]
-[ext_resource type="Texture2D" uid="uid://m2f5ywny4i2f" path="res://Assets/CardsSMALLS/Dorbys_small.png" id="10_aar1b"]
+[ext_resource type="Texture2D" uid="uid://ba3m2oqvqd43m" path="res://Assets/Textures/Missing_texture.png" id="5_qf5us"]
 
 [node name="Panel" type="Panel"]
 self_modulate = Color(1, 0.894118, 1, 1)
@@ -23,7 +19,7 @@ unique_name_in_owner = true
 layout_mode = 0
 offset_right = 120.0
 offset_bottom = 100.0
-text = "10"
+text = "11"
 label_settings = ExtResource("2_6o23c")
 horizontal_alignment = 1
 
@@ -56,7 +52,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 mouse_filter = 2
-texture = ExtResource("4_d5rr8")
+texture = ExtResource("5_qf5us")
 expand_mode = 1
 
 [node name="H0XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer"]
@@ -79,7 +75,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 mouse_filter = 2
-texture = ExtResource("7_n0g03")
+texture = ExtResource("5_qf5us")
 expand_mode = 1
 
 [node name="H1XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer"]
@@ -110,7 +106,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 0
 size_flags_stretch_ratio = 2.0
 mouse_filter = 2
-texture = ExtResource("8_hxcsa")
+texture = ExtResource("5_qf5us")
 expand_mode = 1
 
 [node name="H2XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer2"]
@@ -135,7 +131,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 0
 size_flags_stretch_ratio = 2.0
 mouse_filter = 2
-texture = ExtResource("9_sulxf")
+texture = ExtResource("5_qf5us")
 expand_mode = 1
 
 [node name="H3XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer2"]
@@ -171,7 +167,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 8
 size_flags_stretch_ratio = 2.0
 mouse_filter = 2
-texture = ExtResource("10_aar1b")
+texture = ExtResource("5_qf5us")
 expand_mode = 1
 
 [node name="H4XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer3"]

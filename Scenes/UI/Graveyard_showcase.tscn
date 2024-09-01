@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://Script/UI_layer/Grave.gd" id="2_ppjy0"]
 
 [node name="Graveyard_showcase" type="Control"]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = -126.0

@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://cl4lbfvxcetie"]
+
+[ext_resource type="Texture2D" uid="uid://c5uutsk1ptejg" path="res://Assets/PREUI/CardBack2.png" id="1_tvrxt"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Cardback" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+texture = ExtResource("1_tvrxt")
+expand_mode = 1

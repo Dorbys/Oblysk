@@ -2,6 +2,8 @@ extends TextureButton
 
 @onready var oblysk = $"../.."
 
+
+
 @onready var UI_layer = $".."
 @onready var graveyard_showcase = $"../Graveyard_showcase"
 @onready var scrollh = %SCROLLH
@@ -63,6 +65,13 @@ var towers = [towerA1, towerA2, towerA3, towerB1, towerB2, towerB3]
 
 
 func _ready():
+#	if spawn_rect.name == "SpawnRect":
+#		push_error("THE_BUTTON_EXISTS")
+#	else:
+#		push_error("THE_BUTTON_doesnt exist yet")
+	#I guess since there are so many nodes some script 
+		#may run before all nodes are created
+		
 	new_lane()
 
 func new_lane():
@@ -104,7 +113,7 @@ func _on_pressed():
 		target.disappear_when_THE_BUTTON_is_pushed()
 	#to get rid of tooltips
 		
-	print(str(Base.CAN_CLICK_BUTTON_NOW))
+	print("unlocked? " + str(Base.CAN_CLICK_BUTTON_NOW))
 	if  Base.Combat_phase == 0 and Base.CAN_CLICK_BUTTON_NOW == 1:
 		Base.Main_phase = 0 #determines which curving to use, rng or anull
 		# "when you can play cards"
@@ -137,14 +146,14 @@ func _on_pressed():
 			###################
 			#NEW TURN STUFF HERE:
 	#		await get_tree().create_timer(0.2).timeout
+			
+			
 
 		
 		move_to_next_lane()
 		
-		if Base.current_lane == 4:
-			spawn_rect.new_wave_of_creeps()
-			spawn_rect.more_enemies()
-			await graveyard_showcase.update_both()	
+#		if Base.current_lane == 4:
+				
 		Base.Main_phase = 1
 		#disabled = false in move_to_next_lane()
 			
@@ -208,8 +217,23 @@ func move_to_next_lane():
 		#this is for end of round
 		round_end()
 		
-		await camera_2d.move_camera_to_lane(Base.current_lane)
+		if Base.current_lane == 3:
+				towerA.player_HP.new_damage_to_be_taken(0, towerA.name)
+				towerB.player_HP.new_damage_to_be_taken(0, towerB.name)
+		#so that it doesn't show someone is gonna take dmg
+				
+		camera_2d.move_camera_to_lane(Base.current_lane)
+		spawn_rect.new_wave_of_creeps()
+		spawn_rect.more_enemies()
+		await graveyard_showcase.update_both()
+		
+		while spawn_rect.colliding_units != 0 or camera_2d.moving == true:
+#			print("Button is waiting for collision of units in spawner to complete: " +str(spawn_rect.colliding_units))
+			await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		#wait until the units are collided
+#		push_error("Button is NOT waiting for collision of units in spawner to complete: " +str(spawn_rect.colliding_units) +str(camera_2d.moving))
 		spawner.visible = true
+
 
 
 #######################################################################
@@ -288,7 +312,7 @@ func global_lets_disconnect_abilities_and_items():
 	
 	
 func refresh_player_hp_dmg_to_be_taken():
-	print(towerA.name)
+#	print(towerA.name)
 	towerA.visualise_health_loss()
 	towerB.visualise_health_loss()
 

@@ -2,6 +2,7 @@ extends ColorRect
 
 @onready var Graveyard = $"../../../../../../UI_layer/Graveyard_showcase"
 @onready var spawner = $"../../../../../../UI_layer/Spawner/SpawnRect"
+@onready var opponent_spawner = $"../../../../../../UI_layer/Spawner/Opponent_spawn_rect_fake"
 @onready var scrollh = $"../../../../../../UI_layer/SCROLLH"
 @onready var BUTTON = $"../../../../../../UI_layer/THE_BUTTON"
 @onready var D12 = $"../../../../../../D12"
@@ -42,8 +43,10 @@ var EquippingItem = 0
 
 var OPrena_rect
 var OPrena_roof
-#var MY_identity
+var MY_identity
+#to decide which side I'm on
 var OP_identity
+#cuz children targeting is by 0 or 1 if we have two towers
 var OPTower
 var MYTower
 
@@ -72,16 +75,16 @@ var has_position_aura_array = []
 
 func _ready():
 	if (self.get_parent().get_parent().name) == "Arena":
-#		MY_identity = 0
+		MY_identity = "A"
 		OP_identity = 1
 		OPTower = $"../../../../../Tower_layer/TowerB"
 		MYTower = $"../../../../../Tower_layer/TowerA"
 	elif (self.get_parent().get_parent().name) == "Abarena":
-#		MY_identity = 0
+		MY_identity = "B"
 		OP_identity = 0
 		OPTower = $"../../../../../Tower_layer/TowerA"
 		MYTower = $"../../../../../Tower_layer/TowerB"
-	else: print("Arena has an identity crisis :(")
+	else: push_error("Arena has an identity crisis :(")
 	
 	OPrena_rect = self.get_parent().get_parent().get_parent().get_parent().get_child(OP_identity).get_child(0).get_child(0).get_child(2)
 	OPrena_roof = self.get_parent().get_parent().get_parent().get_parent().get_child(OP_identity).get_child(0).get_child(0).get_child(0)
@@ -98,7 +101,7 @@ func _ready():
 			my_lane = 3
 			tower_layer.my_lane = 3
 		_:
-			print("ArenaRect appeared on an unkown lane")
+			push_error("ArenaRect appeared on an unkown lane")
 
 var Slot_calc_top = 0 - STARTSET # dont scale ----> - distance_to_arena
 var	Slot_calc_bot =	Card_and_offset
@@ -114,7 +117,7 @@ func Adding_Units(_at_position, ID, has_ability):
 			replacing_replacer = 1
 		RIP_BOZO(get_child(Shadow_index))
 	else:
-		print("NO SHADOW detected>>>>>>>>>>>>>>")
+		push_error("NO SHADOW detected>>>>>>>>>>>>>>")
 		
 
 	if replacing_replacer == 0:
@@ -141,7 +144,7 @@ func Adding_Units(_at_position, ID, has_ability):
 	
 	another.HERO = 0
 	another.Identification = ID
-	if OP_identity == 0: 
+	if MY_identity == "B": 
 		another.position.y = BOFFSET
 	else: another.position.y = AOFFSET
 		
@@ -190,7 +193,7 @@ func Cheating_Units(ID, has_ability):
 	another.HERO = 0
 	another.position.x= STARTSET + population * (Card_and_offset)
 	
-	if OP_identity == 0: 
+	if MY_identity == "B": 
 		another.position.y = BOFFSET
 	else: another.position.y = AOFFSET
 		
@@ -223,7 +226,7 @@ func spawn_unit(ID):
 	another.HERO = 0
 	
 	another.position.x= STARTSET + spawning_slot * (Card_and_offset)
-	if OP_identity == 0: 
+	if MY_identity == "B": 
 		another.position.y = BOFFSET
 	else: another.position.y = AOFFSET
 		
@@ -250,7 +253,7 @@ func Remove_Unit(which):
 		#RIP_BOZO should make it so that I don't need to wait a frame now
 		collide_units()
 		
-	else: print("attempted to remove unit over population")
+	else: push_error("attempted to remove unit over population")
 
 #Yo you can call functions that are defined later on in gdscript, poggers
 func collide_units():
@@ -334,7 +337,7 @@ func _on_arena_roof_mouse_exited():
 						Remove_Unit((get_child(i).get_index()))
 						#this basically doesnt happen anymore, but just for sure
 						print("KICKED ASS")
-		else: print("Almost crashed by UFM mexit lol")
+		else: push_error("Almost crashed by UFM mexit lol")
 
 
 func round_to_closest_empty(num, allowed_numbers):
@@ -358,7 +361,7 @@ func Shadow_preview():
 	
 	var population = get_child_count()
 	var another = SHADOW.instantiate()
-	if OP_identity == 0: 
+	if MY_identity == "B": 
 			another.position.y = BOFFSET
 	else: another.position.y = AOFFSET
 	if New_Slot >= population:
@@ -502,7 +505,7 @@ func insert_void(index, sett_status = 1, sitt_status = 1):
 		#cuz it can spawn excess voids during combat
 		#nah this would cause the opposite problem
 	var another = VOID.instantiate()
-	if OP_identity == 0: 
+	if MY_identity == "B": 
 			another.position.y = BOFFSET
 	else: another.position.y = AOFFSET
 	if sett_status == 1:
@@ -519,7 +522,7 @@ func insert_void(index, sett_status = 1, sitt_status = 1):
 
 func replace_me_by_void(node, index, heroism, sett_status, sitt_status):
 	var another = VOID.instantiate()
-	if OP_identity == 0: 
+	if MY_identity == "B": 
 			another.position.y = BOFFSET
 	else: another.position.y = AOFFSET
 	if sett_status == 1:
@@ -549,7 +552,7 @@ func maybe_clean_two_voids(index):
 				UNITS_MOVED_YO()
 				#send signal that units moved
 		else:
-			printerr("MAYBE_CLEAN_TWO_VOIDS encountered null target")
+			push_error("MAYBE_CLEAN_TWO_VOIDS encountered null target")
 				
 func get_opposer(Index):
 	#I cant add an incorect argument check here because it wouldnt get to while loop
@@ -592,7 +595,7 @@ func playing_on(Is_played_on):
 	if Is_played_on == "Unit":
 		Are_creeps_being_played_on = true
 		Are_heroes_being_played_on = true
-		print("units are being played on")
+#		print("units are being played on")
 		
 	elif Is_played_on == "Hero":
 		Are_heroes_being_played_on = true
@@ -647,7 +650,10 @@ func create_hero(ID):
 	
 	OPrena_rect.insert_void(0, 1, 1)
 	add_child(another)
-	Base.Player_heroes.append(another)
+	if MY_identity == "A":
+		Base.Player_heroes.append(another)
+	else:
+		Base.Opponent_heroes.append(another)
 
 
 #var fake_number = -1
@@ -656,7 +662,11 @@ func transfer_hero_to_spawner(target):
 	#to spawner from which they can be sent elsewhere
 	target.appear_dead()
 	remove_child(target)
-	spawner.add_child(target)
+	if MY_identity == "A":
+		spawner.add_child(target)
+	else: 
+		opponent_spawner.add_child(target)
+	
 	
 	insert_void(0,1,1)
 
@@ -719,10 +729,10 @@ func spawn_lane_creep():
 	
 	another.HERO = 0
 	another.Identification = ID
-	if OP_identity == 1:
+	if MY_identity == "A":
 		another.Unit_Pfp = Base.SPECIAL_TEXTURES[ID]
 		another.position.y = AOFFSET
-	elif OP_identity == 0: 
+	elif MY_identity == "B": 
 		another.position.y = BOFFSET
 		another.Unit_Pfp = Base.SPECIAL_TEXTURES[ID+1]
 		

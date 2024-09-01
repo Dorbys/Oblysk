@@ -6,11 +6,14 @@ extends Node
 @onready var the_button = $"../OBLYSK/UI_layer/THE_BUTTON"
 
 
-var PLAYTEST = 1
+var PLAYTEST = 0
 #change to 1 to shuffle deck, set mana and XP, hide tech stuff,
 #turns off alwayscaster
 #you can play all units into enemy side
 #Bombard building doesnt bombard
+
+var MULTIPLAYER = true
+#to build mp funcs and change the view of scenes based on whether mp ornah
 
 
 
@@ -80,7 +83,7 @@ preload("res://Assets/CardsPNGS/Creep_abilities/Zombie.png")]
 var card = load("res://Scenes/UNIT/Unit1.tscn")
 #var card = scene.instantiate()
 var PlayerDeck =  [["spell",0],["spell",0],["spell",6],["spell",8],
-	["creep",5],["creep",0],["creep",1],["build", 0],["item", 0]]
+	["spell",3],["creep",0],["creep",1],["build", 0],["item", 0]]
 	
 	
 	
@@ -99,9 +102,15 @@ var index = PlayerDeck.find(["creep",0])
 var HeroDeck = [1,4,2,3,0]
 #DORBYS 	PLOTT 		KAJUS		KIMMEDI 	ACAMAR
 
+#this is copied over to OpponentDeck atm
+var OpponentHeroDeck = [1,4,2,3,0]
+
 var Player_heroes = []
 #this array is appended by hero nodes 
 #after they are initiated in arena during game start
+
+var Opponent_heroes = []
+#contains same heroes but unique nodes
 
 var LAST_TOWER_HP = 23
 
@@ -130,15 +139,15 @@ var Main_phase = 0
 #for unit gd   combat_damage_refresh
 #determined by BUTTON
 
-var current_lane = 1
-var viewed_lane = 1
+var current_lane =3
+var viewed_lane = 3
 #used for scrolling lanes
 
 var LANE1_COORDINATES = Vector2(0,1600)
 var LANE2_COORDINATES = Vector2(1930,1600)
 var LANE3_COORDINATES = Vector2(3860,1600)
-var ZOOM_COORDINATES = Vector2(-110,844)
-
+#var ZOOM_COORDINATES = Vector2(-110,844)
+var ZOOM_COORDINATES = Vector2(-110,735)
 #DONT USE THESE TWO TOGETHER
 #set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_BACK)
 

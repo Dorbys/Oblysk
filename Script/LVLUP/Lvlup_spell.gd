@@ -127,7 +127,7 @@ func assign_stats(preview, ID):
 #prevents from making multiple previews
 var showing = 0
 func _on_texture_rect_mouse_entered():
-	print("calling there")
+#	print("calling there")
 	create_card_in_hand_preview(self,Identification)
 	
 

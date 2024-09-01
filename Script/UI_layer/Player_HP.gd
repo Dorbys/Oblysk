@@ -46,7 +46,7 @@ func new_damage_to_be_taken(healthloss, where):
 	elif where == "TowerB":
 		target = %Beta_dmg
 	else:
-		print("tower has given playerHP unkown name")
+		push_error("tower has given playerHP unkown name")
 		
 	if healthloss == 0:
 		target.visible = false

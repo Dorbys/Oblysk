@@ -1,19 +1,19 @@
 extends TextureButton
 @onready var option_button = $"../OptionButton"
 
-@onready var arena_rect1 = $"../../First_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
-@onready var abarena_rect1 = $"../../First_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
-@onready var card_layer1 = $"../../First_lane/Card_layer"
+@onready var arena_rect1 = $"../../../First_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
+@onready var abarena_rect1 = $"../../../First_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
+@onready var card_layer1 = $"../../../First_lane/Card_layer"
 
-@onready var arena_rect2 = $"../../Mid_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
-@onready var abarena_rect2 = $"../../Mid_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
-@onready var card_layer2 = $"../../Mid_lane/Card_layer"
+@onready var arena_rect2 = $"../../../Mid_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
+@onready var abarena_rect2 = $"../../../Mid_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
+@onready var card_layer2 = $"../../../Mid_lane/Card_layer"
 
-@onready var arena_rect3 = $"../../Last_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
-@onready var abarena_rect3 = $"../../Last_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
-@onready var card_layer3 = $"../../Last_lane/Card_layer"
+@onready var arena_rect3 = $"../../../Last_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
+@onready var abarena_rect3 = $"../../../Last_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
+@onready var card_layer3 = $"../../../Last_lane/Card_layer"
 
-@onready var game_over = $"../Game_over"
+@onready var game_over = $"../../Game_over"
 
 var arena_rect
 var abarena_rect

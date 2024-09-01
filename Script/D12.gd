@@ -5,10 +5,8 @@ extends Control
 
 func _ready():
 	if Base.PLAYTEST == 1:
-		%DRAW1.visible = false
-		%OptionButton.visible = false
+		%DevTools.visible = false
 		%XP_Panel.XP = 10
-		%TextureButton.visible = false
 		
 func lets_stop_targeting():
 	for i in get_child_count():

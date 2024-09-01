@@ -40,7 +40,7 @@ var Kajus_ability_description = "Cooldown(4): Summon a 6/2/8 Legionaire"
 
 
 func PASSIVE(_Target):
-	print("there was an attempt to trigger PASSIVE manually")
+	push_error("there was an attempt to trigger PASSIVE manually")
 	
 func Advance(Caster):
 	await Caster.MYrena_rect.spawn_unit(2)

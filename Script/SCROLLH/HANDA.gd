@@ -3,7 +3,8 @@ extends BoxContainer
 @onready var scrollh = $".."
 @onready var hand_rect = $SIZECHECK/HandRect
 
-	
+
+#takes care of the scrollable size
 
 
 func _on_hand_rect_child_entered_tree(_node):

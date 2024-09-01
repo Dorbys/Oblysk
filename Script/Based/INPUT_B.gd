@@ -70,7 +70,7 @@ func _input(event):
 	elif Input.is_action_just_pressed("Camera_Lane_3"):
 		%Camera2D.move_camera_to_lane(3)
 	elif Input.is_action_just_pressed("Camera_zoom_out"):
-		%Camera2D.camera_zoom_out()
+		%Camera2D.move_camera_to_lane(4)
 	
 	elif Input.is_action_just_pressed("THE"):
 		the_button._on_pressed()

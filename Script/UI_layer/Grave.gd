@@ -10,12 +10,12 @@ func r_update():
 		r_time -= 1
 	
 		if r_time == 0:
-			graveyard_showcase.respawn(self, self.get_child(0))
+			await graveyard_showcase.respawn(self, self.get_child(0))
 			self.texture = null
 		elif r_time == 1:
 			self.modulate = green
 		elif r_time == 2:
 			self.modulate = red
 		else:
-			print("UNKNOWN r_time VALUEID: " +str(r_time)  +str(self.get_index()))
+			push_error("UNKNOWN r_time VALUEID: " +str(r_time)  +str(self.get_index()))
 		

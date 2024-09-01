@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://cak63fd13ipg1"]
+[gd_scene load_steps=27 format=3 uid="uid://cak63fd13ipg1"]
 
 [ext_resource type="Script" path="res://Script/Based/INPUT_B.gd" id="1_kus8j"]
 [ext_resource type="PackedScene" uid="uid://b1u0py0ci1rgi" path="res://Scenes/Base.tscn" id="1_v73vy"]
@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://r785avsyfdxf" path="res://Scenes/UI/Player_HP.tscn" id="11_p1uyo"]
 [ext_resource type="AudioStream" uid="uid://df011xt5nto82" path="res://Assets/Sounds/Rxm リム - LOOK AT ME! _ Phonk _ NCS - Copyright Free Music (320kbps).mp3" id="13_virw5"]
 [ext_resource type="PackedScene" uid="uid://bhaer715oasq3" path="res://Scenes/UI/Player_mana_display.tscn" id="15_ywx2j"]
+[ext_resource type="PackedScene" uid="uid://c3lbr0mtr2ums" path="res://Scenes/UI/OpponentHand.tscn" id="16_e8r2r"]
 [ext_resource type="FontFile" uid="uid://c01uqsojl0t5d" path="res://Assets/Font source/RobotoMono-Bold.ttf" id="17_iqa2t"]
 [ext_resource type="Texture2D" uid="uid://kfymxxsg8nw3" path="res://Assets/Effects/LVLUPEFFECT.png" id="17_p02hj"]
 [ext_resource type="Script" path="res://Script/AudioStreamPlayer.gd" id="18_s0iln"]
@@ -90,6 +91,7 @@ offset_bottom = 1311.0
 
 [node name="Graveyard_showcase" parent="UI_layer" instance=ExtResource("3_cxe43")]
 unique_name_in_owner = true
+visible = true
 offset_left = 0.0
 offset_right = 126.0
 offset_bottom = 76.0
@@ -101,24 +103,32 @@ offset_top = 948.0
 offset_right = 1899.0
 offset_bottom = 1048.0
 
-[node name="DRAW1" type="Button" parent="UI_layer"]
+[node name="DevTools" type="Control" parent="UI_layer"]
 unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+
+[node name="DRAW1" type="Button" parent="UI_layer/DevTools"]
+unique_name_in_owner = true
+layout_mode = 0
 offset_left = 289.0
 offset_top = 11.0
 offset_right = 506.0
 offset_bottom = 172.0
 text = "DRAW1"
 
-[node name="TextureButton" parent="UI_layer" instance=ExtResource("6_xyuig")]
+[node name="TextureButton" parent="UI_layer/DevTools" instance=ExtResource("6_xyuig")]
 unique_name_in_owner = true
+layout_mode = 0
 offset_left = 538.0
 offset_top = 18.0
 offset_right = 782.0
 offset_bottom = 175.0
 texture_normal = ExtResource("9_3slyr")
 
-[node name="OptionButton" type="OptionButton" parent="UI_layer"]
+[node name="OptionButton" type="OptionButton" parent="UI_layer/DevTools"]
 unique_name_in_owner = true
+layout_mode = 0
 offset_left = 1253.0
 offset_top = 21.0
 offset_right = 1408.0
@@ -127,6 +137,19 @@ toggle_mode = false
 alignment = 1
 allow_reselect = true
 script = ExtResource("7_inl2i")
+
+[node name="Opponent_info" type="Control" parent="UI_layer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Opponent_SCROLLH" parent="UI_layer/Opponent_info" instance=ExtResource("16_e8r2r")]
+layout_mode = 0
+offset_left = 360.0
+offset_top = -685.0
+offset_right = 1560.0
+offset_bottom = 35.0
 
 [node name="THE_BUTTON" parent="UI_layer" instance=ExtResource("5_51a31")]
 unique_name_in_owner = true
@@ -223,6 +246,7 @@ unique_name_in_owner = true
 stream = ExtResource("24_8jte2")
 max_polyphony = 24
 
-[connection signal="pressed" from="UI_layer/DRAW1" to="UI_layer/SCROLLH" method="_on_draw_1_pressed"]
+[connection signal="pressed" from="UI_layer/DevTools/DRAW1" to="UI_layer/SCROLLH" method="_on_draw_1_pressed"]
+[connection signal="pressed" from="UI_layer/DevTools/DRAW1" to="UI_layer/Opponent_info/Opponent_SCROLLH" method="_on_draw_1_pressed"]
 [connection signal="pressed" from="UI_layer/Active_lane" to="Camera2D" method="_on_active_lane_pressed"]
 [connection signal="pressed" from="UI_layer/Help" to="UI_layer/Help_screen" method="_on_help_pressed"]

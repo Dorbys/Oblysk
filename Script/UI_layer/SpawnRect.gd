@@ -20,12 +20,16 @@ var scale_down = 0.8
 
 var starting_creep_count = 5
 
+var colliding_units = 0
+#to know whether I can make Spawner visible already
+#count of how many units still moving to hide their movement
 
 func _ready():
 	arena_rects = [arena_rect1, arena_rect2,arena_rect3,
 	beta_arena_rect1,beta_arena_rect2,beta_arena_rect3]
 
 func INITIATE_THE_GAME():
+		
 	var target
 	#SpawnRect should already have 3 heroes prepared there
 	var order_of_lanes_to_deploy = [%FirstLaneDeployRect,
@@ -63,10 +67,11 @@ func INITIATE_THE_GAME():
 	
 
 func collide_units(skip_target = -1):
+	#currently copied from SpawnRect, skip_target could be removed
 	var collide_time = 0.2
 	var target
 	var destinationX
-	var offset = (0.5 * Base.CARD_WIDTH)
+	var offset = (0.5 * Base.CARD_WIDTH) 
 	var center = (size.x)/2
 	
 
@@ -94,17 +99,18 @@ func collide_units(skip_target = -1):
 			destinationX =  center + ((i-mid) * Base.CARD_WIDTH)
 
 		var tween = create_tween().set_parallel(true)
-		tween.tween_property(target,"position",
+		await tween.tween_property(target,"position",
 		 Vector2(destinationX,0),
 		 collide_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
-
-#		get_child(i).position.x = (0.5 * Base.CARD_WIDTH) +(i * Base.CARD_WIDTH)
-#		get_child(i).position.y = 0
+	colliding_units -= 1	
 
 func _on_child_entered_tree(node):
+	colliding_units += 1
 	node.enter_draggable_state()
 	node.pre_deploy_respawn()
 	collide_units()
+	
+
 
 func new_wave_of_creeps():
 	%FirstLaneDeployRect.create_a_creep()

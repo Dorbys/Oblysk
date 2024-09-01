@@ -32,7 +32,7 @@ func round_end():
 			shoot_at_random(randolane)
 	
 	else: 
-		print("no units in lane, cant shoot")
+		print("no units in lane, cant bombard")
 	
 
 	

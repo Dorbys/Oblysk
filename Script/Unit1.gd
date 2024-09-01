@@ -237,11 +237,11 @@ func _ready():
 		Lvlup_xp = HeroesDB.HEROES_DB[Identification][HeroesDB.XPPOSITION]
 	#Isnt shown on text so its okay to load here
 	
-	if MYrena_rect.OP_identity == 1:
+	if MYrena_rect.MY_identity == "A":
 		faction = "alpha"
-	elif MYrena_rect.OP_identity == 0:
+	elif MYrena_rect.MY_identity == "B":
 		faction = "beta"
-	else: print("MYrenaRect has conflicting OP_identity")
+	else: push_error("MYrenaRect has conflicting OP_identity")
 	
 	death_shader = load("res://Assets/Shaders/ShadeShade.gdshader")
 #	var death_material : ShaderMaterial = ShaderMaterial.new()
@@ -286,7 +286,7 @@ func respawn(silent = 0):
 	new_lane()
 	HealthC = HealthM
 	AttackC = AttackM
-	if MYrena_rect.OP_identity == 0:
+	if MYrena_rect.MY_identity == "B":
 		#==0 Means we are in Abarena
 		self.position.y = MYrena_rect.BOFFSET
 	else:
@@ -508,8 +508,8 @@ func Death_sudden(DMG):
 var mid_damage = 11.0
 var DM = 1 #Direction modifier
 func death_animation(DMG):
-	if MYrena_rect.OP_identity == 0:
-		#==0 Means we are in Abarena
+	if MYrena_rect.MY_identity == "B":
+		# "B" Means we are in Abarena
 		DM = -1
 	var push_modifier = 0.6 + DMG/mid_damage
 	var tween = create_tween().set_parallel(true)
@@ -534,7 +534,7 @@ func refresh_neighbours_from_my_death(id, parent, opposer):
 			opposer.besieging_damage = 0
 			overkill_damage = 0
 			#not nullified for when curving ig
-			print("After death thing tirgg")
+			printerr("refreshing neighbours and bro had siege")
 			
 #	await get_tree().create_timer(Base.MICRO_TIME).timeout
 
@@ -651,7 +651,7 @@ func whats_passive_abilitys_target():
 		Ability_target = AbilitiesDB.CREEP_ABILITIES_DB[Identification][AbilitiesDB.TARGPOSITION]
 	if Ability_target == Enums.Targeting.myself:
 		Target = self
-	else: print(" modify whats_passive_abilitys_target(): in Unit1GD pls")
+	else: push_error(" modify whats_passive_abilitys_target(): in Unit1GD pls")
 	
 	return Target
 
@@ -714,7 +714,7 @@ func _drop_data(_at_position, DropData):
 		var DBList = SpellsDB.SPELLS_DB
 		if DropData[0] == 11:
 		#Useless, will be removed
-			print("calling from lvldb")
+#			print("calling from lvldb")
 			DB = LvlupDB
 			DBList = LvlupDB.LVLUPS_DB
 			#If the card is from lvlup, we need to change the DB 
@@ -808,12 +808,12 @@ func _on_slacksus_mouse_exited():
 
 func SpellEffect_preview():
 	var caller = "SpellEffect_preview"
-	print("spelleffecting")
+#	print("spelleffecting")
 	effect_over_hovered_unit(MYrena_rect.TargetingSpell, Aiming, EFFECT, caller)		
 		
 func ItemEffect_preview():
 	var caller = "ItemEffect_preview"
-	print("itemeffecting")
+#	print("itemeffecting")
 	effect_over_hovered_unit(MYrena_rect.EquippingItem, Iteming, IEFFECT, caller)
 	
 func effect_over_hovered_unit(cond1, cond2, effect, caller):
@@ -825,7 +825,7 @@ func effect_over_hovered_unit(cond1, cond2, effect, caller):
 #		print("I added the kid again lol")
 #		another.position.x = -0
 		self.add_child(another)
-		print("adding")
+#		print("adding")
 	elif population == NATURAL_CHILD_COUNT+1:
 #		var ETarget = MYrena_mid.get_child(0)
 #		ETarget.position.x = self.position.x
@@ -833,7 +833,7 @@ func effect_over_hovered_unit(cond1, cond2, effect, caller):
 #		print("Effect is chilling")
 		pass
 	else:
-		print("Unit has too many children: "+str(self.get_child_count()))
+		push_error("Unit has too many children: "+str(self.get_child_count()))
 			
 
 	await get_tree().create_timer(Base.FAKE_GAMMA).timeout
@@ -874,7 +874,7 @@ func Im_no_longer_clickable():
 var leveling = 0
 func show_I_can_lvlup(XP, caller):
 	clean_myself_from_effects()
-	print("showing I can lvlup. I need " +str(Lvlup_xp) + " xp")
+#	print("showing I can lvlup. I need " +str(Lvlup_xp) + " xp")
 	if Lvlup_xp <= XP and can_lvlup == true:
 		#Hero / nonhero handled in:
 		if ConnectionB == 0:
@@ -897,7 +897,6 @@ func LVLUP():
 	if is_connected("gui_input", _on_ColorRect_input):
 		disconnect("gui_input", _on_ColorRect_input)
 		ConnectionB = 0
-		print("yeaah")
 	XP_panel.increase_xp(-Lvlup_xp)
 	Targeter.update_XP()
 	increase_AttackM(1,1)
@@ -951,9 +950,9 @@ func curve_rng():
 
 	else:
 		var random_value = randf()  # Generates a random float between 0 and 1
-#		print(random_value)
 		if random_value < 0.4 and my_slot != 0:
-		# 42% chance
+		# 42% chance 
+			#That looks like 40 bro
 			if OPrena.get_child(my_slot-1) != null and OPrena.get_child(my_slot-1).TYPE == 0:
 				curve_left()
 			else:
@@ -1154,7 +1153,10 @@ func refresh_combat_damage():
 					curve_straight()
 			"right":
 					curve_right()
-	else: print("Unknown Base.Main_phase value")
+	elif Base.Main_phase == 0 and alive == 0:
+		pass
+		#this happens during game start and causes no problems
+	else: push_error("Unknown Base.Main_phase value")
 	#lets keep it till a diff is made
 				
 func annul_damage_directed_to_me(loudness = false):
@@ -1251,9 +1253,10 @@ func redirect_damage_to_me_again():
 			if excess_damage != opposer.besieging_damage:
 				#if the damage Im supposed to send to tower has changed
 				Card_layer.unit_no_longer_being_sieged(faction, opposer.besieging_damage)
-				expected_damage -= excess_damage
-				opposer.besieging_damage = excess_damage
-				Card_layer.unit_being_sieged(faction, opposer.besieging_damage)
+				if excess_damage > 0:
+					expected_damage -= excess_damage
+					opposer.besieging_damage = excess_damage
+					Card_layer.unit_being_sieged(faction, opposer.besieging_damage)
 		#we are taking care of besieged in increase_damage_to_be_taken() now
 		increase_damage_to_be_taken(expected_damage, false)
 			
@@ -1270,7 +1273,7 @@ func annul_my_damage():
 		else:
 			straight_target.Im_no_longer_attacked_only_by(self,Siege)
 	else:
-		printerr("straight target was null during annuling my damage")
+		push_error("straight target was null during annuling my damage")
 				
 	
 func redirect_damage(target):
@@ -1311,7 +1314,7 @@ func redirect_damage(target):
 			
 			#well now that we have creeps we have to take them into account:
 			if straight_target != null:
-				print("well now that we have creeps we have to take them into account:")
+				push_error("well now that we have creeps we have to take them into account:")
 				straight_target.Im_no_longer_attacked_only_by(self,Siege)
 			
 			damage_used_up_1 = 0
@@ -1378,7 +1381,7 @@ func redirect_damage(target):
 
 			
 		else: #if we are curved into the other side unit
-			print("it was else")
+#			print("it was else")
 			side_target.Im_no_longer_side_attacked_by(self)
 			side_target = target
 			side_target.Im_side_attacked_by(self)
@@ -1494,22 +1497,41 @@ func ignore_opposer():
 		
 
 func increase_damage_to_be_taken(amount, check_for_siege = true): 
+	var problem = false
+	#for debugging
+	
 	damage_to_be_taken += amount 
 	var opposer = await get_opposer()
 #	var preopposer = await get_opposer()
 #	if opposer.TYPE == 0 and opposer.Siege == true:
-#	push_error(" increasing dmg tbt by: " +str(amount) +" " + str( damage_to_be_taken) +" " + str( opposer.besieging_damage) + " " +str(get_index()) + " " +str(faction))
+	#wtf is preopposer
+	
+	if problem == true:
+		push_error(" increasing dmg tbt by: " +str(amount) +" " + str( damage_to_be_taken) +" " + str( opposer.besieging_damage) + " " +str(get_index()) + " " +str(faction))
 	#Oh nyo, welcome back again master 
 	
 	
 	if check_for_siege == true: 
-		#only set to false when this is called from the anull guys 
+		#only set to false when this is called from the anull guys
+		
+
 		damage_to_be_taken += opposer.besieging_damage 
 		#voids have besieging damage 0, which is unit default
-		if alive == 1:
+		if alive == 1 and damage_to_be_taken >= 0:
 			overkill_damage =  damage_to_be_taken - HealthC 
 			#otherwise dying unit recalcs overkill damage
+		if alive == 1 and damage_to_be_taken < 0:
+			#this means that a unit that inflicted so much damage onto
+				#me that it would oneshot me died and siege is fucked
+			damage_to_be_taken += overkill_damage 
+			#this can only happen when subtracting dmgtbtkn 
+				#gotta divide this function into adding and subtracting
+			Card_layer.unit_no_longer_being_sieged(faction, overkill_damage)
+			overkill_damage = 0
+			
 		var being_sieged = false 
+		if problem == true:
+			push_error("overkill dmg: " +str(overkill_damage))
 		if overkill_damage > 0:
 			
 			if opposer.TYPE == 0 and opposer.Siege == true and opposer.targeting == "straight":
@@ -1532,6 +1554,7 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 		if opposer.besieging_damage> 0 and being_sieged == false:
 			#this only happens if overkill is 0, so that's kept
 			#could cause problems if opposer qufreed early
+				#quefreeing early solved with: 'if alive == 1 and damage_to_be_taken < 0:'
 			Card_layer.unit_no_longer_being_sieged(faction, opposer.besieging_damage)
 			opposer.besieging_damage = 0
 			#I might've been sieged previously, retract that if no longer
@@ -1539,7 +1562,8 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 	%DMG_TBT.text = str(damage_to_be_taken)
 	check_damage_to_be_taken()		
 	#modifies deathmarker
-#	push_error(" final increased dmg tbt by: " +str(amount) +" " + str( damage_to_be_taken) +" " + str( opposer.besieging_damage) + " " +str(faction))
+	if problem == true:
+		push_error(" final increased dmg tbt by: " +str(amount) +" " + str( damage_to_be_taken) +" " + str( opposer.besieging_damage) + " " +str(faction))
 
 
 func check_damage_to_be_taken():

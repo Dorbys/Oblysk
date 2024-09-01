@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://dwwrxkxhppb77"]
+[gd_scene load_steps=6 format=3 uid="uid://dwwrxkxhppb77"]
 
 [ext_resource type="Script" path="res://Script/UI_layer/LaneDeployRect.gd" id="1_4rkcp"]
 [ext_resource type="Script" path="res://Script/UI_layer/SpawnRect.gd" id="2_l25vf"]
 [ext_resource type="PackedScene" uid="uid://c4np20856wsq8" path="res://Scenes/Building/BuildingMain.tscn" id="2_vjyy1"]
+[ext_resource type="Script" path="res://Script/UI_layer/Opponent_info/Opponent_spawn_rect_fake.gd" id="5_llblb"]
 [ext_resource type="PackedScene" uid="uid://clrltqfiak7yu" path="res://Scenes/UNIT/UnitDeploypreview.tscn" id="5_tdt42"]
 
 [node name="Spawner" type="Control"]
@@ -25,9 +26,9 @@ unique_name_in_owner = true
 self_modulate = Color(0.658824, 0.337255, 1, 0)
 layout_mode = 0
 offset_left = -957.0
-offset_top = -714.0
+offset_top = -730.0
 offset_right = -341.0
-offset_bottom = -174.0
+offset_bottom = -190.0
 script = ExtResource("1_4rkcp")
 UNIT_SCENE = ExtResource("5_tdt42")
 
@@ -36,9 +37,9 @@ unique_name_in_owner = true
 self_modulate = Color(0.658824, 0.337255, 1, 0)
 layout_mode = 0
 offset_left = -336.0
-offset_top = -714.0
+offset_top = -730.0
 offset_right = 280.0
-offset_bottom = -174.0
+offset_bottom = -190.0
 script = ExtResource("1_4rkcp")
 UNIT_SCENE = ExtResource("5_tdt42")
 
@@ -47,9 +48,9 @@ unique_name_in_owner = true
 self_modulate = Color(0.658824, 0.337255, 1, 0)
 layout_mode = 0
 offset_left = 287.0
-offset_top = -714.0
+offset_top = -730.0
 offset_right = 903.0
-offset_bottom = -174.0
+offset_bottom = -190.0
 script = ExtResource("1_4rkcp")
 UNIT_SCENE = ExtResource("5_tdt42")
 
@@ -58,9 +59,9 @@ unique_name_in_owner = true
 self_modulate = Color(0.658824, 0.337255, 1, 0)
 layout_mode = 0
 offset_left = -957.0
-offset_top = -1280.0
+offset_top = -1217.0
 offset_right = -341.0
-offset_bottom = -740.0
+offset_bottom = -677.0
 mouse_filter = 2
 script = ExtResource("1_4rkcp")
 UNIT_SCENE = ExtResource("5_tdt42")
@@ -70,9 +71,9 @@ unique_name_in_owner = true
 self_modulate = Color(0.658824, 0.337255, 1, 0)
 layout_mode = 0
 offset_left = -336.0
-offset_top = -1280.0
+offset_top = -1217.0
 offset_right = 280.0
-offset_bottom = -740.0
+offset_bottom = -677.0
 mouse_filter = 2
 script = ExtResource("1_4rkcp")
 UNIT_SCENE = ExtResource("5_tdt42")
@@ -82,12 +83,19 @@ unique_name_in_owner = true
 self_modulate = Color(0.658824, 0.337255, 1, 0)
 layout_mode = 0
 offset_left = 287.0
-offset_top = -1280.0
+offset_top = -1217.0
 offset_right = 903.0
-offset_bottom = -740.0
+offset_bottom = -677.0
 mouse_filter = 2
 script = ExtResource("1_4rkcp")
 UNIT_SCENE = ExtResource("5_tdt42")
 
+[node name="Opponent_spawn_rect_fake" type="Control" parent="."]
+anchors_preset = 0
+offset_top = -910.0
+offset_bottom = -910.0
+script = ExtResource("5_llblb")
+
 [connection signal="child_entered_tree" from="SpawnRect" to="SpawnRect" method="_on_child_entered_tree"]
 [connection signal="child_order_changed" from="SpawnRect" to="SpawnRect" method="_on_child_order_changed"]
+[connection signal="child_entered_tree" from="Opponent_spawn_rect_fake" to="Opponent_spawn_rect_fake" method="_on_child_entered_tree"]

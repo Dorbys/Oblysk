@@ -30,6 +30,6 @@ func find_new_head():
 			var gamba = randi()%voidcount
 			arena.swap_children(wielder.get_index(),empty_voids[gamba])
 		else:
-			print("no new heads to hunt were found")
+			push_error("no new heads to hunt were found")
 		
 	

@@ -16,7 +16,7 @@ func _ready():
 		elif (self.get_parent().name) == "SCROLLB":
 			OP_identity = 0
 			
-		else: print("Arena has an identity crisis :(")
+		else: push_error("Arena has an identity crisis :(")
 	
 		OPrena = self.get_parent().get_parent().get_child(OP_identity).get_child(0)
 

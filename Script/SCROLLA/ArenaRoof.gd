@@ -25,7 +25,7 @@ func _ready():
 	######################3 HERE WE DO A LITTLE TROLLING FOR NOW 
 				
 		
-	else: print("MYrenaRect has OP identity crisis i guess")
+	else: push_error("MYrenaRect has OP identity crisis i guess")
 	
 	my_lane = MYrena_rect.my_lane
 #	print("roofs mylane is: " +str(my_lane))

@@ -50,7 +50,7 @@ func _on_gui_input(event):
 				await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 				_on_gui_input(event)
 			else:
-				printerr("ran out of tries in: " +str(name))
+				push_error("ran out of tries in: " +str(name))
 	
 func prepare_cooldown():
 	#for when active item is equipped it should be ready to use

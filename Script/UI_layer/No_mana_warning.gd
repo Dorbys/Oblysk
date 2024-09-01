@@ -3,7 +3,7 @@ extends TextureRect
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print("Yo waddup")
+	print("No mana bro")
 	var warmup_time = 0.25
 	var warning_time = 0.5
 	await get_tree().create_timer(warmup_time).timeout 

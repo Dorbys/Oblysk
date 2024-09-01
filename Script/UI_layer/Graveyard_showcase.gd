@@ -2,13 +2,14 @@ extends Control
 @onready var arena_dsc = %Arena_dshowcase
 @onready var abarena_dsc = %Abarena_dshowcase
 @onready var spawner = $"../Spawner/SpawnRect"
-
+@onready var opponent_spawner = $"../Spawner/Opponent_spawn_rect_fake"
 
 
 @onready var arena_rect1 = $"../../First_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect" 
 @onready var abarena_rect1 = $"../../First_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect" 
 @onready var card_layer1 = $"../../First_lane/Card_layer"
-@onready var tower1 = $"../../First_lane/Tower_layer/TowerB"
+@onready var towerB = $"../../First_lane/Tower_layer/TowerB"
+@onready var towerA = $"../../First_lane/Tower_layer/TowerA"
 
 @onready var arena_rect2 = $"../../Mid_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect" 
 @onready var abarena_rect2 = $"../../Mid_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect" 
@@ -20,50 +21,74 @@ extends Control
 #gonna respawn everything in first lane until deployment is implemented
 
 
-var herocount = 5
+
 func _ready():
+	await initiate_heroes(Base.HeroDeck,arena_rect1,towerB)
+	
+	if Base.MULTIPLAYER == true:
+		await get_tree().create_timer(0.1).timeout
+		await initiate_heroes(Base.OpponentHeroDeck,abarena_rect1,towerA)
+	
+	await get_tree().create_timer(0.1).timeout
+	#guess I need to wait a moment?
+		#not all nodes probly have time to spawn
+	spawner.INITIATE_THE_GAME()
+		
+
+var herocount = 5
+func initiate_heroes(deck, arena_rect, tower):
 	for i in herocount:
 		#crates the five heroes from players hero deck
-		arena_rect1.create_hero(Base.HeroDeck[i%herocount])
+		arena_rect.create_hero(deck[i%herocount])
 		
-	arena_rect1.collide_units()
+#	arena_rect.collide_units()
+	#not needed?
+	
 	for i in 3:
 		#3 of them will be randomly deployed to a lane
-		var target = arena_rect1.get_child(i)
+		var target = arena_rect.get_child(i)
 		#has to be 0 else it will take the third and fifth basly
 		#has to be i actually cuz I'm replacing them with voids as we go
-		arena_rect1.transfer_hero_to_spawner(target)
+		arena_rect.transfer_hero_to_spawner(target)
 		#doing it like this so that I deal with voids over there as well
 
 	
 	
 		
-	Add_grave(arena_rect1.get_child(3), arena_rect1)
-	arena_rect1.insert_void(0,1,1)
-	update_arena_dsc()
+	Add_grave(arena_rect.get_child(3), arena_rect)
+	arena_rect.insert_void(0,1,1)
+	if arena_rect == arena_rect1:
+		await update_arena_dsc()
+	else:
+		await update_abarena_dsc()
 	#moves the HERO4 to a grave and decreases their turns to spawn by 1
-	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
+#	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	#needed or else both heroes would be there for 1 turn
+		#not needed when await is in the update_arena part
 	
 	#HERE FOR AGROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO DEPLOY
 	#11111111111111111111111111111111111111111111111111111111111111111111111111
 	
-	Add_grave(arena_rect1.get_child(4), arena_rect1)
-	arena_rect1.insert_void(0,1,1)
+	Add_grave(arena_rect.get_child(4), arena_rect)
+	arena_rect.insert_void(0,1,1)
 	#takes the last hero out and places a void, so that they can be cleared now	
+	
+	
+	#################################3
+	if arena_rect == abarena_rect1:
+		await update_abarena_dsc()
+	#for testing of fakespawner opponent
+	###################################3
+	
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	#waiting for the last hero to complete
 	await card_layer1.clear_up_both()
 	#remove the remaining voids
-	tower1.damage_to_be_taken = 0
-	tower1.increase_damage_to_be_taken(0)
+	tower.damage_to_be_taken = 0
+	tower.increase_damage_to_be_taken(0)
 	#because it was increased by creation of heroes
+
 	
-
-	spawner.INITIATE_THE_GAME()
-		
-
-
 func Add_grave(node, parent):
 	if parent == arena_rect1 or parent == arena_rect2 or parent == arena_rect3:
 		for i in 5:
@@ -83,8 +108,8 @@ func Add_grave(node, parent):
 				#getting texture has to be before making it invisible
 #				node.visible= false
 				target.r_time = 3
-				if Base.Combat_phase == 0:
-					target.r_update()
+#				if Base.Combat_phase == 0:
+				target.r_update()
 				
 				break
 				
@@ -122,10 +147,24 @@ func respawn(grave, hero):
 		hero.modulate.a = 1
 		hero.reparent(spawner)
 		#units are automatically collided upon entering spawner
-		spawner.collide_units()
+#		spawner.collide_units()
+
+	elif parent == abarena_dsc:
+		
+		hero.visible = true
+		hero.rotation = 0
+		hero.modulate.a = 1
+		hero.position = Vector2(0,0)
+		hero.reparent(opponent_spawner)
+		#units are automatically collided upon entering spawner
+
+		
 		
 func respawn2(grave, hero):
 #											copy this one as landing kinda
+	#where tf is this used
+	push_error("respawn2 used here")
+	
 	var parent = grave.get_parent()
 	if parent == arena_dsc:
 		var population = arena_rect1.get_child_count()
@@ -139,7 +178,7 @@ func respawn2(grave, hero):
 			randomize()  # Initialize the random number generator
 			var random_index = randi() % empty_slots.size()
 			landing = empty_slots[random_index]
-			print("random index is: " + str(random_index))
+#			print("random index is: " + str(random_index))
 			var replacing_void = arena_rect1.get_child(empty_slots[random_index])
 #			var new_x = replacing_void.position.x
 			replacing_void.queue_free()
@@ -176,7 +215,7 @@ func respawn2(grave, hero):
 			randomize()  # Initialize the random number generator
 			var random_index = randi() % empty_slots.size()
 			landing = empty_slots[random_index]
-			print("random index is: " + str(random_index))
+#			print("random index is: " + str(random_index))
 			var replacing_void = abarena_rect1.get_child(empty_slots[random_index])
 #			var new_x = replacing_void.position.x
 			replacing_void.queue_free()
@@ -200,7 +239,7 @@ func respawn2(grave, hero):
 #			abarena_rect.move_child(abarena_rect.get_child(population-(i+1)),population-i)
 #			abarena_rect.collide_units()
 	else:
-		print ("unknown parent of a grave")
+		push_error ("unknown parent of a grave")
 		
 		
 
@@ -208,8 +247,8 @@ func update_both():
 	var targets = [arena_dsc,abarena_dsc]
 	for i in 2:
 		for j in 5:
-			targets[i].get_child(j).r_update()
-			await get_tree().create_timer(Base.FAKE_GAMMA).timeout
+			await targets[i].get_child(j).r_update()
+#			await get_tree().create_timer(Base.FAKE_GAMMA).timeout
 			#should be better with real respawn
 
 

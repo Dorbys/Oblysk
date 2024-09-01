@@ -166,9 +166,9 @@ func _process(_delta):
 		match I_want_targets:
 			1: handle_one_target()
 			2: handle_two_targets()
-			_: print("I_want_targets is set wrong: " +str(I_want_targets))			
+			_: push_error("I_want_targets is set wrong: " +str(I_want_targets))			
 	else: 
-		print("Too many targets :(")
+		push_error("Too many targets :(")
 		
 		
 func handle_one_target():

@@ -68,7 +68,7 @@ func Morning(target):
 		target.XP_panel.increase_xp(2* (previous_health+1))
 		
 func Annihilate(target):
-	var DAMAGE = 120000000
+	var DAMAGE = 12
 	var HP = target.HealthC
 	var expected_damage = DAMAGE
 	if expected_damage > HP:

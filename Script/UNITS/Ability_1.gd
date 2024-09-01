@@ -106,7 +106,7 @@ func _on_ability_field_gui_input(event):
 
 					if AbilitiesDB.HERO_ABILITIES_DB[AID][AbilitiesDB.TARGPOSITION] == Enums.Targeting.one_unit:
 						another.I_want_targets = 1
-					else: print("I_Want_targets for this targeting wasnt automated yet")
+					else: push_error("I_Want_targets for this targeting wasnt automated yet")
 					
 					another.origin_ability = self
 					another.Ability_ID = AID

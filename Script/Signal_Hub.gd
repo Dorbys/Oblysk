@@ -28,7 +28,7 @@ func _ready():
 		"Last_lane":
 			my_lane = 3
 		_:
-			print("ArenaRect appeared on an unkown lane")
+			push_error("ArenaRect appeared on an unkown lane")
 			
 	%TowerA.my_lane = my_lane
 	%TowerB.my_lane = my_lane

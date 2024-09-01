@@ -57,7 +57,7 @@ func create_a_creep():
 		another.Unit_Pfp = Base.SPECIAL_TEXTURES[0]
 	elif faction == "Beta":
 		another.Unit_Pfp = Base.SPECIAL_TEXTURES[1]
-	else: print("spawnrect doesnt belong to any know faction")
+	else: push_error("spawnrect doesnt belong to any know faction")
 	
 	another.Unit_Attack = DB_slot[CreepsDB.ATTACKPOSITION]
 	another.Unit_Health = DB_slot[CreepsDB.HEALTHPOSITION]

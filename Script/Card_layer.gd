@@ -33,26 +33,26 @@ func slot_care(node):
 #			print(Mirror)
 			if abarena_rect.get_child_count() > wheretf:
 #				if abarena_rect.get_child(wheretf).TYPE != 0:
-				print("Option more:<<<<<<")
+#				print("Option more:<<<<<<")
 				if node.Replaced_a_void == 0:
-					print(wheretf)
+#					print(wheretf)
 					abarena_rect.insert_void(wheretf,0,0)
 #					Mirror.insert(wheretf, [node.TYPE, VOIDTYPE])
 			
 			elif abarena_rect.get_child_count() == wheretf:
 #				if abarena_rect.get_child(wheretf).TYPE != 0:
 					abarena_rect.insert_void(wheretf,0,0)
-					print("Option equals<<<<<<")
+#					print("Option equals<<<<<<")
 #					Mirror.append([node.TYPE, VOIDTYPE])
 			
 			elif (abarena_rect.get_child_count()) < wheretf:
 				if node.Replaced_a_void == 0:
 					abarena_rect.insert_void(wheretf,0,0)
 #					Mirror.append([node.TYPE, VOIDTYPE])
-					print("Hope this gcc can't happen<<<<<<")
-					print(str(wheretf) + str(abarena_rect.get_child_count()))
+#					print("Hope this gcc can't happen<<<<<<")
+#					print(str(wheretf) + str(abarena_rect.get_child_count()))
 				
-			else: print("Abarena gcc error<<<<<<<<<<<<")
+			else: push_error("Abarena gcc error<<<<<<<<<<<<")
 				
 			
 			
@@ -62,16 +62,16 @@ func slot_care(node):
 #			print(Mirror)
 			if arena_rect.get_child_count() > wheretf:
 #				if arena_rect.get_child(wheretf).TYPE != 0:7
-				print("Option more:<<<<<<")
+#				print("Option more:<<<<<<")
 				if node.Replaced_a_void == 0:
 					arena_rect.insert_void(wheretf,0,0)
-					print(wheretf)
+#					print(wheretf)
 #					Mirror.insert(wheretf, [VOIDTYPE, node.TYPE])
 					
 			elif arena_rect.get_child_count() == wheretf:
 #				if arena_rect.get_child(wheretf).TYPE != 0:
 					arena_rect.insert_void(wheretf,0,0)
-					print("Option equals<<<<<<")
+#					print("Option equals<<<<<<")
 #					Mirror.append([VOIDTYPE, node.TYPE])		
 					
 					
@@ -79,19 +79,19 @@ func slot_care(node):
 				if node.Replaced_a_void == 0:
 					arena_rect.insert_void(wheretf,0,0)
 #					Mirror.append([VOIDTYPE, node.TYPE])
-					print("Hope this gcc can't happen<<<<<<")
-					print(wheretf)
+#					print("Hope this gcc can't happen<<<<<<")
+#					print(wheretf)
 					await get_tree().create_timer(0.25).timeout
 
-					print(arena_rect.get_child_count()-1)
+#					print(arena_rect.get_child_count()-1)
 				
 				
-			else: print("Abarena gcc error<<<<<<<<<<<<")
+			else: push_error("Abarena gcc error<<<<<<<<<<<<")
 		#To make sure first is arena rect type and THEN abarena
 		
 		
 		
-		else: print ("UNKOWN PARENT DETECTEEEEEEEEEEEEED")
+		else: push_error("UNKOWN PARENT DETECTEEEEEEEEEEEEED")
 		
 			
 				
@@ -265,7 +265,7 @@ func lets_reshow_abilities():
 			target.reshow_ability()	
 			
 func lets_lvlup(XP, caller):
-	print("letslvlup with " + str(XP) +" xp")
+#	print("letslvlup with " + str(XP) +" xp")
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
 		if target.TYPE == 0 and target.HERO == 1:
@@ -392,7 +392,7 @@ func unit_being_sieged(faction, siege_dmg):
 		"beta":
 			tower_b.increase_damage_to_be_taken(siege_dmg)	
 		_:
-			print("faction doesnt match again")	
+			print("faction in unit_being_sieged doesnt match again")	
 	
 func unit_no_longer_being_sieged(faction, siege_dmg):
 	print("UN siege dmg is: " +str(siege_dmg))
