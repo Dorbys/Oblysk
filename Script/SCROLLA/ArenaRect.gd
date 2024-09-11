@@ -19,7 +19,7 @@ extends ColorRect
 @export var EFFECT: PackedScene
 @export var IEFFECT: PackedScene
 @export var VOID: PackedScene
-@export var STARTSET = (Base.CARD_WIDTH/2)
+@export var STARTSET = (Base.CARD_WIDTH/2.0)
 @export var OFFSET = 16
 var distance_to_arena = 150
 #the arena node isn't glued to the left side of the screen
@@ -654,6 +654,7 @@ func create_hero(ID):
 		Base.Player_heroes.append(another)
 	else:
 		Base.Opponent_heroes.append(another)
+#		print("AbarenaRect appended Base.Opponent_heroes")
 
 
 #var fake_number = -1

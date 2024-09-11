@@ -22,7 +22,11 @@ func collide_units():
 			
 	var population = get_child_count()
 	var mid = ceil(population/2)
-	
+	if population == 4:
+		center += 0.25 * Base.CARD_WIDTH #cuz scaled size
+	elif population == 5:
+		center += 0.5 * Base.CARD_WIDTH
+		
 	for i in population:
 
 		

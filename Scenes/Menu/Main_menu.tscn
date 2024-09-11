@@ -1,0 +1,98 @@
+[gd_scene load_steps=7 format=3 uid="uid://3au5ircxans"]
+
+[ext_resource type="Script" path="res://Script/Menu/Main_menu.gd" id="1_5sqjf"]
+[ext_resource type="Texture2D" uid="uid://kf368eo4difl" path="res://Assets/CardsPNGS/Creeps/Sommelier.png" id="2_i1ydm"]
+[ext_resource type="Texture2D" uid="uid://hu0fydv4r6ic" path="res://Assets/Pics/Menutexture.png" id="2_r8dw0"]
+[ext_resource type="Texture2D" uid="uid://ixnf1t3lo74x" path="res://Assets/Pics/Waiting.jpg" id="4_xg7it"]
+[ext_resource type="FontFile" uid="uid://d2ihhuv8jsk4n" path="res://Assets/Font source/RobotoMono-Thin.ttf" id="5_bm8nb"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_baupd"]
+font = ExtResource("5_bm8nb")
+font_size = 120
+
+[node name="Main_menu" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_5sqjf")
+
+[node name="BCG" type="TextureRect" parent="."]
+self_modulate = Color(0.231373, 0, 0.490196, 1)
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("2_r8dw0")
+expand_mode = 1
+
+[node name="SP" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1511.0
+offset_top = 148.0
+offset_right = 1891.0
+offset_bottom = 310.0
+theme_override_font_sizes/font_size = 60
+text = "Singleplayer"
+
+[node name="Host" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1511.0
+offset_top = 366.0
+offset_right = 1891.0
+offset_bottom = 528.0
+theme_override_font_sizes/font_size = 60
+text = "Host"
+
+[node name="Join" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1511.0
+offset_top = 585.0
+offset_right = 1891.0
+offset_bottom = 747.0
+theme_override_font_sizes/font_size = 60
+text = "Join"
+
+[node name="Sommelier" type="Sprite2D" parent="."]
+self_modulate = Color(0.592157, 0.00392157, 0.85098, 1)
+position = Vector2(553, 543)
+texture = ExtResource("2_i1ydm")
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 0
+offset_left = 275.0
+offset_top = 60.0
+offset_right = 817.0
+offset_bottom = 205.0
+theme_override_font_sizes/font_size = 64
+placeholder_text = "Pick a username"
+
+[node name="Waiting_screen" type="TextureRect" parent="."]
+unique_name_in_owner = true
+visible = false
+self_modulate = Color(0.215686, 0.215686, 0.215686, 1)
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("4_xg7it")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="Waiting_screen"]
+layout_mode = 0
+offset_top = 502.0
+offset_right = 1920.0
+offset_bottom = 649.0
+text = "Looking for opponent"
+label_settings = SubResource("LabelSettings_baupd")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Close_waiting_button" type="Button" parent="Waiting_screen"]
+layout_mode = 0
+offset_left = 1876.0
+offset_right = 1920.0
+offset_bottom = 48.0
+text = "X"
+
+[connection signal="pressed" from="SP" to="." method="_on_sp_pressed"]
+[connection signal="pressed" from="Host" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="Join" to="." method="_on_join_pressed"]
+[connection signal="text_changed" from="LineEdit" to="." method="_on_line_edit_text_changed"]
+[connection signal="pressed" from="Waiting_screen/Close_waiting_button" to="." method="_on_close_waiting_button_pressed"]

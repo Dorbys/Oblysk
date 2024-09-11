@@ -15,7 +15,7 @@ func refresh_aura(target,faction,wielder):
 #		print(house.do_I_affect_faction(faction))
 
 
-func _on_child_exiting_tree(node):
+func _on_child_exiting_tree(_node):
 	card_layer.lane_aura_check_both()
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	collide_buildings()

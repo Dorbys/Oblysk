@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://r785avsyfdxf"]
+[gd_scene load_steps=8 format=3 uid="uid://r785avsyfdxf"]
 
 [ext_resource type="Script" path="res://Script/UI_layer/Player_HP.gd" id="1_l3q7a"]
 [ext_resource type="Texture2D" uid="uid://dbrik7o5nd31y" path="res://Assets/Antag.png" id="2_2p88f"]
 [ext_resource type="LabelSettings" uid="uid://d0suxobd3mvgd" path="res://Setts/Labels/Player_HP.tres" id="3_vgq2f"]
 [ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="4_6wx0a"]
 [ext_resource type="Texture2D" uid="uid://iftr6f2txht8" path="res://Assets/Life in lifeing room.jpg" id="5_6ncok"]
+[ext_resource type="LabelSettings" uid="uid://cpeo7l8ht4hdc" path="res://Setts/Labels/Player_name.tres" id="5_farna"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_mrgus"]
 font = ExtResource("4_6wx0a")
@@ -49,6 +50,16 @@ label_settings = SubResource("LabelSettings_mrgus")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Beta_name" type="Label" parent="Beta_pfp"]
+layout_mode = 0
+offset_top = -87.8788
+offset_right = 239.0
+offset_bottom = -1.87878
+text = "Bob"
+label_settings = ExtResource("5_farna")
+horizontal_alignment = 1
+vertical_alignment = 2
+
 [node name="Alpha_pfp" type="TextureRect" parent="."]
 layout_mode = 0
 offset_top = 480.0
@@ -80,3 +91,13 @@ text = "2
 label_settings = SubResource("LabelSettings_mrgus")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Alpha_name" type="Label" parent="Alpha_pfp"]
+layout_mode = 0
+offset_top = -87.8788
+offset_right = 239.0
+offset_bottom = -1.87878
+text = "You"
+label_settings = ExtResource("5_farna")
+horizontal_alignment = 1
+vertical_alignment = 2

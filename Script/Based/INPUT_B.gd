@@ -87,6 +87,10 @@ func _input(event):
 			
 	elif Input.is_action_just_pressed("idk"):
 		%idk.play()
+#		if main_menu.visible == true:
+#			main_menu.visible = false
+#		else:
+#			main_menu.visible = true
 		
 	elif Input.is_action_just_pressed("Reveal_game_over"):
 		var target = %Game_over

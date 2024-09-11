@@ -3,7 +3,8 @@ extends Node
 
 
 #pls dont do too many connections in base.gd
-@onready var the_button = $"../OBLYSK/UI_layer/THE_BUTTON"
+@onready var the_button
+#THE_BUTTON declares itself this in it's _ready
 
 
 var PLAYTEST = 0
@@ -12,8 +13,8 @@ var PLAYTEST = 0
 #you can play all units into enemy side
 #Bombard building doesnt bombard
 
-var MULTIPLAYER = true
-#to build mp funcs and change the view of scenes based on whether mp ornah
+
+
 
 
 
@@ -102,8 +103,8 @@ var index = PlayerDeck.find(["creep",0])
 var HeroDeck = [1,4,2,3,0]
 #DORBYS 	PLOTT 		KAJUS		KIMMEDI 	ACAMAR
 
-#this is copied over to OpponentDeck atm
-var OpponentHeroDeck = [1,4,2,3,0]
+#this is copied over and reordered to OpponentDeck atm 
+var OpponentHeroDeck = [1,4,0,3,2]
 
 var Player_heroes = []
 #this array is appended by hero nodes 
@@ -120,7 +121,7 @@ var CARD_HEIGHT = 360
 var FAKE_DELTA = 1/60.0
 var FAKE_GAMMA = 1/42.0
 var FAKE_OMEGA = 1/9.0
-var MICRO_TIME = 1/240
+var MICRO_TIME = 1/240.0
 #cuz nearsimultaneous shit
 
 var Red_color = Color(250,0,0)
@@ -139,8 +140,8 @@ var Main_phase = 0
 #for unit gd   combat_damage_refresh
 #determined by BUTTON
 
-var current_lane =3
-var viewed_lane = 3
+var current_lane =1
+var viewed_lane = 1
 #used for scrolling lanes
 
 var LANE1_COORDINATES = Vector2(0,1600)

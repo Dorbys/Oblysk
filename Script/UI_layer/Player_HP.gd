@@ -54,6 +54,9 @@ func new_damage_to_be_taken(healthloss, where):
 		target.text = str(healthloss)
 		target.visible = true
 			
-	
-	
+@rpc("any_peer" , "call_remote", "reliable")
+func set_opponent_name(given_name):
+	$Beta_pfp/Beta_name.text = given_name
 		
+func set_my_name(given_name):
+	$Alpha_pfp/Alpha_name.text = given_name

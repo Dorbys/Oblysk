@@ -3,6 +3,7 @@ extends ColorRect
 @export var BUILDING_SCENE: PackedScene
 
 @onready var BUTTON = $"../../THE_BUTTON"
+@onready var player_HP = $"../../Player_HP"
 @onready var scrollh = $"../../SCROLLH"
 @onready var XP_panel = $"../../XP_Panel"
 
@@ -29,6 +30,10 @@ func _ready():
 	beta_arena_rect1,beta_arena_rect2,beta_arena_rect3]
 
 func INITIATE_THE_GAME():
+		
+	if Lobby.MULTIPLAYER == true:
+		player_HP.rpc_id(Lobby.opponent_peer_id, "set_opponent_name", Lobby.player_name)
+	player_HP.set_my_name(Lobby.player_name)	
 		
 	var target
 	#SpawnRect should already have 3 heroes prepared there
@@ -102,7 +107,9 @@ func collide_units(skip_target = -1):
 		await tween.tween_property(target,"position",
 		 Vector2(destinationX,0),
 		 collide_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
-	colliding_units -= 1	
+	if colliding_units > 0 : 
+		colliding_units -= 1
+	#because we don't care about when units are removed	
 
 func _on_child_entered_tree(node):
 	colliding_units += 1

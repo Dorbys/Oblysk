@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Orgod"
-run/main_scene="res://Scenes/oblysk.tscn"
+run/main_scene="res://Scenes/Menu/Main_menu.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 run/max_fps=60
 boot_splash/bg_color=Color(0.141176, 0.141176, 0.141176, 1)
@@ -29,6 +29,7 @@ BuildDB="*res://Script/Based/BuildDB.gd"
 LvlupDB="*res://Script/Based/LvlupDB.gd"
 CreepsDB="*res://Script/Based/CreepsDB.gd"
 HeroesDB="*res://Script/Based/HeroesDB.gd"
+Lobby="*res://Script/Multiplayer/Lobby.gd"
 
 [display]
 

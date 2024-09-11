@@ -167,8 +167,8 @@ func collide_cards():
 	#their axis
 	var tween = get_tree().create_tween().set_parallel(true)
 	var population = get_child_count()
-	var mid = ceil(population/2)
-	var center = handwidth/2
+	var mid = ceil(population/2.0)
+	var center = handwidth/2.0
 	var compression_multiplier = 1
 	var compression_start = 5
 	if population >= compression_start:

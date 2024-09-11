@@ -523,7 +523,7 @@ func take_combat_damage():
 	take_damage(damage_to_be_taken)
 
 
-func refresh_neighbours_from_my_death(id, parent, opposer):
+func refresh_neighbours_from_my_death(id, _parent, opposer):
 #	if Base.Combat_phase == 0:
 #already checked in parent function
 
@@ -816,7 +816,7 @@ func ItemEffect_preview():
 #	print("itemeffecting")
 	effect_over_hovered_unit(MYrena_rect.EquippingItem, Iteming, IEFFECT, caller)
 	
-func effect_over_hovered_unit(cond1, cond2, effect, caller):
+func effect_over_hovered_unit(_cond1, _cond2, effect, _caller):
 	#	while condition1 == 1 and condition2 == 1:    <----BASICALLY THIS 
 	
 	var population = self.get_child_count()
@@ -902,7 +902,7 @@ func LVLUP():
 	increase_AttackM(1,1)
 	increase_HealthM(1,1)
 	await hand_rect.draw_a_lvlup_card(Identification, LVLUP_type)
-	Card_layer
+#	Card_layer
 	
 func hide_ability():
 	Ability1.hide_myself()
@@ -1314,7 +1314,8 @@ func redirect_damage(target):
 			
 			#well now that we have creeps we have to take them into account:
 			if straight_target != null:
-				push_error("well now that we have creeps we have to take them into account:")
+#				push_error("well now that we have creeps we have to take them into account:")
+				#I have no idea what this does, but it works
 				straight_target.Im_no_longer_attacked_only_by(self,Siege)
 			
 			damage_used_up_1 = 0
@@ -1406,7 +1407,7 @@ func Im_attacked_only_by(attacker, _attackers_siege):
 	
 	
 func Im_side_attacked_by(attacker):		
-	var opposer = await get_opposer()
+#	var opposer = await get_opposer()
 #	if opposer.Siege == true and opposer.targeting == "straight":
 #		var damage_to_be_subtracted = opposer.damage_used_up_1 - (besieged_damage + ArmorC)
 #		damage_to_be_taken -= damage_to_be_subtracted
@@ -1438,7 +1439,7 @@ func Im_straight_attacked_by(attacker):
 	#armor shenanigans
 	increase_damage_to_be_taken(expected_damage)  
 		
-func Im_no_longer_attacked_only_by(attacker, attackers_siege):
+func Im_no_longer_attacked_only_by(attacker, _attackers_siege):
 	var dmg = attacker.damage_used_up_1
 	if dmg > 0:
 		attacker.damage_used_up_1 = 0
@@ -1600,8 +1601,10 @@ func lane_aura_check():
 
 
 
-func connect_my_passive_trigger(_AbilityNode, PassiveTrigger):
-	var function_to_call = str(PassiveTrigger)+"_list"
+func connect_my_passive_trigger(_AbilityNode, _PassiveTrigger):
+#	var function_to_call = str(PassiveTrigger)+"_list"
+	pass
+	#???wtf
 
 
 
@@ -1715,7 +1718,7 @@ func refresh_me_from_being_annulled():
 	if my_damage_was_annuled == false:
 		printerr("unit forced to be refreshed_from_being_annulled despite not being annulled")
 	else:
-		var opposer = await get_opposer()
+#		var opposer = await get_opposer()
 		var my_index = get_index()
 		var target
 		if targeting == "straight": #and opposer.TYPE == 7: #notsure if needed

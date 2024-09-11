@@ -77,7 +77,7 @@ func _ready() -> void:
 
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 #	if _visuals.visible:
 #		var cam_pos = base_camera.global_position
 		var border = Vector2(get_viewport().size)  - padding

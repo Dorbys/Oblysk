@@ -72,6 +72,10 @@ func _ready():
 	#I guess since there are so many nodes some script 
 		#may run before all nodes are created
 		
+	Base.the_button = self
+	#autoload script contains pointer to node that doesn't exist 
+		#at game start
+	
 	new_lane()
 
 func new_lane():
@@ -217,9 +221,9 @@ func move_to_next_lane():
 		#this is for end of round
 		round_end()
 		
-		if Base.current_lane == 3:
-				towerA.player_HP.new_damage_to_be_taken(0, towerA.name)
-				towerB.player_HP.new_damage_to_be_taken(0, towerB.name)
+
+		towerA.player_HP.new_damage_to_be_taken(0, towerA.name)
+		towerB.player_HP.new_damage_to_be_taken(0, towerB.name)
 		#so that it doesn't show someone is gonna take dmg
 				
 		camera_2d.move_camera_to_lane(Base.current_lane)

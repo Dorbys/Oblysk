@@ -15,7 +15,7 @@ anchors_preset = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
 
-[node name="Button" type="Button" parent="."]
+[node name="X_cross" type="Button" parent="."]
 layout_mode = 0
 offset_left = 1876.0
 offset_right = 1920.0
@@ -42,4 +42,4 @@ rotation = 0.205949
 texture = ExtResource("3_6qqj5")
 expand_mode = 1
 
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="X_cross" to="." method="_on_button_pressed"]

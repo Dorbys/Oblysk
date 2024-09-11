@@ -2,13 +2,16 @@ extends ScrollContainer
 
 
 @onready var hand_rect = %HandRect
+@onready var opponent_info = $".."
 
 
+func _ready():
+	if Lobby.MULTIPLAYER == false:
+		opponent_info.visible = false
 
 
-
-func _on_draw_1_pressed():
-	draw_cards(1)
+#func _on_draw_1_pressed():
+#	draw_cards(1)
 		
 func draw_cards(amount):
 	for i in amount:

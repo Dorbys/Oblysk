@@ -28,8 +28,7 @@ func increase_xp(amount):
 	
 	%XP_Count.text = str(XP)
 	
-var enemy_info_panel:bool
-#to determine whether this is players xp or opponent's
+
 
 #var HeroDeck = [0,4,2,3,1]
 #ACAMAR 	PLOTT 		KAJUS		KIMMEDI 	DORBYS
@@ -37,20 +36,13 @@ func _ready():
 	%XP_Count.text = str(XP)
 	hero_pfp_labels_in_deck_order = [h_0,h_1,h_2,h_3,h_4]
 	hero_xp_labels_in_deck_order = [h_0xp,h_1xp,h_2xp,h_3xp,h_4xp]
-	if get_parent().name == "Opponent_info":
-		enemy_info_panel = true
-	else:
-		enemy_info_panel = false
 	update_xp_labels()
 	update_pfps()
 	
 
 func update_xp_labels():
-	if enemy_info_panel == true:
-		pass
-	else:
-		for i in 5:
-			hero_xp_labels_in_deck_order[i].text = str(Base.Player_heroes[i].Lvlup_xp)
+	for i in 5:
+		hero_xp_labels_in_deck_order[i].text = str(Base.Player_heroes[i].Lvlup_xp)
 
 func update_pfps():
 		for i in 5:

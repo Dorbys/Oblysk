@@ -1,0 +1,186 @@
+[gd_scene load_steps=6 format=3 uid="uid://cjqmj0pro1jag"]
+
+[ext_resource type="Script" path="res://Script/UI_layer/Opponent_info/Opponent_XP_panel.gd" id="1_732d2"]
+[ext_resource type="LabelSettings" uid="uid://diptopk45kn1x" path="res://Setts/Labels/XP_Panel_XP.tres" id="2_i6pda"]
+[ext_resource type="Texture2D" uid="uid://bwrv2au3kpysq" path="res://Assets/PREUI/Hover_XP_Heroes.jpg" id="3_pqcjl"]
+[ext_resource type="Texture2D" uid="uid://ba3m2oqvqd43m" path="res://Assets/Textures/Missing_texture.png" id="4_0p6vi"]
+[ext_resource type="LabelSettings" uid="uid://idlo8sks3m3i" path="res://Setts/Labels/XP_Hover_XP.tres" id="5_m48op"]
+
+[node name="Opponent_XP_panel" type="Panel"]
+self_modulate = Color(1, 0.894118, 1, 1)
+offset_right = 140.0
+offset_bottom = 100.0
+script = ExtResource("1_732d2")
+
+[node name="XP_Count" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 120.0
+offset_bottom = 100.0
+text = "11"
+label_settings = ExtResource("2_i6pda")
+horizontal_alignment = 1
+
+[node name="Hover" type="TextureRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = -240.0
+offset_right = 120.0
+offset_bottom = 300.0
+mouse_filter = 2
+texture = ExtResource("3_pqcjl")
+expand_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Hover"]
+layout_mode = 2
+offset_right = 360.0
+offset_bottom = 300.0
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Hover/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 21.0
+mouse_filter = 2
+
+[node name="H0" type="TextureRect" parent="Hover/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("4_0p6vi")
+expand_mode = 1
+
+[node name="H0XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "12"
+label_settings = ExtResource("5_m48op")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control" type="Control" parent="Hover/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.2
+mouse_filter = 2
+
+[node name="H1" type="TextureRect" parent="Hover/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("4_0p6vi")
+expand_mode = 1
+
+[node name="H1XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "12"
+label_settings = ExtResource("5_m48op")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control2" type="Control" parent="Hover/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.5
+mouse_filter = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Hover/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 11.0
+mouse_filter = 2
+
+[node name="H2" type="TextureRect" parent="Hover/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(0, 85)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("4_0p6vi")
+expand_mode = 1
+
+[node name="H2XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "12"
+label_settings = ExtResource("5_m48op")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control" type="Control" parent="Hover/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.2
+mouse_filter = 2
+
+[node name="H3" type="TextureRect" parent="Hover/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(0, 85)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("4_0p6vi")
+expand_mode = 1
+
+[node name="H3XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "12"
+label_settings = ExtResource("5_m48op")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control3" type="Control" parent="Hover/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Hover/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 7.0
+mouse_filter = 2
+
+[node name="Control2" type="Control" parent="Hover/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+
+[node name="H4" type="TextureRect" parent="Hover/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("4_0p6vi")
+expand_mode = 1
+
+[node name="H4XP" type="Label" parent="Hover/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+text = "12"
+label_settings = ExtResource("5_m48op")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Control" type="Control" parent="Hover/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
