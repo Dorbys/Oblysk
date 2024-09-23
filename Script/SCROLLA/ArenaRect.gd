@@ -13,6 +13,10 @@ extends ColorRect
 @onready var scroller = $"../../.."
 @onready var MYrena_mid = $"../ArenaMid"
 
+var abarena: Node
+#found during _ready
+var arena_meine: Node
+
 # ::::::::::::::::::
 @export var CARD: PackedScene
 @export var SHADOW: PackedScene
@@ -79,11 +83,14 @@ func _ready():
 		OP_identity = 1
 		OPTower = $"../../../../../Tower_layer/TowerB"
 		MYTower = $"../../../../../Tower_layer/TowerA"
+		abarena = $"../../../../SCROLLB/Abarena/SIZECHECK/ArenaRect"
+		
 	elif (self.get_parent().get_parent().name) == "Abarena":
 		MY_identity = "B"
 		OP_identity = 0
 		OPTower = $"../../../../../Tower_layer/TowerA"
 		MYTower = $"../../../../../Tower_layer/TowerB"
+		arena_meine = $"../../../../SCROLLA/Arena/SIZECHECK/ArenaRect"
 	else: push_error("Arena has an identity crisis :(")
 	
 	OPrena_rect = self.get_parent().get_parent().get_parent().get_parent().get_child(OP_identity).get_child(0).get_child(0).get_child(2)
@@ -142,7 +149,7 @@ func Adding_Units(_at_position, ID, has_ability):
 		another.Unit_Ability_cooldown = AbilitiesDB.CREEP_ABILITIES_DB[ID][AbilitiesDB.COOLDOWNPOSITION]
 		another.has_ability = true
 	
-	another.HERO = 0
+	another.HERO = false
 	another.Identification = ID
 	if MY_identity == "B": 
 		another.position.y = BOFFSET
@@ -190,7 +197,7 @@ func Cheating_Units(ID, has_ability):
 		another.Unit_Ability_cooldown = AbilitiesDB.CREEP_ABILITIES_DB[ID][AbilitiesDB.COOLDOWNPOSITION]
 		another.has_ability = true
 	
-	another.HERO = 0
+	another.HERO = false
 	another.position.x= STARTSET + population * (Card_and_offset)
 	
 	if MY_identity == "B": 
@@ -223,7 +230,7 @@ func spawn_unit(ID):
 		another.Unit_Ability_cooldown = AbilitiesDB.CREEP_ABILITIES_DB[ID][AbilitiesDB.COOLDOWNPOSITION]
 		another.has_ability = true
 	
-	another.HERO = 0
+	another.HERO = false
 	
 	another.position.x= STARTSET + spawning_slot * (Card_and_offset)
 	if MY_identity == "B": 
@@ -474,7 +481,9 @@ func new_slot_for_shadow_follow():
 		New_Slot = round(New_Slot)
 	return New_Slot
 	
-func new_random_slot():
+func new_random_slot(forced = null):
+	#forced is used for multiplayer
+		#host tells joiner where to land
 	var Random_slot = 0
 	empty_slots = []
 	for i in self.get_child_count():
@@ -482,20 +491,34 @@ func new_random_slot():
 			empty_slots.append(i)
 
 	if len(empty_slots) != 0:
-		
-		randomize()  # Initialize the random number generator
-		var random_index = randi() % empty_slots.size()
-		Random_slot = empty_slots[random_index]
-		var replacing_void = get_child(empty_slots[random_index])
-#			var new_x = replacing_void.position.x
-		RIP_BOZO(replacing_void)
-#		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		if forced == null:
+			randomize()  # Initialize the random number generator
+			var random_index = randi() % empty_slots.size()
+			Random_slot = empty_slots[random_index]
+			var replacing_void = get_child(empty_slots[random_index])
+	#			var new_x = replacing_void.position.x
+			RIP_BOZO(replacing_void)
+	#		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		elif forced != null:
+			for i in len(empty_slots):
+				if empty_slots[i] == forced:
+					Random_slot = empty_slots[i]
+					var replacing_void = get_child(empty_slots[i])
+					RIP_BOZO(replacing_void)
+					
 	else:
-		var random_index = randf()
-		if random_index <  0.5:
+		if forced == null:
+			var random_index = randf()
+			if random_index <  0.5:
+				Random_slot = self.get_child_count()
+			OPrena_rect.insert_void(Random_slot, 1, 1)
+		elif forced == 0:
+			OPrena_rect.insert_void(Random_slot, 1, 1)
+			#random slot is already 0
+		elif forced > 0:
 			Random_slot = self.get_child_count()
-		OPrena_rect.insert_void(Random_slot, 1, 1)
-		
+			OPrena_rect.insert_void(Random_slot, 1, 1)
+			#rightmost slot
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	return Random_slot
 	
@@ -514,7 +537,7 @@ func insert_void(index, sett_status = 1, sitt_status = 1):
 		another.SITT = 1
 		
 	add_child(another)
-	place_me_at(another, index)
+	await place_me_at(another, index)
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	#for combat phase to work KEEEEEEEEEEP
 	
@@ -642,7 +665,7 @@ func create_hero(ID):
 	another.Unit_Armor = DB_slot[HeroesDB.ARMORPOSITION]
 	another.Lvlup_xp = DB_slot[HeroesDB.XPPOSITION]
 
-	another.HERO = 1
+	another.HERO = true
 	another.Identification = ID
 	another.VOIDING = 0
 	#idk
@@ -661,7 +684,8 @@ func create_hero(ID):
 func transfer_hero_to_spawner(target):
 	#used at the beginning of the game to move the heroes that were created here
 	#to spawner from which they can be sent elsewhere
-	target.appear_dead()
+	await target.appear_dead()
+#	push_error("transfering: " +str(target.Unit_Name) + " to spawner")
 	remove_child(target)
 	if MY_identity == "A":
 		spawner.add_child(target)
@@ -669,7 +693,7 @@ func transfer_hero_to_spawner(target):
 		opponent_spawner.add_child(target)
 	
 	
-	insert_void(0,1,1)
+	await insert_void(0,1,1)
 
 	
 	#otherwise they would've remember they are already attacking the tower
@@ -679,9 +703,17 @@ func transfer_hero_to_spawner(target):
 	#this removes the temporary void 
 	#which is necc for the full ready function of unit
 	
-	
-func respawn_here(target):
-	
+@rpc("any_peer", "call_remote", "reliable")
+func respawn_here(target, rpced_slot = null, faction = null):
+	if faction != null:
+		push_error(faction + " hero is respawning at " +str(rpced_slot))
+		if faction == "alpha":
+			target = Base.Player_heroes[target]
+		elif faction == "beta":
+			target = Base.Opponent_heroes[target]
+		else: push_error("unknown respawn_here faction value")
+		#if this was rpced to us, 'target' contains index where to look for the hero
+			#else its the node
 	target.straight_target = null
 	target.side_target = null
 	target.damage_used_up_1 = 0
@@ -691,8 +723,12 @@ func respawn_here(target):
 	#MUST BE HERE TO START THE GAME CUZ HEROES ARE MADE IN L1
 	##################################################################
 	target.scale = Vector2(1,1)
-	
-	var landing_slot = await new_random_slot()
+	var landing_slot
+	if rpced_slot == null:
+		landing_slot = await new_random_slot()
+	else:
+		landing_slot = await new_random_slot(rpced_slot)
+		
 	target.reparent(self)
 	move_child(target, landing_slot)
 	target.respawn(1)
@@ -701,6 +737,24 @@ func respawn_here(target):
 	UNITS_MOVED_YO()
 	#sends signal yo
 	
+	if Lobby.MULTIPLAYER == true and rpced_slot == null:
+		var opposite_faction = "beta"
+		var index = Base.Player_heroes.find(target)
+		#returns index of target in the Herodeck
+		if index == -1:
+			#if we didn't find it
+			index = Base.Opponent_heroes.find(target)
+			opposite_faction = "alpha"
+		if index == -1:
+			#if it wasn't found it opponentHeroDeck either
+			push_error("Respawn target not found in either of the herodecks")
+		else: 
+			if abarena:
+				abarena.rpc_id(Lobby.opponent_peer_id, "respawn_here", index, landing_slot, opposite_faction)
+			elif arena_meine:
+				arena_meine.rpc_id(Lobby.opponent_peer_id, "respawn_here", index, landing_slot, opposite_faction)
+			else: push_error("abarena nor arena_meine is available")
+			
 func land_here(target):
 	#same as respawn_here but for when a unit enters this lane from elsewhere
 	#D12 is used
@@ -715,9 +769,30 @@ func land_here(target):
 	UNITS_MOVED_YO()
 	#sends signal yo
 
-func spawn_lane_creep():
-	var spawning_slot = await new_random_slot()		
-	
+@rpc("any_peer", "call_remote", "reliable")
+func spawn_lane_creep(rpced_slot = null, forced_here = false):
+	var spawning_slot
+	if rpced_slot == null:
+		spawning_slot = await new_random_slot()		
+	else:
+		if forced_here == false:
+			spawning_slot = rpced_slot
+			#new_radnom_slot GENERATES VOIDS !!! 
+			
+			if abarena:
+				#if abarena isn't null -> I'm not abarena
+				abarena.spawn_lane_creep(rpced_slot, true)
+#				push_error("telling abarena to spawn creep at " +str(rpced_slot))
+				return
+			elif arena_meine:
+				arena_meine.spawn_lane_creep(rpced_slot, true)
+#				push_error("telling arena_meine to spawn creep at " +str(rpced_slot))
+				return
+		elif  forced_here == true:
+			spawning_slot = await new_random_slot(rpced_slot)
+			#voids need to be created after arena or abarena is decided
+			
+#	push_error("creating creep at:" +str(rpced_slot) +" " +str(abarena) +" " +str(arena_meine))
 	var another = CARD.instantiate()
 	var ID = 0
 	var DB_slot = CreepsDB.SPECIAL_DB[ID]
@@ -728,7 +803,7 @@ func spawn_lane_creep():
 	another.Unit_Health = DB_slot[CreepsDB.HEALTHPOSITION]
 	another.Unit_Armor = DB_slot[CreepsDB.ARMORPOSITION]
 	
-	another.HERO = 0
+	another.HERO = false
 	another.Identification = ID
 	if MY_identity == "A":
 		another.Unit_Pfp = Base.SPECIAL_TEXTURES[ID]
@@ -744,6 +819,9 @@ func spawn_lane_creep():
 	move_child(another, spawning_slot)
 	collide_units()
 #	another.respawn()
+	if rpced_slot == null:
+		rpc_id(Lobby.opponent_peer_id, "spawn_lane_creep", spawning_slot)
+#		push_error("sending joiner order to spawn a lane creep at " +str(spawning_slot))
 	
 func reset_curving():
 	#BRATTY CURVING, NEEDS TO BE CORRECTED
@@ -768,7 +846,7 @@ func is_there_a_hero_check():
 		var target
 		for i in population:
 			target = get_child(i)
-			if target.TYPE == 0 and target.HERO == 1:
+			if target.TYPE == 0 and target.HERO == true:
 				return true
 		return false
 	print("there is always a caster")

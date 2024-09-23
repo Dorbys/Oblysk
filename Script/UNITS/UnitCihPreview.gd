@@ -18,7 +18,7 @@ var Card_Cost = 0
 var TYPE = 0
 var has_ability = false
 #var actually_exiting = 1
-var HERO = 0
+var HERO = false
 var Card_XP
 
 func _ready():

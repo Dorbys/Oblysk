@@ -17,7 +17,8 @@ func _ready():
 			wielder.increase_AttackM(target.AttackM,1)
 	
 
-func new_lane(new_tower_layer):
+func new_lane(_new_tower_layer):
+	#currently just because all passives must have this
 	pass
 
 

@@ -154,7 +154,7 @@ func collide_units(skip_target = -1, pretty = 1):
 
 func _can_drop_data(_at_position, data):
 	#data these: HeroNode , parent
-	if data[0].HERO == 1:
+	if data[0].HERO == true:
 		return true
 		
 func _drop_data(_at_position, data):
@@ -230,7 +230,7 @@ func _drop_data(_at_position, data):
 
 			
 func deploy_unit(target):
-	if target.HERO != 0:
+	if target.HERO == true:
 		target.appear_alive()
 		target.leave_draggable_state()
 		my_lane.respawn_here(target)
@@ -246,7 +246,27 @@ func deploy_unit(target):
 		my_lane.spawn_unit(3)
 		target.queue_free()
 	else:
+		#sommelier
 		my_lane.spawn_unit(4)
 		target.queue_free()
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout		
 		
+func deploy_unit_MP(target):
+	#only in multiplayer
+	if target.HERO == true:
+		target.appear_alive()
+		target.leave_draggable_state()
+		if Lobby.opponent_peer_id != 1:
+			my_lane.respawn_here(target)
+		
+		
+		
+	elif target.Unit_Name == "AlphaCreep":
+		if Lobby.opponent_peer_id != 1:
+			my_lane.spawn_lane_creep()
+		target.queue_free()
+	#since Alphacreeps aren't units but UnitCIHPreviews 
+		#we have to do this workaround yea 
+		
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	

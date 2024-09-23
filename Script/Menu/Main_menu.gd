@@ -22,6 +22,8 @@ var my_peer_id
 func _on_sp_pressed():
 	Lobby.MULTIPLAYER = false
 	var new_scene_path = "res://Scenes/oblysk.tscn"  # Replace with your scene path
+	if Lobby.player_name == "":
+		Lobby.player_name = "You"
 	get_tree().change_scene_to_file(new_scene_path)
 
 
@@ -32,6 +34,8 @@ func _on_host_pressed():
 	#telling game that we are the server
 	my_peer_id = 1
 	#server's id is always 1
+	if Lobby.player_name == "":
+		Lobby.player_name = "host"
 	
 	multiplayer_peer.peer_connected.connect(someone_joined)
 
@@ -40,16 +44,20 @@ func _on_join_pressed():
 	multiplayer.multiplayer_peer = multiplayer_peer
 	#telling game that we are the client
 	my_peer_id = multiplayer.get_unique_id()
+	if Lobby.player_name == "":	
+		Lobby.player_name = "join"
 	
 	
 
 
 
 func someone_joined(new_peer_id):
-	await get_tree().create_timer(1).timeout
-	start_game()
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	Lobby.opponent_peer_id = new_peer_id
 	rpc_id(new_peer_id, "start_game")
+	start_game()
+	#since the rpc travels for a moment, it's better to send it BEFORE 
+		#starting the game localy
 	
 
 func _on_close_waiting_button_pressed():
@@ -66,12 +74,15 @@ func _on_close_waiting_button_pressed():
 	
 @rpc("authority", "call_local", "reliable")
 func start_game():
-	if Lobby.opponent_peer_id == null:
+	if Lobby.opponent_peer_id == 0:
+		#since I declared it as :int it  now havs different default value
+#		push_error("setting joiner's opponent_peer_id to 1")
 		Lobby.opponent_peer_id = 1
-		
-	if $LineEdit.text == null:
-		Lobby.player_name = my_peer_id
+		Base.swap_player_decks()
 	else:
+		Lobby.host = true
+		
+	if $LineEdit.text != "":
 		Lobby.player_name = $LineEdit.text
 	
 #	%Player_HP.rpc_id(Lobby.opponent_peer_id, "set_opponent_name", Lobby.player_name)
@@ -85,10 +96,9 @@ func start_game():
 	var new_scene_path = "res://Scenes/oblysk.tscn"  # Replace with your scene path
 	get_tree().change_scene_to_file(new_scene_path)
 	
-
-	
-
-
+func _input(event):
+	if Input.is_action_just_pressed("ui_cancel"):
+		get_tree().quit()
 
 
 

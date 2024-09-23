@@ -23,12 +23,14 @@ extends Control
 
 
 func _ready():
-	await initiate_heroes(Base.HeroDeck,arena_rect1,towerB)
-	
+
 	if Lobby.MULTIPLAYER == true:
-		await get_tree().create_timer(0.1).timeout
-		await initiate_heroes(Base.OpponentHeroDeck,abarena_rect1,towerA)
-	
+			await initiate_heroes(Base.HeroDeck,arena_rect1,towerB)
+			await get_tree().create_timer(0.1).timeout
+			await initiate_heroes(Base.OpponentHeroDeck,abarena_rect1,towerA)
+	else:
+		await initiate_heroes(Base.HeroDeck,arena_rect1,towerB)
+
 	await get_tree().create_timer(0.1).timeout
 	#guess I need to wait a moment?
 		#not all nodes probly have time to spawn
@@ -41,22 +43,13 @@ func initiate_heroes(deck, arena_rect, tower):
 		#crates the five heroes from players hero deck
 		arena_rect.create_hero(deck[i%herocount])
 		
-#	arena_rect.collide_units()
-	#not needed?
 	
-	for i in 3:
-		#3 of them will be randomly deployed to a lane
-		var target = arena_rect.get_child(i)
-		#has to be 0 else it will take the third and fifth basly
-		#has to be i actually cuz I'm replacing them with voids as we go
-		arena_rect.transfer_hero_to_spawner(target)
-		#doing it like this so that I deal with voids over there as well
-
+	arena_rect.move_child(arena_rect.get_child(3),5)
+	#because that hero is to respawn before hero on last slot
 	
+	Add_grave(arena_rect.get_child(4), arena_rect)
+	arena_rect.insert_void(4,1,1)
 	
-		
-	Add_grave(arena_rect.get_child(3), arena_rect)
-	arena_rect.insert_void(0,1,1)
 	if arena_rect == arena_rect1:
 		await update_arena_dsc()
 	else:
@@ -69,20 +62,39 @@ func initiate_heroes(deck, arena_rect, tower):
 	#HERE FOR AGROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO DEPLOY
 	#11111111111111111111111111111111111111111111111111111111111111111111111111
 	
-	Add_grave(arena_rect.get_child(4), arena_rect)
-	arena_rect.insert_void(0,1,1)
-	#takes the last hero out and places a void, so that they can be cleared now	
+	Add_grave(arena_rect.get_child(3), arena_rect)
+	arena_rect.insert_void(3,1,1)
+	#takes the hero out and places a void,
 	
 	
-	#################################3
-	if arena_rect == abarena_rect1:
-		await update_abarena_dsc()
-	#for testing of fakespawner opponent
-	###################################3
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+
+
+	
+	for i in 3:
+		#3 of them will be randomly deployed to a lane
+		var target = arena_rect.get_child(i)
+		#has to be 0 else it will take the third and fifth basly
+		#has to be i actually cuz I'm replacing them with voids as we go
+		await arena_rect.transfer_hero_to_spawner(target)
+		#doing it like this so that I deal with voids over there as well
+
+	
+	
+		
+	
+	
+#	#################################3
+#	if arena_rect == abarena_rect1:
+#		await update_abarena_dsc()
+#	#for testing of fakespawner opponent
+#	###################################3
 	
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	#waiting for the last hero to complete
+	
 	await card_layer1.clear_up_both()
+	
 	#remove the remaining voids
 	tower.damage_to_be_taken = 0
 	tower.increase_damage_to_be_taken(0)
@@ -90,49 +102,37 @@ func initiate_heroes(deck, arena_rect, tower):
 
 	
 func Add_grave(node, parent):
+	var death_showcase: Node
+#	push_error("adding grave for: " +str(node.Unit_Name))
 	if parent == arena_rect1 or parent == arena_rect2 or parent == arena_rect3:
-		for i in 5:
-			var target = arena_dsc.get_child(i)
-			if target.r_time == 0:
+		death_showcase = arena_dsc
+	else: 
+		death_showcase = abarena_dsc
+		
+	for i in 5:
+		var target = death_showcase.get_child(i)
+		if target.r_time == 0:
 #				await get_tree().create_timer(card_layer.death_anim_length).timeout
 #				parent.remove_child(node)
 #				parent.insert_void(index,1,1)
 #				target.add_child(node)
-				node.visible = false
-				node.alive = 0
-				#twice cuz initiating the game doesnt actually kill them
-				#and wanna have sure opposer stays fine
-				node.reparent(target)
-				
-				target.texture = node.Unit_Icon
-				#getting texture has to be before making it invisible
+			node.visible = false
+			node.alive = 0
+			#twice cuz initiating the game doesnt actually kill them
+			#and wanna have sure opposer stays fine
+			node.reparent(target)
+#			push_error("attempting to reparent")
+			
+			
+			target.texture = node.Unit_Icon
+			#getting texture has to be before making it invisible
 #				node.visible= false
-				target.r_time = 3
+			target.r_time = 3
 #				if Base.Combat_phase == 0:
-				target.r_update()
+			target.r_update()
+			
+			break
 				
-				break
-				
-	if parent == abarena_rect1 or parent == abarena_rect2 or parent == abarena_rect3:
-		for i in 5:
-			var target = abarena_dsc.get_child(i)
-#			print(target.r_time)
-			if target.r_time == 0:
-#				await get_tree().create_timer(card_layer.death_anim_length).timeout
-#				parent.remove_child(node)
-#				target.add_child(node)
-				node.visible = false
-				node.alive = 0
-				#twice cuz initiating the game doesnt actually kill them
-				#and wanna have sure opposer stays fine
-				node.reparent(target)
-				target.texture = node.Unit_Icon
-#				node.visible= false
-				target.r_time = 3
-				if Base.Combat_phase == 0:
-					target.r_update()
-				break
-		
 func respawn(grave, hero):
 	var parent = grave.get_parent()
 	if parent == arena_dsc:
@@ -258,12 +258,13 @@ func update_arena_dsc():
 	var targets = arena_dsc
 	for j in 5:
 		targets.get_child(j).r_update()
-		await get_tree().create_timer(Base.FAKE_GAMMA).timeout
+#		await get_tree().create_timer(Base.FAKE_GAMMA).timeout
+		#waiting here?
 			
 func update_abarena_dsc():
 	var targets = abarena_dsc
 	for j in 5:
 		targets.get_child(j).r_update()
-		await get_tree().create_timer(Base.FAKE_GAMMA).timeout
+#		await get_tree().create_timer(Base.FAKE_GAMMA).timeout
 		
 #these two are mainly for beginning of the game to not intercept

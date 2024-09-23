@@ -33,6 +33,10 @@ func increase_xp(amount):
 #var HeroDeck = [0,4,2,3,1]
 #ACAMAR 	PLOTT 		KAJUS		KIMMEDI 	DORBYS
 func _ready():
+	#HERE 
+	await get_tree().create_timer(1).timeout
+
+	
 	%XP_Count.text = str(XP)
 	hero_pfp_labels_in_deck_order = [h_0,h_1,h_2,h_3,h_4]
 	hero_xp_labels_in_deck_order = [h_0xp,h_1xp,h_2xp,h_3xp,h_4xp]

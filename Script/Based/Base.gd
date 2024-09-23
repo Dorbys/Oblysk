@@ -102,10 +102,17 @@ var index = PlayerDeck.find(["creep",0])
 	
 var HeroDeck = [1,4,2,3,0]
 #DORBYS 	PLOTT 		KAJUS		KIMMEDI 	ACAMAR
-
+#var HeroDeck = [1, 1 , 1, 1, 1,]
 #this is copied over and reordered to OpponentDeck atm 
-var OpponentHeroDeck = [1,4,0,3,2]
+var OpponentHeroDeck = [0,3,1,4,2]
 
+func swap_player_decks():
+	#this will be replaced by sending playerdecks later on
+	var temp = HeroDeck.duplicate()
+	HeroDeck = []
+	HeroDeck = OpponentHeroDeck.duplicate()
+	OpponentHeroDeck = temp.duplicate()
+	
 var Player_heroes = []
 #this array is appended by hero nodes 
 #after they are initiated in arena during game start

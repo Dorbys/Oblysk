@@ -5,6 +5,9 @@ var r_time = 0
 var green = Color(1, 2, 1, 1)
 var red = Color(2, 1, 1, 1)
 
+
+
+	
 func r_update():
 	if r_time > 0:
 		r_time -= 1

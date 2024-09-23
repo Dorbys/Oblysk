@@ -39,8 +39,17 @@ var Lvlup_xp = 0
 #increased only for heroes
 var Grants_xp = 0
 #increased only for creeps
-var HERO = 0
+var HERO: bool = false
 var Identification = 3
+
+#================================================================
+var MY_UNIQUE_UNIT_KEY: int
+#every unit is granted a unique number based on when it's created
+	#for MP
+	#number corresponds to it's position in the Lobby.universal_global_unit_array
+	#first 10 slots are reserved for heroes
+#================================================================
+
 
 #var UNIT = 1
 #var SPELL = 0
@@ -181,6 +190,36 @@ var can_lvlup = true
 
 
 func _ready():
+	################################################################
+	if HERO == false:
+		Lobby.unique_unit_key += 1
+		Lobby.universal_global_unit_array.append(self)
+		
+	if MYrena_rect.MY_identity == "A":
+		faction = "alpha"
+	elif MYrena_rect.MY_identity == "B":
+		faction = "beta"
+	else: push_error("MYrenaRect has conflicting OP_identity")
+	
+	if HERO == true:
+		var my_slot:int
+		if Lobby.host == true:
+			if faction == "alpha":
+				my_slot = Base.HeroDeck.find(Identification)
+			else:
+				my_slot = 5 + Base.OpponentHeroDeck.find(Identification)
+		else: 
+			if faction == "beta":
+				my_slot = Base.HeroDeck.find(Identification)
+			else:
+				my_slot = 5 + Base.OpponentHeroDeck.find(Identification)
+		Lobby.universal_global_unit_array[my_slot] = self
+		MY_UNIQUE_UNIT_KEY = my_slot
+	################################################################
+	#that part was for unique_unit_key
+	#has to be done asap cuz sync
+	################################################################
+	
 	OPrena = MYrena_rect.OPrena_rect
 #	%NAME.text = Unit_Name
 	%ATK.text = str(Unit_Attack)
@@ -204,14 +243,14 @@ func _ready():
 			Passiveness = false
 			Ability1.Im_active_and_ready()
 		else:
-#			if HERO == 1:
+#			if HERO == true:
 #				Passive_Trigger = AbilitiesDB.HERO_ABILITIES_DB[Identification][AbilitiesDB.PASSIVETRIGPOSITION]
 #			else:
 #				Passive_Trigger = AbilitiesDB.CREEP_ABILITIES_DB[Identification][AbilitiesDB.PASSIVETRIGPOSITION]
 			#not sure what this was for,  earlier passives wtf
 			
 			Ability1.Im_passive_and_ready()
-	if HERO == 0:
+	if HERO == false:
 		%weapon_slot.visible = false
 		%special_slot.visible = false
 		%armor_slot.visible = false
@@ -229,19 +268,15 @@ func _ready():
 	AttackC = Unit_Attack
 	ArmorC = Unit_Armor
 	
-#	if HERO == 0:
+#	if HERO == false:
 #		Grants_xp = CreepsDB.CREEPS_DB[Identification][CreepsDB.XPPOSITION]
 	#why was this in Unit1.gd ????????
 	
-	if HERO == 1:
+	if HERO == true:
 		Lvlup_xp = HeroesDB.HEROES_DB[Identification][HeroesDB.XPPOSITION]
 	#Isnt shown on text so its okay to load here
 	
-	if MYrena_rect.MY_identity == "A":
-		faction = "alpha"
-	elif MYrena_rect.MY_identity == "B":
-		faction = "beta"
-	else: push_error("MYrenaRect has conflicting OP_identity")
+	
 	
 	death_shader = load("res://Assets/Shaders/ShadeShade.gdshader")
 #	var death_material : ShaderMaterial = ShaderMaterial.new()
@@ -249,7 +284,7 @@ func _ready():
 	if Passiveness == true and has_ability == true:
 		var Passive_ability_node = Control.new()
 		var loaded_script
-		if HERO == 1:
+		if HERO == true:
 			loaded_script = load("res://Script/Passive_abilities_list/" +str(HeroesDB.HEROES_DB[Identification][HeroesDB.NAMEPOSITION])  +"_passive.gd")
 		else:	
 			loaded_script = load("res://Script/Creep_abilities_list/" +str(CreepsDB.CREEPS_DB[Identification][CreepsDB.NAMEPOSITION])  +"_passive.gd")
@@ -305,6 +340,7 @@ func respawn(silent = 0):
 	check_if_I_put_space_between_curving()
 
 func land():
+	#blink ig
 	new_lane()
 	
 	var opposer = await get_opposer()
@@ -312,6 +348,7 @@ func land():
 		straight_target = opposer
 	else:
 		straight_target = MYrena_rect.OPTower
+	
 		
 	curve_rng()
 	if opposer.TYPE == 0:
@@ -494,7 +531,7 @@ func Death_sudden(DMG):
 #	self.reparent(Card_layer)
 	
 	await get_tree().create_timer(Card_layer.visible_death_anim_length).timeout
-	if HERO == 0:
+	if HERO == false:
 		Card_layer.Death_care(self, id, par)
 	else :
 		clean_myself_from_effects()
@@ -645,7 +682,7 @@ func prep_phase():
 func whats_passive_abilitys_target():
 	var Target
 	var Ability_target
-	if HERO == 1:
+	if HERO == true:
 		Ability_target = AbilitiesDB.HERO_ABILITIES_DB[Identification][AbilitiesDB.TARGPOSITION]
 	else:
 		Ability_target = AbilitiesDB.CREEP_ABILITIES_DB[Identification][AbilitiesDB.TARGPOSITION]
@@ -685,13 +722,13 @@ func _can_drop_data(_at_position, DropData):
 			#if this is the current lane or the targeting is multilane
 			if DropData[0] == 1 or DropData[0] == 11:
 				#if its a spell:
-				if DropData[6] == "Hero" and HERO == 1 and MYrena_rect.Are_heroes_being_played_on == true:
+				if DropData[6] == "Hero" and HERO == true and MYrena_rect.Are_heroes_being_played_on == true:
 					return true
-				elif DropData[6] == "Creep" and HERO == 0 and MYrena_rect.Are_creeps_being_played_on == true:
+				elif DropData[6] == "Creep" and HERO == false and MYrena_rect.Are_creeps_being_played_on == true:
 					return true
 				elif DropData[6] == "Unit" and MYrena_rect.Are_heroes_being_played_on == true:
 					return true
-			elif DropData[0] == 2 and HERO == 1:
+			elif DropData[0] == 2 and HERO == true:
 				return true
 		return false
 
@@ -786,7 +823,7 @@ func _drop_data(_at_position, DropData):
 			
 func _on_slacksus_mouse_entered():
 	#	print("MOUSE ENTERED UNIT")
-	if (HERO == 1 and MYrena_rect.Are_heroes_being_played_on == true) or (HERO == 0 and MYrena_rect.Are_creeps_being_played_on == true):
+	if (HERO == true and MYrena_rect.Are_heroes_being_played_on == true) or (HERO == false and MYrena_rect.Are_creeps_being_played_on == true):
 	#Make an effect only if the dragged card can be played on me
 		if MYrena_rect.TargetingSpell == 1:
 			Aiming = 1
@@ -933,7 +970,6 @@ func _on_ColorRect_input(event):
 
 
 
-
 func curve_rng():
 	var my_slot = get_index()
 	var population = OPrena.get_child_count()
@@ -949,27 +985,47 @@ func curve_rng():
 	#bug includes being curved but the arrow not showing it
 
 	else:
-		var random_value = randf()  # Generates a random float between 0 and 1
-		if random_value < 0.4 and my_slot != 0:
-		# 42% chance 
-			#That looks like 40 bro
-			if OPrena.get_child(my_slot-1) != null and OPrena.get_child(my_slot-1).TYPE == 0:
-				curve_left()
+		if Lobby.host == true:
+			#only the host will calculate curving
+			var random_value = randf()  # Generates a random float between 0 and 1
+			if random_value < 0.4 and my_slot != 0:
+			# 42% chance 
+				#That looks like 40 bro
+				if OPrena.get_child(my_slot-1) != null and OPrena.get_child(my_slot-1).TYPE == 0:
+					curve_left()
+					make_my_mirror_self_curve("left")
+				else:
+					curve_straight()
+					make_my_mirror_self_curve("straight")
+			elif random_value >= 0.4 and random_value < 0.8 and my_slot != (population-1):
+			# Another 42% chance (totaling 84%)
+				if OPrena.get_child(my_slot+1) != null and OPrena.get_child(my_slot+1).TYPE == 0:
+					curve_right()
+					make_my_mirror_self_curve("right")
+				else:
+					curve_straight()
+					make_my_mirror_self_curve("straight")
 			else:
+			# Remaining 16% chance
 				curve_straight()
-		elif random_value >= 0.4 and random_value < 0.8 and my_slot != (population-1):
-		# Another 42% chance (totaling 84%)
-			if OPrena.get_child(my_slot+1) != null and OPrena.get_child(my_slot+1).TYPE == 0:
-				curve_right()
-			else:
-				curve_straight()
-		else:
-		# Remaining 16% chance
-			curve_straight()
+				make_my_mirror_self_curve("straight")
+		elif Lobby.host == false:
+			start_waiting_for_curve_data()
+
+@rpc("any_peer", "call_remote", "reliable")
+func make_my_mirror_self_curve(direction, unique_key = null):
+	push_error("trying to make_my_mirror_self_curve " +direction)
+	#can be "straight" "left" or "right"
+	var fun_to_call = "curve_" +direction
+	if unique_key == null:
+		rpc_id(Lobby.opponent_peer_id, fun_to_call)
+	
+func start_waiting_for_curve_data():
+	push_error("Waiting for curve data")
 		
 #RNG_curve should probably have its own shit, then we make the annul stuff		
 		
-		
+@rpc("any_peer", "call_remote", "reliable")
 func curve_left():
 	targeting = "left"
 #	print("curving left")
@@ -978,7 +1034,8 @@ func curve_left():
 		redirect_damage(OPrena.get_child(get_index()-1))
 	else:
 		curve_straight()	
-		
+
+@rpc("any_peer", "call_remote", "reliable")
 func curve_right():
 	targeting = "right"
 #	print("curving right")
@@ -987,7 +1044,8 @@ func curve_right():
 		redirect_damage(OPrena.get_child(get_index()+1))
 	else:
 		curve_straight()
-	
+		
+@rpc("any_peer", "call_remote", "reliable")
 func curve_straight():
 	targeting = "straight"	
 #	print("curving straight")
@@ -1638,7 +1696,6 @@ func new_lane():
 		#child 2 of ability is the one that is created during ready
 	
 	
-#	curve_rng()
 	
 	
 
@@ -1679,7 +1736,7 @@ func get_opposer(Index = get_index()):
 		
 	#WARNING EXPERIMENTAL SOLUTION	
 	
-	#at least it doesnt freeze and I can see where the problem at, nice
+	#at least it doesnt crash and I can see where the problem at, nice
 	#not like I can fix it though lule
 
 func I_have_position_aura():
@@ -1748,28 +1805,28 @@ func refresh_me_from_being_annulled():
 func hide_ability_and_items_mb():
 	#sets mouse filter to ignore, used when targeting units
 	hide_ability()
-	if HERO == 1:
+	if HERO == true:
 		%weapon_slot.hide_myself()
 		%special_slot.hide_myself()	
 		%armor_slot.hide_myself()
 		
 func reshow_ability_and_items_mb():
 	reshow_ability()	
-	if HERO == 1:
+	if HERO == true:
 		%weapon_slot.reshow_myself()
 		%special_slot.reshow_myself()	
 		%armor_slot.reshow_myself()
 	
 func disconnect_ability_and_items_mb():
 	disconnect_ability()
-	if HERO == 1:
+	if HERO == true:
 		%weapon_slot.disconnect_myself()
 		%special_slot.disconnect_myself()	
 		%armor_slot.disconnect_myself()
 		
 func reconnect_ability_and_items_mb():
 	reconnect_ability()	
-	if HERO == 1:
+	if HERO == true:
 		%weapon_slot.reconnect_myself()
 		%special_slot.reconnect_myself()	
 		%armor_slot.reconnect_myself()

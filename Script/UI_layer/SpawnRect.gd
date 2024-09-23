@@ -15,6 +15,8 @@ extends ColorRect
 @onready var beta_arena_rect3 = $"../../../Last_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect" 
 var arena_rects
 
+@onready var opp_spawn_rect = $"../Opponent_spawn_rect_fake"
+	
 
 var scale_down = 0.8
 #how much do we scale down the units
@@ -28,37 +30,49 @@ var colliding_units = 0
 func _ready():
 	arena_rects = [arena_rect1, arena_rect2,arena_rect3,
 	beta_arena_rect1,beta_arena_rect2,beta_arena_rect3]
+	
+	if opp_spawn_rect:
+		opp_spawn_rect.connect("child_entered_tree",_on_child_entered_tree)
 
 func INITIATE_THE_GAME():
 		
 	if Lobby.MULTIPLAYER == true:
 		player_HP.rpc_id(Lobby.opponent_peer_id, "set_opponent_name", Lobby.player_name)
+		
 	player_HP.set_my_name(Lobby.player_name)	
 		
-	var target
-	#SpawnRect should already have 3 heroes prepared there
-	var order_of_lanes_to_deploy = [%FirstLaneDeployRect,
-	%MidLaneDeployRect,%LastLaneDeployRect]
-	order_of_lanes_to_deploy.shuffle()
-	#ok so basically it shuffles
-	for i in 3:
-		target = get_child(2-i) 
-		remove_child(target) 
-		order_of_lanes_to_deploy[i].add_child(target)
-		#I'm not decreasing their scale since this won't be visible
+	deploy_my_heroes()
+	#better to keep this clientside since we gonna wait for it from both
+	
+#	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 
-	for i in starting_creep_count:
-		spawn_a_creep_in_random_lane_for_both_players(0)
+#	for i in starting_creep_count:
+#		spawn_a_creep_in_random_lane_for_both_players(0)
 		
-	%BetaFirstLaneDeployRect.create_a_super_creep()
-	%BetaMidLaneDeployRect.create_a_super_creep()
-	%BetaLastLaneDeployRect.create_a_super_creep()
-	#spawns a supercreept in each lane
+	if Lobby.MULTIPLAYER == false:
+		for i in starting_creep_count:
+			spawn_a_creep_in_random_lane_for_both_players(0)
+		
+		%BetaFirstLaneDeployRect.create_a_super_creep()
+		%BetaMidLaneDeployRect.create_a_super_creep()
+		%BetaLastLaneDeployRect.create_a_super_creep()
+		#spawns a supercreept in each lane
 			
-	assign_starting_buildings()
-				
+		assign_starting_buildings()
+		
+		
+	elif Lobby.MULTIPLAYER == true:
+		for i in starting_creep_count:
+			spawn_a_creep_in_random_lane()
+		await get_tree().create_timer(0.5).timeout
+
+	else: push_error("incorrect 'Lobby.MULTIPLAYER' value")
+	
 	await deploy_all()
-	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
+		
+	await get_tree().create_timer(0.2).timeout
+	#we were starting before all the creeps spawned lol
+	
 	BUTTON.global_prep_phase()
 	scrollh.draw_cards(8)
 	
@@ -69,7 +83,31 @@ func INITIATE_THE_GAME():
 	#using BUTTON so that I don't have to count which card layer it is
 	#or load the cl1
 	
+func deploy_my_heroes():
+	var target
 	
+	#SpawnRect should already have 3 heroes prepared there
+	var lanes_to_deploy = [%FirstLaneDeployRect,
+	%MidLaneDeployRect,%LastLaneDeployRect]
+	var ints_for_lanes = [0,1,2]
+	
+	ints_for_lanes.shuffle()
+	#ok so basically it shuffles
+	for i in 3:
+		target = get_child(2-i) 
+		target.reparent(lanes_to_deploy[ints_for_lanes[i]])
+		#I'm not decreasing their scale since this won't be visible
+		rpc_id(Lobby.opponent_peer_id,"deploy_opponent_heroes", ints_for_lanes[i])
+		
+@rpc("any_peer", "call_remote", "reliable")
+func deploy_opponent_heroes(which_lane):
+	var target
+	#SpawnRect should already have 3 heroes prepared there
+	var lanes_to_deploy = [%BetaFirstLaneDeployRect,
+	%BetaMidLaneDeployRect,%BetaLastLaneDeployRect]
+
+	target = opp_spawn_rect.get_child(opp_spawn_rect.get_child_count()-1) 
+	target.reparent(lanes_to_deploy[which_lane])
 
 func collide_units(skip_target = -1):
 	#currently copied from SpawnRect, skip_target could be removed
@@ -126,8 +164,42 @@ func new_wave_of_creeps():
 	%BetaFirstLaneDeployRect.create_a_creep()
 	%BetaMidLaneDeployRect.create_a_creep()
 	%BetaLastLaneDeployRect.create_a_creep()
-	spawn_a_creep_in_random_lane_for_both_players(1)
 		
+	if Lobby.MULTIPLAYER == true:
+		spawn_a_creep_in_random_lane()
+	else:
+		spawn_a_creep_in_random_lane_for_both_players(1)
+	
+func spawn_a_creep_in_random_lane():
+	#Can only be called if MULTIPLAYER
+	var uno = randi()%3
+
+	match uno:
+		0:
+			%FirstLaneDeployRect.create_a_creep()
+		1:
+			%MidLaneDeployRect.create_a_creep()
+		2:
+			%LastLaneDeployRect.create_a_creep()
+	rpc_id(Lobby.opponent_peer_id, "opponent_spawned_random_creep_in_this_lane", uno)
+	#we tell opponent where to create random creep
+#	push_error("calling to " +str(Lobby.opponent_peer_id) + " with info " + str(uno))
+		
+@rpc("any_peer", "call_remote", "reliable")
+func opponent_spawned_random_creep_in_this_lane(which_lane:int):
+#	push_error("received call from " +str(Lobby.opponent_peer_id) + " with info " + str(which_lane))
+
+	match which_lane:
+		0:
+			%BetaFirstLaneDeployRect.create_a_creep()
+		1:
+			%BetaMidLaneDeployRect.create_a_creep()
+		2:
+			%BetaLastLaneDeployRect.create_a_creep()
+		_:
+			push_error("incorrect 'client_spawned_random_creep_in_this_lane' input")
+	
+			
 func spawn_a_creep_in_random_lane_for_both_players(include_supers = 1):
 	var uno = randi()%3
 	match uno:
@@ -159,6 +231,10 @@ func spawn_a_creep_in_random_lane_for_both_players(include_supers = 1):
 	
 
 func deploy_all():
+	var deploy_function = "deploy_unit"
+	if Lobby.MULTIPLAYER == true:
+		deploy_function = "deploy_unit_MP"
+		
 	var alpha_squadron = []
 	var beta_squadron = []
 	var alpha_lanes = [%FirstLaneDeployRect, %MidLaneDeployRect, %LastLaneDeployRect ]
@@ -206,11 +282,11 @@ func deploy_all():
 			if k%2 == 0:
 				deploy_target = starting_squadron[k/2]
 				if deploy_target != null:
-					await starting_deployer.deploy_unit(deploy_target)
+					await starting_deployer.call(deploy_function,deploy_target)
 			if k%2 == 1:
 				deploy_target = second_squadron[floor(k/2)]
 				if deploy_target != null:
-					await second_deployer.deploy_unit(deploy_target)
+					await second_deployer.call(deploy_function,deploy_target)
 		#deploys the units switching between starting and second deployer
 		# skipping when its null
 				
@@ -218,13 +294,30 @@ func deploy_all():
 #		arena_rects[i].reset_curving()
 			
 			
-#	%FirstLaneDeployRect.deploy_my_units()
-#	%MidLaneDeployRect.deploy_my_units()
-#	%LastLaneDeployRect.deploy_my_units()
-#	%BetaFirstLaneDeployRect.deploy_my_units()
-#	%BetaMidLaneDeployRect.deploy_my_units()
-#	%BetaLastLaneDeployRect.deploy_my_units()
+#func deploy_all_MP():
+#	#This function is only resolved for host, the results are rpced to joiner
+#	var alpha_squadron = []
+#	var alpha_lanes = [%FirstLaneDeployRect, %MidLaneDeployRect, %LastLaneDeployRect ]
+#
+#	#I want to alternate between deploying from alphalane and from betalane
+#	#and add "voids" which would represent skipping a deploy
+#	#no void is generated, it just skips rn
+#
+#	for i in 3:
+#		var alpha_deployer = alpha_lanes[i]
+#		alpha_squadron = []
+#		#make sure they empty
+#		for j in alpha_deployer.get_child_count():
+#			alpha_squadron.append(alpha_deployer.get_child(j))
+#		alpha_squadron.shuffle()
+#
+#		var deploy_target
+#		for k in len(alpha_squadron):
+#			deploy_target = alpha_squadron[k]
+#			if deploy_target != null:
+#				await alpha_deployer.deploy_unit(deploy_target)
 
+					
 func _on_child_order_changed():
 	if get_child_count() > 0:
 		Base.lock_pass_button()

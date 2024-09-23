@@ -98,4 +98,3 @@ script = ExtResource("5_llblb")
 
 [connection signal="child_entered_tree" from="SpawnRect" to="SpawnRect" method="_on_child_entered_tree"]
 [connection signal="child_order_changed" from="SpawnRect" to="SpawnRect" method="_on_child_order_changed"]
-[connection signal="child_entered_tree" from="Opponent_spawn_rect_fake" to="Opponent_spawn_rect_fake" method="_on_child_entered_tree"]

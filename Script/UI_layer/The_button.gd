@@ -123,7 +123,12 @@ func _on_pressed():
 		# "when you can play cards"
 		disabled = true
 		if Base.current_lane == 4:
-			await spawn_rect.deploy_all()
+			if Lobby.MULTIPLAYER == true:
+				if Lobby.host == true:
+					#If I'm the host
+					await spawn_rect.deploy_all()
+			else: await spawn_rect.deploy_all()
+			
 			await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
 			global_prep_phase()
 		if Base.current_lane != 4:

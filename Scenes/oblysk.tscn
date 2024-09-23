@@ -105,14 +105,6 @@ offset_left = 0.0
 offset_right = 126.0
 offset_bottom = 76.0
 
-[node name="XP_Panel" parent="UI_layer" instance=ExtResource("4_8bybo")]
-unique_name_in_owner = true
-z_index = 1
-offset_left = 1759.0
-offset_top = 948.0
-offset_right = 1899.0
-offset_bottom = 1048.0
-
 [node name="DevTools" type="Control" parent="UI_layer"]
 unique_name_in_owner = true
 layout_mode = 3
@@ -194,6 +186,14 @@ offset_left = 708.0
 offset_top = 829.0
 offset_right = 708.0
 offset_bottom = 829.0
+
+[node name="XP_Panel" parent="UI_layer" instance=ExtResource("4_8bybo")]
+unique_name_in_owner = true
+z_index = 1
+offset_left = 1759.0
+offset_top = 948.0
+offset_right = 1899.0
+offset_bottom = 1048.0
 
 [node name="Active_lane" type="TextureButton" parent="UI_layer"]
 unique_name_in_owner = true

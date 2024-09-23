@@ -49,10 +49,10 @@ func collide_units():
 		 Vector2(destinationX,0),
 		 collide_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 		
-	await get_tree().create_timer(collide_time).timeout
+	get_tree().create_timer(collide_time).timeout
 	spawn_rect.colliding_units -= 1
 
 func _on_child_entered_tree(node):
 	spawn_rect.colliding_units += 1
 	node.scale = Vector2(0.5,0.5)
-	await collide_units()
+	collide_units()
