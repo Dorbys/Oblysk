@@ -62,7 +62,7 @@ func new_lane():
 
 
 func _on_tree_exited():
-
+	print("Unit_preview exiting tree")
 #	if actually_exiting == 1:
 	arena_rect.Carrying = 0
 	abarena_rect.Carrying = 0

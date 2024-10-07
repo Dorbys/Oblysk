@@ -1,0 +1,18 @@
+curving actually by a common node
+to send rpcs 
+mr gpt lied agane
+    or I can just cram it into Card_layer
+currently doesnt work cuz x
++now that curving is sent with delay it might happen before the unit to that direction is there esp deployment
+    #I believe that was for a different reason: creeps weren't even assigned their UUK
+#order in Unit.gd _ready() changed to put increasedmgtbt later, might help with opposer situation
+
+curving via Card_layer worked
+
+hero on hero curving doesnt work
+creeps seem fine
+
+heroes work too now
+
+hand fuckedup, adding/spawning seems to work except adding in between is then sent as spawn as the right-most
+#here devnotes implemented by taking out of Prezident.txt

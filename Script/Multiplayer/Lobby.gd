@@ -6,6 +6,8 @@ extends Node
 var MULTIPLAYER = true
 #to build mp funcs and change the view of scenes based on whether mp ornah
 
+#var INITIATIVE = 0
+#moved to Base.gd cuz it operates THEBUTTON
 
 var opponent_peer_id:int
 #int 1 if joiner, random if hoster

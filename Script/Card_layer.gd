@@ -23,6 +23,7 @@ var Targeting_now = 0
 
 #var Mirror = []
 func slot_care(node):
+	#might try deleting this 
 	if node.VOIDING == 0:
 		pass
 	else :
@@ -268,10 +269,10 @@ func lets_lvlup(XP, caller):
 #	print("letslvlup with " + str(XP) +" xp")
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0 and target.HERO == 1:
+		if target.TYPE == 0 and target.HERO == true:
 			target.show_I_can_lvlup(XP, caller)	
 		var target2 = abarena_rect.get_child(i)
-		if target2.TYPE == 0 and target2.HERO == 1:
+		if target2.TYPE == 0 and target2.HERO == true:
 			target2.show_I_can_lvlup(XP, caller)	
 		
 func card_preview_targeting_non_single_exits_tree():				
@@ -442,3 +443,37 @@ func lets_check_cooldown_penetrability():
 		var target = abarena_rect.get_child(i)
 		if target.TYPE == 0:
 			target.check_cooldown_penetrability()	
+			
+			
+			
+			
+			
+#================================================================
+#						SYNCING
+#================================================================
+	#when unit curves or something is played on a unit, I need
+		#to replicate the effect for opponent
+		#since different treepaths, units can't RPC
+	
+@rpc("any_peer", "call_remote", "reliable")
+func make_mirror_unit_curve(direction, unique_key:int):
+	if multiplayer.get_remote_sender_id() != 0:
+		#if I was RPCed
+		push_error("get_remote_sender_id s mp funguje")
+		var fun_to_call = "curve_" + direction
+		Lobby.universal_global_unit_array[unique_key].call(fun_to_call)
+	else:
+		#if I was called localy
+		rpc_id(Lobby.opponent_peer_id, "make_mirror_unit_curve", direction, unique_key)
+			
+			
+			
+			
+			
+			
+			
+			
+			
+#================================================================
+#						SYNCINGONE
+#================================================================

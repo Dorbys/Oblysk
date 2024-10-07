@@ -70,24 +70,31 @@ func _get_drag_data(_at_position):
 	if manacheck == true:
 		var herocheck = arena_rect.is_there_a_hero_check()
 		if herocheck == true:
-			Base.lock_pass_button()
-			#until preview is gone
-			arena.move_roof_to_front()
-			abarena.move_roof_to_front()
-			the_button.global_lets_hide_abilities_and_items()
+			var initiative_check
+			if Lobby.MULTIPLAYER == true:
+				initiative_check = does_player_have_initiative()
+			else:
+				initiative_check = true
+			if initiative_check == true:			
+				Base.lock_pass_button()
+				#until preview is gone
+				arena.move_roof_to_front()
+				abarena.move_roof_to_front()
+				the_button.global_lets_hide_abilities_and_items()
 
 
+					
+				var drag_preview = create_preview(Identification)
+		#		UI_layer.add_child(drag_preview)
+				set_drag_preview(drag_preview)
+				drag_preview.modulate.a = .5
+					
+			#	arena.move_arena_to_front()
+			#	abarena.move_arena_to_front()
+					
 				
-			var drag_preview = create_preview(Identification)
-	#		UI_layer.add_child(drag_preview)
-			set_drag_preview(drag_preview)
-			drag_preview.modulate.a = .5
-				
-		#	arena.move_arena_to_front()
-		#	abarena.move_arena_to_front()
-				
-			
-			return [TYPE,Identification, self.get_index()]
+				return [TYPE,Identification, self.get_index()]
+			else: you_dont_have_initiative(self)
 		else: no_hero_to_cast_this(self)	
 	else: not_enough_mana(self)
 	

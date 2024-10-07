@@ -11,6 +11,7 @@ extends TextureButton
 @onready var spawner = %Spawner
 @onready var spawn_rect = $"../Spawner/SpawnRect"
 @onready var player_mana_display = $"../Player_mana_display"
+@onready var opponent_turn_indicator = $"../Opponent_info/Opponent_turn_indicator"
 
 @onready var towerB1 = $"../../First_lane/Tower_layer/TowerB" #MOVE the tower1 to point to THE Tower1 and add TYPE, then continue with damageassigning abilities
 @onready var towerA1 = $"../../First_lane/Tower_layer/TowerA"
@@ -75,6 +76,7 @@ func _ready():
 	Base.the_button = self
 	#autoload script contains pointer to node that doesn't exist 
 		#at game start
+	Base.game_started_yet_bruh = true
 	
 	new_lane()
 
@@ -360,8 +362,12 @@ func transfer_tower_mana_to_player_mana():
 	var mana_to_be_added = (mana1 + mana2 + mana3)/3
 	player_mana_display.increase_mana(mana_to_be_added)
 
-
-
+func show_opponent_turn_begins():
+	opponent_turn_indicator.active_texture_now()
+	
+func show_opponent_turn_is_over():
+	opponent_turn_indicator.inactive_texture_now()
+	
 #######################################################################
 ###							SIGNALHUBBING							###
 #######################################################################

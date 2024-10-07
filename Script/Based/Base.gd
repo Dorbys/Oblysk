@@ -13,8 +13,9 @@ var PLAYTEST = 0
 #you can play all units into enemy side
 #Bombard building doesnt bombard
 
-
-
+var INITIATIVE = 0
+#You can only play if you have initiative
+#not bool since I want to implement fleeting initiative 
 
 
 
@@ -83,7 +84,7 @@ preload("res://Assets/CardsPNGS/Creep_abilities/Zombie.png")]
 #currently stores alphacreep and betacreeep
 var card = load("res://Scenes/UNIT/Unit1.tscn")
 #var card = scene.instantiate()
-var PlayerDeck =  [["spell",0],["spell",0],["spell",6],["spell",8],
+var PlayerDeck =  [["spell",0],["spell",0],["creep",2],["creep",6],["spell",7],
 	["spell",3],["creep",0],["creep",1],["build", 0],["item", 0]]
 	
 	
@@ -169,10 +170,22 @@ var aura_unique_id = 0
 #used to give each aura source a unique number in their name (affect name and effect name)
 #this allows auras to stack
 
+var game_started_yet_bruh = false
+	#set to true in THEbutton's _ready()
+
 func _ready():
 	if PLAYTEST == 1:
 		PlayerDeck= playtest_deck
 		PlayerDeck.shuffle()
+		
+	while game_started_yet_bruh == false:
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	if Lobby.MULTIPLAYER == true:
+		if INITIATIVE == 0:
+		#If I wasnt chosen as the starting player in the Main_menu.gd
+			pass_the_initiative()
+			#calls receive for opp
+			
 		
 ####################################SHUFFLE HERE
 	
@@ -336,27 +349,50 @@ func lock_pass_button():
 	the_button.set_disabled(true)
 	
 func unlock_pass_button(forced = false):
-	if forced == true:
-		CAN_CLICK_BUTTON_NOW = 1
-		the_button.set_disabled(false)
-	else:
-		CAN_CLICK_BUTTON_NOW -= 1
-		if CAN_CLICK_BUTTON_NOW == 1:
+	if Lobby.MULTIPLAYER == true:
+		if INITIATIVE == 1:
+			if forced == true:
+				CAN_CLICK_BUTTON_NOW = 1
+				the_button.set_disabled(false)
+			else:
+				CAN_CLICK_BUTTON_NOW -= 1
+				if CAN_CLICK_BUTTON_NOW == 1:
+					the_button.set_disabled(false)
+	elif Lobby.MULTIPLAYER == false:
+		if forced == true:
+			CAN_CLICK_BUTTON_NOW = 1
 			the_button.set_disabled(false)
+		else:
+			CAN_CLICK_BUTTON_NOW -= 1
+			if CAN_CLICK_BUTTON_NOW == 1:
+				the_button.set_disabled(false)
+				
+func refresh_pass_button():
+	#only in Multiplayer because locking thebutton increases lock by 1
+	if Base.INITIATIVE == 1:
+		the_button.set_disabled(false)
+	elif Base.INITIATIVE == 0:
+		the_button.set_disabled(true)
+	else: push_error("Unknown Base.INITIATIVE value")
 
-
-
-
-
-func increase_aura_unique_id():
-	aura_unique_id += 1
-
-
-
-
-#I'm taking care of this in python so that it is in alphabetical order
+@rpc("any_peer", "call_remote", "reliable")
+func receive_the_initiative():
+	INITIATIVE = 1
+	unlock_pass_button(true)
+	the_button.show_opponent_turn_is_over()
+	
+func pass_the_initiative():
+	INITIATIVE = 0
+	refresh_pass_button()
+	rpc_id(Lobby.opponent_peer_id, "receive_the_initiative")
+	the_button.show_opponent_turn_begins()
+	
+	
 
 	
+
+func increase_aura_unique_id():
+	aura_unique_id += 1	
 
 
 

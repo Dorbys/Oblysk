@@ -146,6 +146,8 @@ func used_card(which):
 	if manacost >= 0:
 		#so that its easy to skip cards like items
 		BUTTON.tower_current_mana.spend_mana(manacost)
+	if Lobby.MULTIPLAYER == true:
+		Base.pass_the_initiative()
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	collide_cards()
 	
@@ -184,7 +186,7 @@ func collide_cards():
 	elif round(population%2) == 1  :
 		for i in population:
 			tween.tween_property(get_child(i),
-			 "position:x", (center + (i-mid)*final_compression),
+			 "position:x", (center + (i+1-mid)*final_compression),
 			0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 			
 #			get_child(i).position.x= ((i+1) * compressed)

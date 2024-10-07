@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://1ii2eu8a2p22"]
+[gd_scene load_steps=4 format=3 uid="uid://bfhd3nkyne6ik"]
 
 [ext_resource type="Texture2D" uid="uid://5x4wfxxg6pix" path="res://Assets/PREUI/No_caster.png" id="1_h2b4d"]
 [ext_resource type="Script" path="res://Script/UI_layer/No_mana_warning.gd" id="2_tx3mu"]

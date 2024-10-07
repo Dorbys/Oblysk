@@ -54,6 +54,10 @@ func _on_join_pressed():
 func someone_joined(new_peer_id):
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	Lobby.opponent_peer_id = new_peer_id
+	if new_peer_id%2 == 0:
+		rpc_id(new_peer_id, "gain_starting_initiative")
+	else:
+		gain_starting_initiative()
 	rpc_id(new_peer_id, "start_game")
 	start_game()
 	#since the rpc travels for a moment, it's better to send it BEFORE 
@@ -95,6 +99,23 @@ func start_game():
 	
 	var new_scene_path = "res://Scenes/oblysk.tscn"  # Replace with your scene path
 	get_tree().change_scene_to_file(new_scene_path)
+	
+@rpc("any_peer", "call_remote", "reliable")
+func gain_starting_initiative():
+	Base.INITIATIVE = 1
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 func _input(event):
 	if Input.is_action_just_pressed("ui_cancel"):

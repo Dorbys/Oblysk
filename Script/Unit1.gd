@@ -42,13 +42,7 @@ var Grants_xp = 0
 var HERO: bool = false
 var Identification = 3
 
-#================================================================
-var MY_UNIQUE_UNIT_KEY: int
-#every unit is granted a unique number based on when it's created
-	#for MP
-	#number corresponds to it's position in the Lobby.universal_global_unit_array
-	#first 10 slots are reserved for heroes
-#================================================================
+
 
 
 #var UNIT = 1
@@ -177,6 +171,22 @@ var my_damage_was_annuled = false
 #for example when blinking
 
 #######################################################################
+### 					MULTIPLAYER VARIABLES						###
+#######################################################################
+
+#================================================================
+var MY_UNIQUE_UNIT_KEY: int
+#every unit is granted a unique number based on when it's created
+	#for MP
+	#number corresponds to it's position in the Lobby.universal_global_unit_array
+	#first 10 slots are reserved for heroes
+#================================================================
+
+var sent_over_to_opponent:bool = false
+#Trying to implement sending data about unit deployment in waves,
+	#this will be checked and modified in such wave
+
+#######################################################################
 ### 					SPECIAL CASE VARIABLES 						###
 #######################################################################
 #Used for special cases such as being able to lvlup, which are rarely modified
@@ -193,7 +203,9 @@ func _ready():
 	################################################################
 	if HERO == false:
 		Lobby.unique_unit_key += 1
+		MY_UNIQUE_UNIT_KEY = Lobby.unique_unit_key
 		Lobby.universal_global_unit_array.append(self)
+		
 		
 	if MYrena_rect.MY_identity == "A":
 		faction = "alpha"
@@ -209,12 +221,14 @@ func _ready():
 			else:
 				my_slot = 5 + Base.OpponentHeroDeck.find(Identification)
 		else: 
-			if faction == "beta":
-				my_slot = Base.HeroDeck.find(Identification)
+			if faction == "alpha": #HERE
+				my_slot = 5+ Base.HeroDeck.find(Identification)
 			else:
-				my_slot = 5 + Base.OpponentHeroDeck.find(Identification)
+				my_slot = Base.OpponentHeroDeck.find(Identification)
+				
 		Lobby.universal_global_unit_array[my_slot] = self
 		MY_UNIQUE_UNIT_KEY = my_slot
+	push_error("UNIT: " +str(MY_UNIQUE_UNIT_KEY) +" CREATED AS: " +str(faction) + " at " +str(get_index()))
 	################################################################
 	#that part was for unique_unit_key
 	#has to be done asap cuz sync
@@ -224,9 +238,9 @@ func _ready():
 #	%NAME.text = Unit_Name
 	%ATK.text = str(Unit_Attack)
 	%HP.text = str(Unit_Health)
-	%AR.text = str(Unit_Armor)
-	increase_damage_to_be_taken(0)
-	
+	%AR.text = str(Unit_Armor)	
+	#increase_damage_to_be_taken(0)
+	#moved further, might help the opposer losing
 	
 	%ATK.modulate = Base.Black_color
 	%HP.modulate = Base.Black_color
@@ -256,6 +270,7 @@ func _ready():
 		%armor_slot.visible = false
 		
 	refresh_my_lane_int()
+	#just sets the int
 	
 	
 	
@@ -301,21 +316,41 @@ func _ready():
 	if Base.Main_phase == 1:
 		await get_tree().create_timer(0.2).timeout 
 		check_if_I_put_space_between_curving()
+		
 #	curve_rng()
+	#fuck it lets call this from the spawning source
 	
-	#fuck it lets call this from the spawning source	
+	#unfuck it and lets call this from second_ready()
 	
+		
+
+	
+	
+	
+func second_ready():
+	#needs to be called together with _ready() for a proper initiation
+		#of a unit, but the delay between the two can be modified
+	
+	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
+	curve_rng()
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
-	lane_aura_check()
+	increase_damage_to_be_taken(0)
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	lane_aura_check()	
 	
+func second_ready_without_curve_rng():
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	increase_damage_to_be_taken(0)
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	lane_aura_check()	
 	
-	
-	
-	
-	
+	refresh_combat_damage()
 	
 	
 func respawn(silent = 0):
+	sent_over_to_opponent = false
+	#because my slot has to be synced again
+	
 	appear_alive()
 	scale = Vector2(1,1)
 	new_lane()
@@ -650,7 +685,13 @@ func before_prep_phase():
 	besieging_damage = 0
 	
 func prep_phase():
-	curve_rng()
+	if Lobby.MULTIPLAYER == true:
+		if Lobby.host == true:
+			curve_rng()
+		else:
+			refresh_combat_damage()
+	elif Lobby.MULTIPLAYER == false:
+		curve_rng()
 ################################################################
 
 
@@ -1012,43 +1053,41 @@ func curve_rng():
 		elif Lobby.host == false:
 			start_waiting_for_curve_data()
 
-@rpc("any_peer", "call_remote", "reliable")
-func make_my_mirror_self_curve(direction, unique_key = null):
+
+func make_my_mirror_self_curve(direction):
 	push_error("trying to make_my_mirror_self_curve " +direction)
 	#can be "straight" "left" or "right"
-	var fun_to_call = "curve_" +direction
-	if unique_key == null:
-		rpc_id(Lobby.opponent_peer_id, fun_to_call)
+	Card_layer.make_mirror_unit_curve(direction, MY_UNIQUE_UNIT_KEY)
 	
 func start_waiting_for_curve_data():
 	push_error("Waiting for curve data")
 		
 #RNG_curve should probably have its own shit, then we make the annul stuff		
 		
-@rpc("any_peer", "call_remote", "reliable")
+#@rpc("any_peer", "call_remote", "reliable")
 func curve_left():
 	targeting = "left"
-#	print("curving left")
+	push_error("curving left")
 	%Arrow_combat.curve_left()
 	if OPrena.get_child(get_index()-1).TYPE == 0:
 		redirect_damage(OPrena.get_child(get_index()-1))
 	else:
 		curve_straight()	
 
-@rpc("any_peer", "call_remote", "reliable")
+#@rpc("any_peer", "call_remote", "reliable")
 func curve_right():
 	targeting = "right"
-#	print("curving right")
+	push_error("curving right")
 	%Arrow_combat.curve_right()	
 	if OPrena.get_child(get_index()+1).TYPE == 0:
 		redirect_damage(OPrena.get_child(get_index()+1))
 	else:
 		curve_straight()
 		
-@rpc("any_peer", "call_remote", "reliable")
+#@rpc("any_peer", "call_remote", "reliable")
 func curve_straight():
 	targeting = "straight"	
-#	print("curving straight")
+	push_error("curving straight")
 	%Arrow_combat.curve_straight()
 	var opposer = await get_opposer()
 	if opposer.TYPE == 0:

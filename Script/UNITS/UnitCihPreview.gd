@@ -28,8 +28,10 @@ func _ready():
 	%AR.text = str(Unit_Armor)
 	%HERO_JPEG.texture = Unit_Pfp
 	var loaded_script = load("res://Script/Creep_abilities_list/" + str(CreepsDB.CREEPS_DB[Identification][CreepsDB.NAMEPOSITION]) + "_passive.gd")
-	var script_instance = loaded_script.new()
-	%Card_description.text = script_instance.description
+	var script_instance
+	if loaded_script != null:
+		script_instance = loaded_script.new()
+		%Card_description.text = script_instance.description
 	
 	if Unit_Armor != 0:
 		%AR.visible = true

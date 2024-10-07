@@ -54,37 +54,43 @@ func _get_drag_data(_at_position):
 	if manacheck == true:
 		var herocheck = arena_rect.is_there_a_hero_check()
 		if herocheck == true:
-			Base.lock_pass_button()
-			#until preview is gone
-			the_button.global_lets_hide_abilities_and_items()
-			
-			if Targets == Enums.Targeting.lane:
-				arena.move_roof_to_front()
-				abarena.move_roof_to_front()
+			var initiative_check
+			if Lobby.MULTIPLAYER == true:
+				initiative_check = does_player_have_initiative()
+			else:
+				initiative_check = true
+			if initiative_check == true:
+				Base.lock_pass_button()
+				#until preview is gone
+				the_button.global_lets_hide_abilities_and_items()
+				
+				if Targets == Enums.Targeting.lane:
+					arena.move_roof_to_front()
+					abarena.move_roof_to_front()
 
-			
-			if Targets == Enums.Targeting.one_unit or Targets == Enums.Targeting.one_ally:
-				arena_rect.a_spell_is_being_dragged(Is_played_on)
-			if Targets == Enums.Targeting.one_unit or Targets == Enums.Targeting.one_enemy:	
-				abarena_rect.a_spell_is_being_dragged(Is_played_on)
+				
+				if Targets == Enums.Targeting.one_unit or Targets == Enums.Targeting.one_ally:
+					arena_rect.a_spell_is_being_dragged(Is_played_on)
+				if Targets == Enums.Targeting.one_unit or Targets == Enums.Targeting.one_enemy:	
+					abarena_rect.a_spell_is_being_dragged(Is_played_on)
 
+					
+				var drag_preview = create_preview(Identification)
+		#		UI_layer.add_child(drag_preview)
+				set_drag_preview(drag_preview)
+				drag_preview.modulate.a = .5
+					
+			#	arena.move_arena_to_front()
+			#	abarena.move_arena_to_front()
+					
 				
-			var drag_preview = create_preview(Identification)
-	#		UI_layer.add_child(drag_preview)
-			set_drag_preview(drag_preview)
-			drag_preview.modulate.a = .5
-				
-		#	arena.move_arena_to_front()
-		#	abarena.move_arena_to_front()
-				
-			
-			return [TYPE,Identification, self.get_index(),
-			  cross_lane, Card_from_lvlup, Secondary_targets, 
-			Is_played_on]
-		
-		#[0= TYPE, 1=Identification, 2=self.get_index(), 
-	#3=crosslane, 4=Card_from_lvlup, 5 = Secondary_targets,
-	#6 = Is_played_on]
+				return [TYPE,Identification, self.get_index(),
+				  cross_lane, Card_from_lvlup, Secondary_targets, 
+				Is_played_on]
+			else: you_dont_have_initiative(self)
+			#[0= TYPE, 1=Identification, 2=self.get_index(), 
+		#3=crosslane, 4=Card_from_lvlup, 5 = Secondary_targets,
+		#6 = Is_played_on]
 		else: no_hero_to_cast_this(self)
 	else: not_enough_mana(self)
 	

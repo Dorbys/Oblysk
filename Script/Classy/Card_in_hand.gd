@@ -41,6 +41,19 @@ var tower_mana
 var cross_lane = false
 #this default can be changed, hopefully in each 
 
+
+
+
+var BIG_SCALE = Vector2(1.2,1.2)
+#var NORM_SCALE = Vector2(1.0,1.0)
+var UP_THE_YMIDSCREEN = -300
+
+var FANT = 0.15 	#FOCUS_ANIMATION_TIME
+
+var no_mana_warning = load("res://Scenes/UI/No_mana_warning.tscn")
+var no_caster_warning = load("res://Scenes/UI/No_caster_warning.tscn")
+var no_initiative_warning = load("res://Scenes/UI/No_initiative_warning.tscn")
+
 func _ready():
 	new_lane()
 	
@@ -68,19 +81,6 @@ func new_lane():
 			abarena_rect = abarena_rect3
 			tower_mana = tower_mana3
 	
-
-
-
-var BIG_SCALE = Vector2(1.2,1.2)
-#var NORM_SCALE = Vector2(1.0,1.0)
-var UP_THE_YMIDSCREEN = -300
-
-var FANT = 0.15 	#FOCUS_ANIMATION_TIME
-
-var no_mana_warning = load("res://Scenes/UI/No_mana_warning.tscn")
-var no_caster_warning = load("res://Scenes/UI/No_caster_warning.tscn")
-
-
 
 
 func create_card_in_hand_preview(source,ID):
@@ -130,6 +130,16 @@ func does_player_have_enough_mana(caller):
 		return true
 	else:
 		return false
+		
+func does_player_have_initiative():
+	if Base.INITIATIVE == 1:
+		return true
+	else:
+		return false
+		
+func you_dont_have_initiative(caller):
+	var initiative_jumpscare = no_initiative_warning.instantiate()
+	caller.UI_layer.add_child(initiative_jumpscare)
 		
 func not_enough_mana(caller):
 	var mana_jumpscare = no_mana_warning.instantiate()

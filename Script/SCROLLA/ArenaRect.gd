@@ -113,8 +113,35 @@ func _ready():
 var Slot_calc_top = 0 - STARTSET # dont scale ----> - distance_to_arena
 var	Slot_calc_bot =	Card_and_offset
 	
-func Adding_Units(_at_position, ID, has_ability):
+@rpc("any_peer", "call_remote", "reliable")
+func Adding_Units(_at_position, ID, forced_here = null):
+	#THIS function is for when units are dropped from card 
+	
+	#howto shadowindex lemao
+	
 	Carrying = 0
+		
+	if Lobby.MULTIPLAYER == true:
+		if multiplayer.get_remote_sender_id() != 0:
+			#if I was rpced
+			if forced_here == false:
+				push_error("Calling to spawn_unit " +str(ID))
+				if abarena:
+					#if abarena isn't null <=> I'm not abarena
+					abarena.Adding_Units(_at_position, ID, true)
+		#				push_error("telling abarena to spawn creep at " +str(rpced_slot))
+					return
+				elif arena_meine:
+					arena_meine.Adding_Units(_at_position, ID, true)
+		#				push_error("telling arena_meine to spawn creep at " +str(rpced_slot))
+					return
+			else: #if forced_here == true
+				pass
+		elif Lobby.host == true: #if I was called locally and am HOST
+			rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, Shadow_index, false)
+			await get_tree().create_timer(Base.FAKE_DELTA).timeout
+
+
 	var replacing_replacer = 0
 	if self.get_child_count()-1 >= Shadow_index:
 		if get_child(Shadow_index).Replaced_a_void == 1:
@@ -144,13 +171,13 @@ func Adding_Units(_at_position, ID, has_ability):
 	another.Unit_Health = DB_slot[CreepsDB.HEALTHPOSITION]
 	another.Unit_Armor = DB_slot[CreepsDB.ARMORPOSITION]
 	
-	if has_ability == true:
-		another.Unit_Ability_texture = Base.CREEP_ABILITY_TEXTURES[ID]
-		another.Unit_Ability_cooldown = AbilitiesDB.CREEP_ABILITIES_DB[ID][AbilitiesDB.COOLDOWNPOSITION]
-		another.has_ability = true
+	
 	
 	another.HERO = false
 	another.Identification = ID
+	
+	another = handle_has_ability_for_creeps(another)
+	
 	if MY_identity == "B": 
 		another.position.y = BOFFSET
 	else: another.position.y = AOFFSET
@@ -168,11 +195,15 @@ func Adding_Units(_at_position, ID, has_ability):
 		for i in (population-Shadow_index):
 			move_child(get_child(population-(i+1)),population-i)
 		collide_units()
-	await get_tree().create_timer(Base.FAKE_OMEGA).timeout 
-	another.curve_rng()
-	#game works almost fine without this
-		#as in DTBT is still calced right (Excluding the sommelier bug) but isnt shown
-	#Duelyst bug says otherwise
+	if Lobby.MULTIPLAYER == true and Lobby.host == false:
+		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, Shadow_index,  false)
+		another.second_ready_without_curve_rng()
+		push_error("mult true and lobbyhost false")
+	else:
+		await get_tree().create_timer(Base.FAKE_OMEGA).timeout 
+		another.second_ready()
+		#these two lines also work for SP
+
 	UNITS_MOVED_YO()
 	#signal yo
 	
@@ -210,10 +241,36 @@ func Cheating_Units(ID, has_ability):
 		
 	add_child(another)
 	
-
-func spawn_unit(ID):
-	var spawning_slot = await new_random_slot()
-	
+@rpc("any_peer", "call_remote", "reliable")
+func spawn_unit(ID, rpced_slot = null, forced_here = false):
+	#THIS function is for when units are spawned from effect 
+	var spawning_slot
+	if rpced_slot == null:
+		spawning_slot = await new_random_slot()		
+	else:
+		if forced_here == false:
+			spawning_slot = rpced_slot
+			#new_radnom_slot GENERATES VOIDS !!! 
+			
+			if abarena:
+				#if abarena isn't null <=> I'm not abarena
+				abarena.spawn_unit(ID, rpced_slot, true)
+#				push_error("telling abarena to spawn creep at " +str(rpced_slot))
+				return
+			elif arena_meine:
+				arena_meine.spawn_unit(ID, rpced_slot, true)
+#				push_error("telling arena_meine to spawn creep at " +str(rpced_slot))
+				return
+		elif  forced_here == true:
+			spawning_slot = await new_random_slot(rpced_slot)
+			#voids need to be created after arena or abarena is decided
+	if Lobby.MULTIPLAYER == true and Lobby.host == true and rpced_slot == null:
+	#multiplayer check isn't necessary here, but I want to signify all parts
+		#of the code that are for MP purpose only
+		push_error("Host calling to spawn_unit " +str(ID))
+		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, spawning_slot, forced_here)
+		#so that the unit is first created at joiner, since he can't mirrorcurve
+		
 #	var population = get_child_count()
 	var another = CARD.instantiate()
 	
@@ -225,10 +282,8 @@ func spawn_unit(ID):
 	another.Unit_Health = CreepsDB.CREEPS_DB[ID][CreepsDB.HEALTHPOSITION]
 	another.Unit_Armor = CreepsDB.CREEPS_DB[ID][CreepsDB.ARMORPOSITION]
 	
-	if CreepsDB.CREEPS_DB[ID][CreepsDB.ABILITYPOSITION] == true:
-		another.Unit_Ability_texture = Base.CREEP_ABILITY_TEXTURES[ID]
-		another.Unit_Ability_cooldown = AbilitiesDB.CREEP_ABILITIES_DB[ID][AbilitiesDB.COOLDOWNPOSITION]
-		another.has_ability = true
+	another.Identification = ID
+	another = handle_has_ability_for_creeps(another)
 	
 	another.HERO = false
 	
@@ -239,15 +294,30 @@ func spawn_unit(ID):
 		
 	another.my_lane = my_lane
 	#to track which lane a unit is in
-	another.Identification = ID
+	
 		
 	
 	add_child(another)
+	##############
+	if Lobby.MULTIPLAYER == true and Lobby.host == false and rpced_slot == null:
+	#multiplayer check isn't necessary here, but I want to signify all parts
+		#of the code that are for MP purpose only
+		push_error("Joiner calling to spawn_unit " +str(ID))
+		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, spawning_slot, forced_here)
+		#so that the unit is created also at host, but after mine
+
+	##############
 	move_child(another, spawning_slot)
 	collide_units()
 	UNITS_MOVED_YO()
-	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
-	another.curve_rng()
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	if Lobby.MULTIPLAYER == true:
+		if Lobby.host == true:
+			another.second_ready()
+		else:
+			another.second_ready_without_curve_rng()
+	else: another.second_ready()		
+	
 	
 
 			
@@ -303,6 +373,16 @@ func fake_collide_units(index):
 #	node.position.x = STARTSET + index * Card_and_offset
 #	print("Placing " +str(node) +str("at index " +str(index)))
 #
+
+func handle_has_ability_for_creeps(creep) -> Node:
+	#can only be used if it already has assigned Identification
+	var ID = creep.Identification
+	if CreepsDB.CREEPS_DB[ID][CreepsDB.ABILITYPOSITION] == true:
+		creep.Unit_Ability_texture = Base.CREEP_ABILITY_TEXTURES[ID]
+		creep.Unit_Ability_cooldown = AbilitiesDB.CREEP_ABILITIES_DB[ID][AbilitiesDB.COOLDOWNPOSITION]
+		creep.has_ability = true
+	return creep
+		
 func place_me_at(node, index):
 	move_child(node,index)
 	node.position.x = STARTSET + index * Card_and_offset
@@ -483,7 +563,7 @@ func new_slot_for_shadow_follow():
 	
 func new_random_slot(forced = null):
 	#forced is used for multiplayer
-		#host tells joiner where to land
+		#host? tells joiner where to land
 	var Random_slot = 0
 	empty_slots = []
 	for i in self.get_child_count():
@@ -516,7 +596,7 @@ func new_random_slot(forced = null):
 			OPrena_rect.insert_void(Random_slot, 1, 1)
 			#random slot is already 0
 		elif forced > 0:
-			Random_slot = self.get_child_count()
+			Random_slot = forced #self.get_child_count()
 			OPrena_rect.insert_void(Random_slot, 1, 1)
 			#rightmost slot
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
@@ -542,6 +622,10 @@ func insert_void(index, sett_status = 1, sitt_status = 1):
 	#for combat phase to work KEEEEEEEEEEP
 	
 	collide_units()
+	
+func insert_two_voids(index, sett_status = 1, sitt_status = 1):
+	insert_void(index, sett_status, sitt_status)
+	OPrena_rect.insert_void(index, sett_status, sitt_status)
 
 func replace_me_by_void(node, index, heroism, sett_status, sitt_status):
 	var another = VOID.instantiate()
@@ -754,7 +838,11 @@ func respawn_here(target, rpced_slot = null, faction = null):
 			elif arena_meine:
 				arena_meine.rpc_id(Lobby.opponent_peer_id, "respawn_here", index, landing_slot, opposite_faction)
 			else: push_error("abarena nor arena_meine is available")
-			
+	#Trying to do this by waves
+	#nvm
+	#mb dividing the Unit1.gd _ready() into two parts will solve the problem
+	
+		
 func land_here(target):
 	#same as respawn_here but for when a unit enters this lane from elsewhere
 	#D12 is used
@@ -780,7 +868,7 @@ func spawn_lane_creep(rpced_slot = null, forced_here = false):
 			#new_radnom_slot GENERATES VOIDS !!! 
 			
 			if abarena:
-				#if abarena isn't null -> I'm not abarena
+				#if abarena isn't null <=> I'm not abarena
 				abarena.spawn_lane_creep(rpced_slot, true)
 #				push_error("telling abarena to spawn creep at " +str(rpced_slot))
 				return
@@ -818,9 +906,13 @@ func spawn_lane_creep(rpced_slot = null, forced_here = false):
 	add_child(another)
 	move_child(another, spawning_slot)
 	collide_units()
-#	another.respawn()
-	if rpced_slot == null:
+	another.respawn()
+	if Lobby.MULTIPLAYER == true and rpced_slot == null:
+		#multiplayer check isn't necessary here, but I want to signify all parts
+			#of the code that are for MP purpose only
 		rpc_id(Lobby.opponent_peer_id, "spawn_lane_creep", spawning_slot)
+	#trying to do this by waves
+	#nvm
 #		push_error("sending joiner order to spawn a lane creep at " +str(spawning_slot))
 	
 func reset_curving():

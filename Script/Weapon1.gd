@@ -69,22 +69,30 @@ func new_lane():
 
 		
 func _get_drag_data(_at_position):
-	Base.lock_pass_button()
-	#until preview is gone
-	var drag_preview = create_preview(Identification)
-#	UI_layer.add_child(drag_preview)
-	set_drag_preview(drag_preview)
-	drag_preview.modulate.a = .5
+	var initiative_check
+	if Lobby.MULTIPLAYER == true:
+		initiative_check = does_player_have_initiative()
+	else:
+		initiative_check = true
+	if initiative_check == true:
+		Base.lock_pass_button()
+		#until preview is gone
+		var drag_preview = create_preview(Identification)
+	#	UI_layer.add_child(drag_preview)
+		set_drag_preview(drag_preview)
+		drag_preview.modulate.a = .5
 
-	arena_rect.an_item_is_being_dragged()
-	abarena_rect.an_item_is_being_dragged()
-	the_button.global_lets_hide_abilities_and_items()
-#	arena.move_arena_to_front()
-#	abarena.move_arena_to_front()
+		arena_rect.an_item_is_being_dragged()
+		abarena_rect.an_item_is_being_dragged()
+		the_button.global_lets_hide_abilities_and_items()
+	#	arena.move_arena_to_front()
+	#	abarena.move_arena_to_front()
+		
+		
+		return [TYPE,Identification, self.get_index(), cross_lane]
+		
+	else: you_dont_have_initiative(self)
 	
-	
-	return [TYPE,Identification, self.get_index(), cross_lane]
-
 func create_preview(ID):
 	var preview = Scene.instantiate()
 	assign_stats(preview,ID)

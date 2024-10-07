@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://cak63fd13ipg1"]
+[gd_scene load_steps=32 format=3 uid="uid://cak63fd13ipg1"]
 
 [ext_resource type="Script" path="res://Script/Based/INPUT_B.gd" id="1_kus8j"]
 [ext_resource type="PackedScene" uid="uid://b1u0py0ci1rgi" path="res://Scenes/Base.tscn" id="1_v73vy"]
@@ -15,8 +15,11 @@
 [ext_resource type="PackedScene" uid="uid://dwwrxkxhppb77" path="res://Scenes/UI/spawner.tscn" id="10_86lln"]
 [ext_resource type="Script" path="res://Script/UI_layer/Camera2D.gd" id="10_b5mq6"]
 [ext_resource type="PackedScene" uid="uid://r785avsyfdxf" path="res://Scenes/UI/Player_HP.tscn" id="11_p1uyo"]
+[ext_resource type="Texture2D" uid="uid://bay0dxynxa87i" path="res://Assets/Textures/Inactive_orange.jpg" id="12_n6u6b"]
 [ext_resource type="PackedScene" uid="uid://cjqmj0pro1jag" path="res://Scenes/UI/Opponent/Opponent_XP_panel.tscn" id="13_iuwkg"]
+[ext_resource type="Script" path="res://Script/UI_layer/Opponent_info/Turn_indicator.gd" id="13_rf5i7"]
 [ext_resource type="AudioStream" uid="uid://df011xt5nto82" path="res://Assets/Sounds/Rxm リム - LOOK AT ME! _ Phonk _ NCS - Copyright Free Music (320kbps).mp3" id="13_virw5"]
+[ext_resource type="Texture2D" uid="uid://dk807clcgvok8" path="res://Assets/Textures/FFA200.jpg" id="14_i0xot"]
 [ext_resource type="PackedScene" uid="uid://bhaer715oasq3" path="res://Scenes/UI/Player_mana_display.tscn" id="15_ywx2j"]
 [ext_resource type="PackedScene" uid="uid://c3lbr0mtr2ums" path="res://Scenes/UI/Opponent/OpponentHand.tscn" id="16_e8r2r"]
 [ext_resource type="FontFile" uid="uid://c01uqsojl0t5d" path="res://Assets/Font source/RobotoMono-Bold.ttf" id="17_iqa2t"]
@@ -93,10 +96,11 @@ offset_bottom = 1311.0
 
 [node name="THE_BUTTON" parent="UI_layer" instance=ExtResource("5_51a31")]
 unique_name_in_owner = true
-offset_left = 49.0
-offset_top = 874.0
-offset_right = 308.0
-offset_bottom = 1042.0
+offset_left = 1752.0
+offset_top = 565.0
+offset_right = 2006.0
+offset_bottom = 819.0
+scale = Vector2(0.66, 0.66)
 
 [node name="Graveyard_showcase" parent="UI_layer" instance=ExtResource("3_cxe43")]
 unique_name_in_owner = true
@@ -121,10 +125,10 @@ text = "DRAW1"
 [node name="TextureButton" parent="UI_layer/DevTools" instance=ExtResource("6_xyuig")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 421.0
-offset_top = 1.0
-offset_right = 665.0
-offset_bottom = 158.0
+offset_left = 424.0
+offset_top = 46.0
+offset_right = 668.0
+offset_bottom = 203.0
 texture_normal = ExtResource("9_3slyr")
 
 [node name="OptionButton" type="OptionButton" parent="UI_layer/DevTools"]
@@ -145,6 +149,20 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+
+[node name="Opponent_turn_indicator" type="TextureRect" parent="UI_layer/Opponent_info"]
+z_index = -1
+layout_mode = 0
+offset_left = 1752.0
+offset_top = 249.0
+offset_right = 2006.0
+offset_bottom = 503.0
+scale = Vector2(0.66, 0.66)
+texture = ExtResource("12_n6u6b")
+expand_mode = 1
+script = ExtResource("13_rf5i7")
+active_texture = ExtResource("14_i0xot")
+inactive_texture = ExtResource("12_n6u6b")
 
 [node name="Opponent_SCROLLH" parent="UI_layer/Opponent_info" instance=ExtResource("16_e8r2r")]
 layout_mode = 0
@@ -243,6 +261,7 @@ z_index = 13
 
 [node name="Game_over" parent="UI_layer" instance=ExtResource("5_hdcg8")]
 unique_name_in_owner = true
+z_index = 11
 
 [node name="W_player" type="AudioStreamPlayer" parent="UI_layer/Game_over"]
 stream = ExtResource("19_18oe3")
