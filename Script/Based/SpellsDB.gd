@@ -29,11 +29,11 @@ var SPELLS_DB = [
 ]
 # Called when the node enters the scene tree for the first time.
 
-func Dorbystrike(target):
+func Dorbystrike(target, _current_player = ""):
 	await target.take_damage(5-target.ArmorC)
 	
 	
-func Duel(Caster, Target1):
+func Duel(Caster, Target1, _current_player = ""):
 	var attack1 = Caster.AttackC - Target1.ArmorC
 	var attack2 = Target1.AttackC - Caster.ArmorC #CURRENT IMPLLLLLLLL
 
@@ -43,11 +43,11 @@ func Duel(Caster, Target1):
 	#hero_death_Care in CardLayer can manage heroes dying at the "same" time
 	await Target1.take_damage(attack1)
 
-func SummonTwo(allied_row):
+func SummonTwo(allied_row, _current_player = ""):
 	for i in 2:
 		await allied_row.spawn_unit(6)
 		
-func My_peak(target):
+func My_peak(target, _current_player = ""):
 	target.can_lvlup = false
 	for i in 5:
 		Base.Player_heroes[i].Lvlup_xp += 2
@@ -59,7 +59,7 @@ func My_peak(target):
 	
 	await target.XP_panel.update_xp_labels()
 	
-func Morning(target):
+func Morning(target, _current_player = ""):
 	var previous_health = target.HealthC
 	target.HealthC = -1
 	target.updateS()
@@ -67,7 +67,7 @@ func Morning(target):
 	if target.faction == "alpha":
 		target.XP_panel.increase_xp(2* (previous_health+1))
 		
-func Annihilate(target):
+func Annihilate(target, _current_player = ""):
 	var DAMAGE = 12
 	var HP = target.HealthC
 	var expected_damage = DAMAGE
@@ -77,13 +77,13 @@ func Annihilate(target):
 		expected_damage -= damage_to_tower
 	await target.take_damage(expected_damage)
 	
-func Hmmmmm(_allied_lane):
+func Hmmmmm(_allied_lane, _current_player = ""):
 	pass
 
-func Bread(allied_lane):
+func Bread(allied_lane, _current_player = ""):
 	await allied_lane.scrollh.draw_cards(2)
 		
-func Swap(swapped_unit, swapping_unit):
+func Swap(swapped_unit, swapping_unit, _current_player = ""):
 	swapped_unit.annul_my_presence()
 	swapping_unit.annul_my_presence()
 	

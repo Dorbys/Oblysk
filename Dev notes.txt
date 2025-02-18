@@ -1,3 +1,53 @@
+await get_tree().create_timer(Base.FAKE_DELTA).timeout
+push_error("calling to" +str(Lobby.opponent_peer_id) + "with info " + str(uno))
+if multiplayer.get_remote_sender_id() == 0:
+
+for i in range(herocount - 1, -1, -1):
+
+
+
+
+
+
+
+
+
+
+
+
+barrier powered by draining power from jailmate, rewire healspell to barrier to change the powerflow
+protection charm that is a timebomb instead, real protecting is in an injected chip, used in prison ig
+quest looking for something that the questgiver is wearing
+expensive fun we're having
+hamsterball symbiosis
+one of the most valuable weapons, doesnt look very valuable, element of surprise.._
+karma ==
+wait a minute - counterargument for attack, oh ok nvm
+Taking a phrase of a deceased partner
+
+
+#########     ###########            ##########            ########            ########
+
+invest bigga time into one actionsession
+
+
+#########     ###########            ##########            ########            ########
+
+Curving done at host and sent to join
+rpcing functions to happen first at host, so that curving doesn't cause problem
+
+
+
+#########     ###########            ##########            ########            ########
+
+
+
+
+
+
+
+
+
 curving actually by a common node
 to send rpcs 
 mr gpt lied agane
@@ -16,3 +66,209 @@ heroes work too now
 
 hand fuckedup, adding/spawning seems to work except adding in between is then sent as spawn as the right-most
 #here devnotes implemented by taking out of Prezident.txt
+
+
+
+common initiative
+
+
+
+common deployment:
+    same creepspawns
+    waiting till both assign hero
+    both can [SPACE]
+        newlane into 4 unlock for both
+
+passing after deployment causes immediate combat on the player who didn't confirm placement yet
+double pass call?
+different host n join behaviour too
+
+fixed
+
+
+testable?
+lvlups
+
+
+
+lvlup done 
+kimmedi ult stacks for both players, solution via only alpha doesn't work
+solution was solving a different problem
+
+
+synced both ult and passive for now, doubling untested cuz time
+kimmedi ult works
+
+history of played cards started
+Unit1.tscn
+    Damage_to_be_taken to not be shown when 0
+    Death and dtbt shows briefly when new unit 
+create_functions in played_card.tscn 
+
+Find VIP_list
+    REMOVED VIP_list
+    CardType improvement = inst of ints just use strings bruh
+
+From future fixes
+TYPE:
+    replace ints with strings                                   DONE
+        TYPE 8 = shadow
+        TYPE 7 = void
+        TYPE 3 = building
+        TYPE 2 = upgrade
+            fucked up in arena_rect.gd had to fix
+                Save more often jic
+
+add cardplayed signal to drop func
+    Added it to used_card() in hand.gd instead
+
+######################################
+dynamic card_type and card_ID allocation
+    from the card played signal, connected to somewhere in history
+    also pfp
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CI:
+
+Creep that can sacrifice itself after 1 round, dealing X dmg to all neighbors
+Creep: active [quick] eats your most expensive card, gets +X/X where X is the cost
+Hero: executioner, deals 6 dmg to opp hp after Bigass number of turns
+Creep: passive [charge1] when a hero equips upgrade, you gain a copy of that upgrade and I take X damage where X=cost
+Building: when a hero dies, its tower takes X dmg where X=  2*HP_max - ATK
+
+Command: tp scroll
+Swap would be a Command
+Command: move = move to any empty combat spot
+Command: retreat = moves to a random different combat spot, higher XP
+Command: flash grenade = retreat + the previous opp is disarmed
+Command: aggro = move + flashgr new target
+Command: breakthrough = move enemy neighbours to random empty combat spots
+Command: defensive position = +3 armour until end of round
+Command: axing dimensions = move to a different lane
+
+All commands require cast-target, not only the command owner
+
+enough for commands ig
+
+
+
+
+
+
+TH:
+Upgrades divided into:
+    items, enchants, commands
+
+
+Main diff against items and enchants:
+    Items active, enchants passive ?
+
+Enchants
+    base transfer of 
+
+    +6 life
+    +3atk
+    +1 armor
+    +1 resist
+    and up + comb
+    Convert your physical ATK dmg into magical and vice versa
+    Cooldown of your command -1, but not bellow 1
+    I need 25% less XP to lvlup
+    Whenever you activate your item: +1ATK
+    Lvlup grants an additional Signature card
+    Heroes I kill in combat grant double gold
+    SIEGE
+    Enemy neighbors have -X resists/armor
+    
+
+Why would you buy enchants with money?????????????????????
+    Power cost of a total enchant
+
+
+Items
+    Keenfolk gun = same
+    Charges: 0 , gains a charge whenever you play a card in this lane, ACTIVE: deal X dmg to opposer where X=charges, consume all charges CD 1
+    Blink axe = blink axe
+    +2 ATK, ACTIVE: Heal myself 12, -2ATK
+    Kamikaze vest only opps
+    Hourglass, CD 3, ACTIVE: decreases current CD of my ability by 1
+    Distraction, CD 3, ACTIVE: increases current CD of abilities of all enemy heroes by 1
+    Window to the soul: copies your enchant
+
+    Invisible cloaka: opponent can't see me this round (persists after movement n stuff)
+        Cards targeting only invisible heroes aren't shown 
+
+        Invis sounds fuckin cancer, and its gonna be hell to implement
+            Either opp can't see cards played on invis units and then ...
+                Opp could see card-type (upgrade or normal card) and will see manacost and could estimate what card could it be
+
+    Drawing table: charges: 1, shuffle your hand back into your deck and draw as many cards as you shuffled in 
+    Madness mask: hero is silenced but gains +8ATK and SIEGE, effect wears off on death
+    
+
+
+
+
+
+
+
+
+Future fixes:
+    names:
+        replace "...list"
+        with "...array"
+    day and other signals:
+        unite into a single mb
+    all unit passives:
+        "must have newlane()" ??
+        improve class to include array appendation if
+    Capitalization
+        bro (crying emoji)
+    OP_indentity
+        simplification to reduce negations/mirroring
+    Lvlup_db
+        could be divided to lspellsdb and lcreepsdb when creeps
+    Item => upgrade 
+        i dont even know
+
+
+
+
+

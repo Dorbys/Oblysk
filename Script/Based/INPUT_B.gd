@@ -73,7 +73,10 @@ func _input(event):
 		%Camera2D.move_camera_to_lane(4)
 	
 	elif Input.is_action_just_pressed("THE"):
-		the_button._on_pressed()
+		if Lobby.MULTIPLAYER == false:
+			the_button._on_pressed()
+		elif Base.granted_action == 1: 		#Lobby.MULTIPLAYER == true
+			the_button._on_pressed()
 		
 	elif Input.is_action_just_pressed("Show_or_hide_help"):
 		%Help_screen.show_or_hide()

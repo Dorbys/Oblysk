@@ -3,12 +3,15 @@ extends Control
 @onready var player_HP = $"../../../UI_layer/Player_HP"
 @onready var game_over = $"../../../UI_layer/Game_over"
 @onready var player_mana = $"../../../UI_layer/Player_mana_display"
+@onready var opponent_player_mana = $"../../../UI_layer/Opponent_info/Opponent_mana"
 @onready var buildings = $Buildings
+@onready var current_mana = %Current_mana
+@onready var max_mana = %Max_mana
 
 var HealthM = 12
 var HealthC = 12
 var ArmorC = 0
-var TYPE = 11
+var TYPE = "tower" #11
 var my_lane
 #given by tower layer during its ready
 #it works: 2.3. 2024

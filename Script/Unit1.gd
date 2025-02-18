@@ -25,7 +25,7 @@ extends Control
 
 
 var Unit_Name = "E"
-var Unit_Pfp 
+var Card_pfp 
 var Unit_Ability_texture
 var Unit_Ability_cooldown = 0
 var Passiveness = true
@@ -47,7 +47,7 @@ var Identification = 3
 
 #var UNIT = 1
 #var SPELL = 0
-var TYPE = 0
+var TYPE:String = "unit"
 var VOIDING = 1
 #idk
 var SETT = 1
@@ -108,7 +108,7 @@ var Im_targeted = 0
 var Targeter = null
 #the covering node containing script with TList
 
-var placeholder = 1
+var placeholder = "placeholder"
 var weapon_equipped = 0
 var special_equipped = 0
 var armour_equipped = 0
@@ -136,6 +136,7 @@ var death_shader = preload("res://Assets/Shaders/ShadeShade.gdshader")
 #makes hero_jpeg grayscale
 
 var faction 
+# "alpha" or "beta"
 #used for determining which auras should affect the unit and which not
 
 var LVLUP_type
@@ -180,6 +181,14 @@ var MY_UNIQUE_UNIT_KEY: int
 	#for MP
 	#number corresponds to it's position in the Lobby.universal_global_unit_array
 	#first 10 slots are reserved for heroes
+	
+var my_target_deployment_lane: int = 0
+	# 1-3 based on which lane player decides to deploy me 
+	#is sent over to the other player so that SpawnRect.deploy_all() knows where 
+		#to send enemy heroes 
+		#sync?
+	#reset to 0 after reparenting to DeployRect
+		
 #================================================================
 
 var sent_over_to_opponent:bool = false
@@ -228,7 +237,7 @@ func _ready():
 				
 		Lobby.universal_global_unit_array[my_slot] = self
 		MY_UNIQUE_UNIT_KEY = my_slot
-	push_error("UNIT: " +str(MY_UNIQUE_UNIT_KEY) +" CREATED AS: " +str(faction) + " at " +str(get_index()))
+#	push_error("UNIT: " +str(MY_UNIQUE_UNIT_KEY) +" CREATED AS: " +str(faction) + " at " +str(get_index()))
 	################################################################
 	#that part was for unique_unit_key
 	#has to be done asap cuz sync
@@ -247,9 +256,11 @@ func _ready():
 	if Unit_Armor != 0:
 		%AR.visible = true
 		%AR.modulate = Base.Black_color
+	increase_damage_to_be_taken(0)
+	#HERE
 
 	
-	%UNIT_JPEG.texture = Unit_Pfp
+	%UNIT_JPEG.texture = Card_pfp
 	Ability1.texture = Unit_Ability_texture
 	Ability1.CooldownM = Unit_Ability_cooldown
 	if has_ability == true:
@@ -330,7 +341,6 @@ func _ready():
 func second_ready():
 	#needs to be called together with _ready() for a proper initiation
 		#of a unit, but the delay between the two can be modified
-	
 	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
 	curve_rng()
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
@@ -339,6 +349,7 @@ func second_ready():
 	lane_aura_check()	
 	
 func second_ready_without_curve_rng():
+	#Used in multiplayer since curving is done only for at host
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	increase_damage_to_be_taken(0)
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
@@ -379,30 +390,30 @@ func land():
 	new_lane()
 	
 	var opposer = await get_opposer()
-	if opposer.TYPE == 0:
+	if opposer.TYPE == "unit":
 		straight_target = opposer
 	else:
 		straight_target = MYrena_rect.OPTower
 	
 		
 	curve_rng()
-	if opposer.TYPE == 0:
+	if opposer.TYPE == "unit":
 		opposer.curve_rng()
 
 func check_if_I_put_space_between_curving():
 	if Base.Main_phase == 1:
 		var opposer = await get_opposer()
-		if opposer.TYPE == 7:
+		if opposer.TYPE == "void":
 			#only if I brought a void here I couldve messed up
 			var id = get_index()
 			if id > 0:
 				var target1 = MYrena_rect.get_child(id-1)
-				if target1.TYPE == 0 and target1.targeting == "right":
+				if target1.TYPE == "unit" and target1.targeting == "right":
 					target1.curve_straight()
 #					print("made him curve straight from right")
 			if id < MYrena_rect.get_child_count() -1 :
 				var target1 = MYrena_rect.get_child(id+1)
-				if target1.TYPE == 0 and target1.targeting == "left":
+				if target1.TYPE == "unit" and target1.targeting == "left":
 					target1.curve_straight()
 #					print("made him curve straight from left")
 #			print("ID is: " +str(id))
@@ -599,7 +610,7 @@ func refresh_neighbours_from_my_death(id, _parent, opposer):
 #	if Base.Combat_phase == 0:
 #already checked in parent function
 
-	if opposer.TYPE == 0:
+	if opposer.TYPE == "unit":
 		opposer.ignore_opposer()
 		if opposer.Siege == true and opposer.targeting == "straight":
 			Card_layer.unit_no_longer_being_sieged(faction, opposer.besieging_damage)
@@ -613,7 +624,7 @@ func refresh_neighbours_from_my_death(id, _parent, opposer):
 	var comp = id-1
 	if comp> -1:
 		var left_opponent = OPrena.get_child(comp)
-		if left_opponent.TYPE == 0 and left_opponent.targeting == "right":
+		if left_opponent.TYPE == "unit" and left_opponent.targeting == "right":
 			left_opponent.curve_straight()
 			
 #	await get_tree().create_timer(Base.MICRO_TIME).timeout
@@ -621,7 +632,7 @@ func refresh_neighbours_from_my_death(id, _parent, opposer):
 	comp = id+1
 	if comp < OPrena.get_child_count():
 		var right_opponent = OPrena.get_child(comp)
-		if right_opponent.TYPE == 0 and right_opponent.targeting == "left":
+		if right_opponent.TYPE == "unit" and right_opponent.targeting == "left":
 			right_opponent.curve_straight()
 
 
@@ -635,8 +646,8 @@ func refresh_neighbours_from_my_death(id, _parent, opposer):
 #		if comp > -1 and comp< parent.get_child_count():
 #			var target = OPrena.get_child(comp)
 #			#gets the neighbours on the opposite lane
-#			if target.TYPE == 0:
-#				if i != 1 and opposer.TYPE !=0:
+#			if target.TYPE == "unit":
+#				if i != 1 and opposer.TYPE != "unit:
 #					#if I die and there is void opposite of me,
 #					# the OPneighbours on left and right must: 
 #					if target.targeting != "straight":
@@ -761,7 +772,7 @@ func _can_drop_data(_at_position, DropData):
 	else: 
 		if Base.current_lane == my_lane or DropData[3] == true:
 			#if this is the current lane or the targeting is multilane
-			if DropData[0] == 1 or DropData[0] == 11:
+			if DropData[0] == "spell" or DropData[0] == "lvlup_spell":
 				#if its a spell:
 				if DropData[6] == "Hero" and HERO == true and MYrena_rect.Are_heroes_being_played_on == true:
 					return true
@@ -769,7 +780,7 @@ func _can_drop_data(_at_position, DropData):
 					return true
 				elif DropData[6] == "Unit" and MYrena_rect.Are_heroes_being_played_on == true:
 					return true
-			elif DropData[0] == 2 and HERO == true:
+			elif DropData[0] == "upgrade" and HERO == true:
 				return true
 		return false
 
@@ -779,18 +790,18 @@ func _drop_data(_at_position, DropData):
 	#DROPDATA SPELL1 THESE: 
 	#[0= TYPE, 1=Identification, 2=self.get_index(), 
 	#3=crosslane, 4=Card_from_lvlup, 5 = Secondary_targets,
-	#6 = Is_played_on]
+	#6 = Is_played_on, #7 Lobby.current_player]
 	
 	#DROPDATA ITEM2 THESE: 
 	#[0= TYPE, 1=Identification, 2=self.get_index(), 
 	#3 = crosslane]
 	
-	if DropData[0] == 1 or DropData[0] == 11:
+	if DropData[0] == "spell" or DropData[0] == "lvlup_spell":
 #		print ("spell dropdata: " + str(DropData[0],DropData[1],DropData[2],DropData[3],DropData[4],
 #		DropData[5],DropData[6]))
 		var DB = SpellsDB
 		var DBList = SpellsDB.SPELLS_DB
-		if DropData[0] == 11:
+		if DropData[0] == "lvlup_spell":
 		#Useless, will be removed
 #			print("calling from lvldb")
 			DB = LvlupDB
@@ -802,7 +813,12 @@ func _drop_data(_at_position, DropData):
 			#FOR PASSIVES
 #			tower_mana.spend_mana(DBList[DropData[1]][DB.COSTPOSITION])
 			#Spends mana
-			DB.call(str(DBList[DropData[1]][DB.NAMEPOSITION]),self)
+			
+			var which_function:String = str(DBList[DropData[1]][DB.NAMEPOSITION])
+			if Lobby.MULTIPLAYER == true:
+				drop_data_multiplayer_funcall(DropData[0],which_function, DropData[7])
+			else:
+				DB.call(which_function,self, DropData[7])
 			#Resolves spell effect
 			
 			hand_rect.used_card(DropData[2])
@@ -830,38 +846,69 @@ func _drop_data(_at_position, DropData):
 			already_a_target(another)
 			
 		
-	elif DropData[0] == 2:
+	elif DropData[0] == "upgrade":
 		#ITEM
 		var ID = DropData[1]
+		if Lobby.MULTIPLAYER == true:
+			item_equipping_multiplayer(ID)
+		else:
+			equip_item(ID)
 		
-		var Item_type = ItemsDB.ITEMS_DB[ID][ItemsDB.ITEMMPOSITION]
-		var Target_slot = self.get_child(Item_type)
-		var loaded_item = load("res://Scenes/Items/Item_base.tscn")
-		var loaded_script = load("res://Script/ITEMS/" + item_script_folders[Item_type] + ItemsDB.ITEMS_DB[ID][ItemsDB.NAMEPOSITION] +".gd")
-		var equipped_item = loaded_item.instantiate()
-		equipped_item.set_script(loaded_script)
-		equipped_item.Item_ID = ID
-		#Item_ID 1
-		
-		if item_equipped[Item_type] == 0:
-			Target_slot.add_child(equipped_item)
-			item_equipped[Item_type] = 1
-		elif item_equipped[Item_type] == 1:
-			Target_slot.get_child(2).being_replaced(equipped_item)
-			#because child 0 is Cooldown
-		
-		
-		
-		hand_rect.get_child(DropData[2]).queue_free()
+		#hand_rect.get_child(DropData[2]).queue_free()
+		hand_rect.used_card(DropData[2])
 #		if MYrena_mid.get_child_count()>0:
 #			MYrena_mid.get_child(0).queue_free()
 		clean_myself_from_effects()
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		hand_rect.collide_cards()
 	
-
-
+func item_equipping_multiplayer(ID):
+	if Lobby.host == true:
+		Card_layer.make_my_mirror_unit_equip_item(ID, MY_UNIQUE_UNIT_KEY)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		equip_item(ID)
+	else:
+		equip_item(ID)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		Card_layer.make_my_mirror_unit_equip_item(ID, MY_UNIQUE_UNIT_KEY)
+		
+func equip_item(ID):
+	var Item_type = ItemsDB.ITEMS_DB[ID][ItemsDB.ITEMMPOSITION]
+	var Target_slot = self.get_child(Item_type)
+	var loaded_item = load("res://Scenes/Items/Item_base.tscn")
+	var loaded_script = load("res://Script/ITEMS/" + item_script_folders[Item_type] + ItemsDB.ITEMS_DB[ID][ItemsDB.NAMEPOSITION] +".gd")
+	var equipped_item = loaded_item.instantiate()
+	equipped_item.set_script(loaded_script)
+	equipped_item.Item_ID = ID
+	#Item_ID 1
+	
+	if item_equipped[Item_type] == 0:
+		Target_slot.add_child(equipped_item)
+		item_equipped[Item_type] = 1
+	elif item_equipped[Item_type] == 1:
+		Target_slot.get_child(2).being_replaced(equipped_item)
+		#because child 0 is Cooldown
+	
+func drop_data_multiplayer_funcall(spelltype:String, function_to_be_called:String, concurrent_player:String):
+	#can only be called if MP yes
+	#handles that join gets the function first, 
+		#since curving can't be fucked from there
+	var DB = SpellsDB
+	if spelltype == "lvlup_spell":
+		DB = LvlupDB
 			
+	if Lobby.host == true:
+		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, MY_UNIQUE_UNIT_KEY, concurrent_player)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		DB.call(function_to_be_called,self,concurrent_player)
+	else:
+		DB.call(function_to_be_called,self,concurrent_player)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, MY_UNIQUE_UNIT_KEY, concurrent_player)
+
+	
+	
+	
 func _on_slacksus_mouse_entered():
 	#	print("MOUSE ENTERED UNIT")
 	if (HERO == true and MYrena_rect.Are_heroes_being_played_on == true) or (HERO == false and MYrena_rect.Are_creeps_being_played_on == true):
@@ -980,7 +1027,16 @@ func LVLUP():
 	increase_AttackM(1,1)
 	increase_HealthM(1,1)
 	await hand_rect.draw_a_lvlup_card(Identification, LVLUP_type)
-#	Card_layer
+	Card_layer.make_my_mirror_unit_lvlup(MY_UNIQUE_UNIT_KEY)
+
+func pretend_LVLUP():
+	#for opponent heroes
+	LEVEL += 1
+	leveling = 0
+	increase_AttackM(1,1)
+	increase_HealthM(1,1)
+	hand_rect.scrollh.visualize_drawing_cards_for_opponent(1)
+	#currently unrevealed cuz that gonna be long
 	
 func hide_ability():
 	Ability1.hide_myself()
@@ -1018,7 +1074,7 @@ func curve_rng():
 	
 	
 		
-	if opposer.TYPE == 0:
+	if opposer.TYPE == "unit":
 		curve_straight()
 		
 	#there might be a bug if this setting is turned off 
@@ -1026,13 +1082,13 @@ func curve_rng():
 	#bug includes being curved but the arrow not showing it
 
 	else:
-		if Lobby.host == true:
+		if Lobby.MULTIPLAYER == false or Lobby.host == true:
 			#only the host will calculate curving
 			var random_value = randf()  # Generates a random float between 0 and 1
 			if random_value < 0.4 and my_slot != 0:
 			# 42% chance 
 				#That looks like 40 bro
-				if OPrena.get_child(my_slot-1) != null and OPrena.get_child(my_slot-1).TYPE == 0:
+				if OPrena.get_child(my_slot-1) != null and OPrena.get_child(my_slot-1).TYPE == "unit":
 					curve_left()
 					make_my_mirror_self_curve("left")
 				else:
@@ -1040,7 +1096,7 @@ func curve_rng():
 					make_my_mirror_self_curve("straight")
 			elif random_value >= 0.4 and random_value < 0.8 and my_slot != (population-1):
 			# Another 42% chance (totaling 84%)
-				if OPrena.get_child(my_slot+1) != null and OPrena.get_child(my_slot+1).TYPE == 0:
+				if OPrena.get_child(my_slot+1) != null and OPrena.get_child(my_slot+1).TYPE == "unit":
 					curve_right()
 					make_my_mirror_self_curve("right")
 				else:
@@ -1055,7 +1111,7 @@ func curve_rng():
 
 
 func make_my_mirror_self_curve(direction):
-	push_error("trying to make_my_mirror_self_curve " +direction)
+#	push_error("trying to make_my_mirror_self_curve " +direction)
 	#can be "straight" "left" or "right"
 	Card_layer.make_mirror_unit_curve(direction, MY_UNIQUE_UNIT_KEY)
 	
@@ -1067,9 +1123,9 @@ func start_waiting_for_curve_data():
 #@rpc("any_peer", "call_remote", "reliable")
 func curve_left():
 	targeting = "left"
-	push_error("curving left")
+#	push_error("curving left")
 	%Arrow_combat.curve_left()
-	if OPrena.get_child(get_index()-1).TYPE == 0:
+	if OPrena.get_child(get_index()-1).TYPE == "unit":
 		redirect_damage(OPrena.get_child(get_index()-1))
 	else:
 		curve_straight()	
@@ -1077,9 +1133,9 @@ func curve_left():
 #@rpc("any_peer", "call_remote", "reliable")
 func curve_right():
 	targeting = "right"
-	push_error("curving right")
+#	push_error("curving right")
 	%Arrow_combat.curve_right()	
-	if OPrena.get_child(get_index()+1).TYPE == 0:
+	if OPrena.get_child(get_index()+1).TYPE == "unit":
 		redirect_damage(OPrena.get_child(get_index()+1))
 	else:
 		curve_straight()
@@ -1087,10 +1143,10 @@ func curve_right():
 #@rpc("any_peer", "call_remote", "reliable")
 func curve_straight():
 	targeting = "straight"	
-	push_error("curving straight")
+#	push_error("curving straight")
 	%Arrow_combat.curve_straight()
 	var opposer = await get_opposer()
-	if opposer.TYPE == 0:
+	if opposer.TYPE == "unit":
 		redirect_damage(OPrena.get_child(get_index()))
 	else:	
 		redirect_damage(MYrena_rect.OPTower)		
@@ -1163,10 +1219,10 @@ func curve_straight():
 #	match targeting:
 #		"straight":
 #			target_to_be_annuled_1 = await get_opposer()
-#			if target_to_be_annuled_1.TYPE == 7:
+#			if target_to_be_annuled_1.TYPE == "void:
 #				#we were curved straight and would need to "annul" a tower
 #				#that's impossible so:
-#				target_to_be_annuled_1.TYPE = MYrena_rect.OPTower
+#				target_to_be_annuled_1.TYPE = MYrena_rect.OPTower #wtf
 #				MYrena_rect.OPTower.Im_no_longer_attacked_only_by(self, false, 0)
 #				#the '0' there makes it so that I don't lose my damage_used_up_1
 #				#since that's how an anull would do it
@@ -1181,21 +1237,21 @@ func curve_straight():
 #	match curved_into:
 #		"straight":
 #			target_to_be_annuled_2 = await get_opposer(id)
-#			if target_to_be_annuled_2.TYPE == 7:
+#			if target_to_be_annuled_2.TYPE == "void:
 #				target_to_be_annuled_2 == MYrena_rect.OPTower
 #		"left":
 #			target_to_be_annuled_2 = await get_opposer(id-1)
 #		"right":
 #			target_to_be_annuled_2 = await get_opposer(id+1)	
 #
-#	if 	target_to_be_annuled_1.TYPE == 0:
+#	if 	target_to_be_annuled_1.TYPE == "unit":
 #		target_to_be_annuled_1.annul_damage_directed_to_me()
-#	elif target_to_be_annuled_1.TYPE == 11:
+#	elif target_to_be_annuled_1.TYPE == "tower":
 #		#if it's a tower 	
 #		pass
 #		#I don't need to do anything, because if I already was targeting it
 #		#the match code already solved it
-#	if target_to_be_annuled_1 != target_to_be_annuled_2 and target_to_be_annuled_2.TYPE ==0:
+#	if target_to_be_annuled_1 != target_to_be_annuled_2 and target_to_be_annuled_2.TYPE == "unit":
 #		target_to_be_annuled_2.annul_damage_directed_to_me()
 #		#target_to_be_annuled_2 can be tower only if it already was dealt with
 #		#in target_to_be_annuled_1
@@ -1209,27 +1265,27 @@ func curve_straight():
 #	var prev_target = annul_data[0]
 #	var new_target = annul_data[1]
 #
-#	if prev_target.TYPE == 0 and new_target.TYPE ==0:
+#	if prev_target.TYPE == "unit" and new_target.TYPE == "unit":
 #		#if they both units:
 #		prev_target.redirect_damage_to_me_again()
 #		if prev_target != new_target :
 #			new_target.redirect_damage_to_me_again()
 #
-#	if prev_target.TYPE == 11 and new_target.TYPE == 11:
+#	if prev_target.TYPE == "tower" and new_target.TYPE == "tower":
 #		#if its the tower
 #		new_target.Im_attacked_only_by(self,false,0)
 #
-#	if prev_target.TYPE == 0 and new_target.TYPE == 11:
+#	if prev_target.TYPE == "unit" and new_target.TYPE == "tower":
 #		#if it was a unit and now its tower
 #		prev_target.redirect_damage_to_me_again()
 #		new_target.Im_attacked_only_by(self,false,0)
 #
-#	if prev_target.TYPE == 11 and new_target.TYPE == 0:
+#	if prev_target.TYPE == "tower" and new_target.TYPE == "unit":
 #		prev_target.Im_straight_attacked_by(self,false,0)
 					
 #func if_no_opposer_reduce_tower_dmg_tbt():
 #	var opposer = await get_opposer()			
-#	if opposer.TYPE == 7:
+#	if opposer.TYPE == "void:
 #		MYrena_rect.OPTower.Im_no_longer_straight_attacked_by(self, false, 0)
 		
 func refresh_combat_damage():
@@ -1264,7 +1320,7 @@ func annul_damage_directed_to_me(loudness = false):
 	#FROM THE UNIT TO LEFT
 	if comp> -1:
 		var left_opponent = OPrena.get_child(comp)
-		if left_opponent.TYPE == 0 and left_opponent.targeting == "right" and left_opponent.damage_used_up_2 > 0 and left_opponent.side_target == self:
+		if left_opponent.TYPE == "unit" and left_opponent.targeting == "right" and left_opponent.damage_used_up_2 > 0 and left_opponent.side_target == self:
 			left_opponent.my_damage_was_annuled = true
 			#helps keeping track when undoing so cuz I might not be afterwards
 			expected_damage = left_opponent.damage_used_up_2 - ArmorC
@@ -1277,7 +1333,7 @@ func annul_damage_directed_to_me(loudness = false):
 	#FROM OPPOSER
 	comp = id
 	var opposer = await get_opposer(comp)
-	if opposer.TYPE == 0 and opposer.straight_target == self: # and opposer.damage_used_up_1 > 0
+	if opposer.TYPE == "unit" and opposer.straight_target == self: # and opposer.damage_used_up_1 > 0
 		opposer.my_damage_was_annuled = true
 		expected_damage = opposer.damage_used_up_1 - ArmorC
 		if ArmorC > 0 and expected_damage < 0:
@@ -1295,7 +1351,7 @@ func annul_damage_directed_to_me(loudness = false):
 	comp = id+1
 	if comp< OPrena.get_child_count():
 		var right_opponent = OPrena.get_child(comp)
-		if right_opponent.TYPE == 0 and right_opponent.targeting == "left" and right_opponent.damage_used_up_2 > 0 and right_opponent.side_target == self:
+		if right_opponent.TYPE == "unit" and right_opponent.targeting == "left" and right_opponent.damage_used_up_2 > 0 and right_opponent.side_target == self:
 			right_opponent.my_damage_was_annuled = true
 			expected_damage = right_opponent.damage_used_up_2 - ArmorC
 			if ArmorC > 0 and expected_damage < 0:
@@ -1316,7 +1372,7 @@ func redirect_damage_to_me_again():
 	var comp = id-1
 	if comp> -1:
 		var left_opponent = await get_opposer(comp)
-		if left_opponent.TYPE == 0 and left_opponent.targeting == "right" and left_opponent.side_target == self:
+		if left_opponent.TYPE == "unit" and left_opponent.targeting == "right" and left_opponent.side_target == self:
 			left_opponent.my_damage_was_annuled = false
 			left_opponent.side_target = self
 			#because I might've landed here and there was someone else b4
@@ -1327,7 +1383,7 @@ func redirect_damage_to_me_again():
 	comp = id+1
 	if comp< MYrena_rect.get_child_count():
 		var right_opponent = await get_opposer(comp)
-		if right_opponent.TYPE == 0 and right_opponent.targeting == "left" and right_opponent.side_target == self: 
+		if right_opponent.TYPE == "unit" and right_opponent.targeting == "left" and right_opponent.side_target == self: 
 			right_opponent.my_damage_was_annuled = false
 			right_opponent.side_target = self
 			#because I might've landed here and there was someone else b4
@@ -1336,7 +1392,7 @@ func redirect_damage_to_me_again():
 	
 	comp = id
 	var opposer = await get_opposer(comp)
-	if opposer.TYPE == 0 and opposer.damage_used_up_1 > 0: #and opposer.straight_target == self:
+	if opposer.TYPE == "unit" and opposer.damage_used_up_1 > 0: #and opposer.straight_target == self:
 		opposer.my_damage_was_annuled = false
 		opposer.straight_target = self
 		#because I might've landed here and there was someone else b4
@@ -1385,7 +1441,7 @@ func redirect_damage(target):
 	#makes sure that when creep is gone we don't try to detract damage from them
 	
 	if straight_target == null and damage_used_up_1+damage_used_up_2 == 0:
-		if opposer.TYPE == 0:
+		if opposer.TYPE == "unit":
 			straight_target = opposer
 			straight_target.Im_attacked_only_by(self, Siege)
 			straight_target.curve_straight()
@@ -1404,7 +1460,7 @@ func redirect_damage(target):
 			
 			#if we are curved into same target again, refresh damage
 			
-		elif target.TYPE == 11:
+		elif target.TYPE == "tower":
 			#We assume that the opposer was the previous target and is dead 
 			#and redirect damage was triggered outside of prephase
 			#for example during cleanup phase
@@ -1459,7 +1515,7 @@ func redirect_damage(target):
 			
 			
 			
-		elif straight_target.TYPE == 0 and target == opposer:
+		elif straight_target.TYPE == "unit" and target == opposer:
 #			print("it was opposer")
 			#if we are curved to attack straight
 			side_target.Im_no_longer_side_attacked_by(self)
@@ -1468,7 +1524,7 @@ func redirect_damage(target):
 			side_target = null
 			straight_target.Im_attacked_only_by(self, Siege)
 			
-		elif straight_target.TYPE == 11 and (target == opposer or target == straight_target):
+		elif straight_target.TYPE == "tower" and (target == opposer or target == straight_target):
 			#we were curved to side and there was empty slot across us, 
 			#a unit appeared there and we target it now or the tower
 			side_target.Im_no_longer_side_attacked_by(self)
@@ -1601,7 +1657,7 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 	damage_to_be_taken += amount 
 	var opposer = await get_opposer()
 #	var preopposer = await get_opposer()
-#	if opposer.TYPE == 0 and opposer.Siege == true:
+#	if opposer.TYPE == "unit" and opposer.Siege == true:
 	#wtf is preopposer
 	
 	if problem == true:
@@ -1632,7 +1688,7 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 			push_error("overkill dmg: " +str(overkill_damage))
 		if overkill_damage > 0:
 			
-			if opposer.TYPE == 0 and opposer.Siege == true and opposer.targeting == "straight":
+			if opposer.TYPE == "unit" and opposer.Siege == true and opposer.targeting == "straight":
 			#check whether tower is gonna take siege damage
 				being_sieged = true
 				if opposer.besieging_damage > 0:
@@ -1669,10 +1725,12 @@ func check_damage_to_be_taken():
 		show_incoming_death()
 	else:
 		hide_incoming_death()
-		
-		
-	%DMG_TBT.text = str(damage_to_be_taken)
-	#only here because of armor shenanigans
+	if damage_to_be_taken == 0:
+		%DMG_TBT.self_modulate.a = 0
+	else:
+		%DMG_TBT.self_modulate.a = 1
+		%DMG_TBT.text = str(damage_to_be_taken)
+	
 
 
 func show_incoming_death():
@@ -1710,6 +1768,7 @@ func connect_my_passive_trigger(_AbilityNode, _PassiveTrigger):
 func enter_draggable_state():
 	#for when a hero respawns to be able to drag it to deploy it
 	%DraggingRect.visible = true
+#	push_error("entering draggable state " + str(MY_UNIQUE_UNIT_KEY))
 	
 	#should be enough?
 	
@@ -1767,7 +1826,7 @@ func get_opposer(Index = get_index()):
 	#which would ruin the primary purpose of this function
 	var opposer = OPrena.get_child(Index)
 #	var mb_opposer
-	while opposer == null or (opposer.TYPE == 0 and opposer.alive == 0):
+	while opposer == null or (opposer.TYPE == "unit" and opposer.alive == 0):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 		opposer = OPrena.get_child(Index)
 
@@ -1817,21 +1876,21 @@ func refresh_me_from_being_annulled():
 #		var opposer = await get_opposer()
 		var my_index = get_index()
 		var target
-		if targeting == "straight": #and opposer.TYPE == 7: #notsure if needed
+		if targeting == "straight": #and opposer.TYPE == "void: #notsure if needed
 			straight_target = null
 			
 		#CLEARING TWO VOIDS WASNT CALLED YET
 		elif targeting == "left":
 			if my_index > 0:
 				target = await get_opposer(my_index-1)
-				if target.TYPE == 7:
+				if target.TYPE == "void":
 					side_target = null
 			else:
 				push_error("I was curved to left despite being id0 ")
 		elif targeting == "right":
 			if my_index > 0:
 				target = await get_opposer(my_index+1)
-				if target.TYPE == 7:
+				if target.TYPE == "void":
 					side_target = null
 			else:
 				push_error("I was curved to left despite being id0 ")

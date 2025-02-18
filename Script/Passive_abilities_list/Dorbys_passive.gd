@@ -1,7 +1,6 @@
-extends Control
+extends Unit_passive_ability
 
-@onready var tower_layer = $"../../../../../../../../../Tower_layer"
-@onready var wielder = $"../../.."
+
 
 var description = "SIEGE"
 

@@ -1,7 +1,6 @@
-extends Control
+extends Unit_passive_ability
 
-@onready var tower_layer = $"../../../../../../../../../Tower_layer"
-@onready var wielder = $"../../.."
+
 
 var description = "Entrance: Increase my attack by attack of my left neighbour"
 
@@ -13,7 +12,7 @@ func _ready():
 	var index = wielder.get_index()
 	if index > 0:
 		var target = wielder.MYrena_rect.get_child(index-1)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			wielder.increase_AttackM(target.AttackM,1)
 	
 

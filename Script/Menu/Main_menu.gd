@@ -79,11 +79,16 @@ func _on_close_waiting_button_pressed():
 @rpc("authority", "call_local", "reliable")
 func start_game():
 	if Lobby.opponent_peer_id == 0:
+		#if I'm join
+		
 		#since I declared it as :int it  now havs different default value
 #		push_error("setting joiner's opponent_peer_id to 1")
 		Lobby.opponent_peer_id = 1
+		Lobby.player = "join"
 		Base.swap_player_decks()
 	else:
+		#I'm host
+		Lobby.player = "host"
 		Lobby.host = true
 		
 	if $LineEdit.text != "":
@@ -102,7 +107,7 @@ func start_game():
 	
 @rpc("any_peer", "call_remote", "reliable")
 func gain_starting_initiative():
-	Base.INITIATIVE = 1
+	Base.initiative = 1
 	
 	
 	

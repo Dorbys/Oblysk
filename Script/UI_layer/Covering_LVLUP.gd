@@ -22,13 +22,16 @@ var abarena_rect
 
 
 
+var og_xp
+#to determine whether to pass initiative or nah
 
 var XP 
 
 func _ready():
 	new_lane()
-	update_XP()
+	update_XP(true)
 	Base.lock_pass_button()
+
 	
 func new_lane():
 	match Base.current_lane:
@@ -45,9 +48,12 @@ func new_lane():
 			arena_rect = arena_rect3
 			abarena_rect = abarena_rect3
 	
-func update_XP():
+func update_XP(first_time = false):
 	XP = XP_panel.XP
 	Card_layer.lets_lvlup(XP,self)
+	
+	if first_time == true:
+		og_xp = XP
 	
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
@@ -65,14 +71,17 @@ func delete_myself():
 	Card_layer.lets_stop_targeting()
 #	for i in arena_rect.get_child_count():
 #		var target = arena_rect.get_child(i)
-#		if target.TYPE == 0:
+#		if target.TYPE == "unit":
 #			target.reshow_ability()
 #			target.clean_myself_from_effects()
 #		var target2 = abarena_rect.get_child(i)
-#		if target2.TYPE == 0:
+#		if target2.TYPE == "unit":
 #			target2.reshow_ability()
 #			target2.clean_myself_from_effects()
 #	arena_rect.TargetingSpell = 0
 #	abarena_rect.TargetingSpell = 0
+	if Lobby.MULTIPLAYER == true and og_xp != XP:
+		Base.pass_the_initiative()
+
 	Base.unlock_pass_button()
 	self.queue_free()

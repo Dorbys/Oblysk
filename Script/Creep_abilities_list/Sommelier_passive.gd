@@ -1,7 +1,6 @@
-extends Control
+extends Unit_passive_ability
 
-@onready var tower_layer = $"../../../../../../../../../Tower_layer"
-@onready var wielder = $"../../.."
+
 
 var ARMOR = 1
 var DAMAGE = 5
@@ -53,7 +52,7 @@ var aura_unique_id
 	
 	
 func do_I_affect_this(target):
-	if target.TYPE == 0 and abs(target.get_index()-wielder.get_index())<= 1:
+	if target.TYPE == "unit" and abs(target.get_index()-wielder.get_index())<= 1:
 		return true
 	else: return false
 	
@@ -92,7 +91,7 @@ func refresh_my_aura():
 	var target
 	for i in range(population-1,-1,-1):
 		target = OPrena.get_child(i)
-		if target != null and target.TYPE == 0:
+		if target != null and target.TYPE == "unit":
 			if abs(target.get_index()-wielders_id) <2:
 			#divided into two parts because UNITS that are affected by me
 			#but should no longer be have to get their auraeffect removed
@@ -113,6 +112,6 @@ func remove_aura_on_death():
 	var target
 	for i in range(population-1,-1,-1):
 		target = OPrena.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			if target.position_auras.has_node(aura_name+str(aura_unique_id)):
 				target.position_auras.get_node(aura_name+str(aura_unique_id)).get_removed()

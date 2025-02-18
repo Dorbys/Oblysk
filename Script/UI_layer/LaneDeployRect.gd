@@ -54,9 +54,9 @@ func create_a_creep():
 	var DB_slot = CreepsDB.SPECIAL_DB[ID]
 	
 	if faction == "Alpha":
-		another.Unit_Pfp = Base.SPECIAL_TEXTURES[0]
+		another.Card_pfp = Base.SPECIAL_TEXTURES[0]
 	elif faction == "Beta":
-		another.Unit_Pfp = Base.SPECIAL_TEXTURES[1]
+		another.Card_pfp = Base.SPECIAL_TEXTURES[1]
 	else: push_error("spawnrect doesnt belong to any know faction")
 	
 	another.Unit_Attack = DB_slot[CreepsDB.ATTACKPOSITION]
@@ -85,7 +85,7 @@ func create_a_super_creep():
 		
 	var DB_slot = CreepsDB.CREEPS_DB[last_ID]
 	another.Unit_Name = CreepsDB.CREEPS_DB[last_ID][CreepsDB.NAMEPOSITION]
-	another.Unit_Pfp = Base.CREEP_TEXTURES[last_ID]
+	another.Card_pfp = Base.CREEP_TEXTURES[last_ID]
 	
 	another.Unit_Attack = DB_slot[CreepsDB.ATTACKPOSITION]
 	another.Unit_Health = DB_slot[CreepsDB.HEALTHPOSITION]
@@ -158,6 +158,8 @@ func _can_drop_data(_at_position, data):
 		return true
 		
 func _drop_data(_at_position, data):
+	#[ 	0: the unit
+	#	1:from where
 	if data[1] != self:
 		var target = data[0]
 		var destination_X = 0
@@ -174,7 +176,11 @@ func _drop_data(_at_position, data):
 		destination_X += global_position.x
 		destination_Y += global_position.y 
 		
-		
+		if Lobby.MULTIPLAYER == true and get_index() < 4:
+										#so that it doesnt trigger for beta
+			target.my_target_deployment_lane = get_index()
+				#since it corresponds with the lane numbers
+				
 		Base.lock_pass_button()
 		#gotta be careful with tweeners since they can persist even after unit leaves
 		var tween = create_tween().set_parallel(true)

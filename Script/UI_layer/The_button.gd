@@ -10,13 +10,19 @@ extends TextureButton
 @onready var camera_2d = %Camera2D
 @onready var spawner = %Spawner
 @onready var spawn_rect = $"../Spawner/SpawnRect"
+@onready var opponent_spawn_rect = $"../Spawner/Opponent_spawn_rect_fake"
+
 @onready var player_mana_display = $"../Player_mana_display"
+@onready var opponent_mana = $"../Opponent_info/Opponent_mana"
 @onready var opponent_turn_indicator = $"../Opponent_info/Opponent_turn_indicator"
+@onready var player_hp = %Player_HP
+
 
 @onready var towerB1 = $"../../First_lane/Tower_layer/TowerB" #MOVE the tower1 to point to THE Tower1 and add TYPE, then continue with damageassigning abilities
 @onready var towerA1 = $"../../First_lane/Tower_layer/TowerA"
 @onready var tower_max_mana1 = $"../../First_lane/Tower_layer/TowerA/Mana_display/Max_mana"
 @onready var tower_current_mana1 = $"../../First_lane/Tower_layer/TowerA/Mana_display/Current_mana"
+@onready var tower_current_mana1B = $"../../First_lane/Tower_layer/TowerB/Mana_display/Current_mana"
 @onready var card_layer1 = $"../../First_lane/Card_layer"
 @onready var scrolla1 = $"../../First_lane/Card_layer/SCROLLA"
 @onready var arena_rect1 = $"../../First_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
@@ -27,6 +33,7 @@ extends TextureButton
 @onready var towerA2 = $"../../Mid_lane/Tower_layer/TowerA"
 @onready var tower_max_mana2 = $"../../Mid_lane/Tower_layer/TowerA/Mana_display/Max_mana"
 @onready var tower_current_mana2 = $"../../Mid_lane/Tower_layer/TowerA/Mana_display/Current_mana"
+@onready var tower_current_mana2B = $"../../First_lane/Tower_layer/TowerB/Mana_display/Current_mana"
 @onready var card_layer2 = $"../../Mid_lane/Card_layer"
 @onready var scrolla2 = $"../../Mid_lane/Card_layer/SCROLLA"
 @onready var arena_rect2 = $"../../Mid_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
@@ -37,6 +44,7 @@ extends TextureButton
 @onready var towerA3 = $"../../Last_lane/Tower_layer/TowerA"
 @onready var tower_max_mana3 = $"../../Last_lane/Tower_layer/TowerA/Mana_display/Max_mana"
 @onready var tower_current_mana3 = $"../../Last_lane/Tower_layer/TowerA/Mana_display/Current_mana"
+@onready var tower_current_mana3B = $"../../First_lane/Tower_layer/TowerB/Mana_display/Current_mana"
 @onready var card_layer3 = $"../../Last_lane/Card_layer"
 @onready var scrolla3 = $"../../Last_lane/Card_layer/SCROLLA"
 @onready var arena_rect3 = $"../../Last_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
@@ -57,9 +65,10 @@ var abarena_rect
 
 
 
-var towers = [towerA1, towerA2, towerA3, towerB1, towerB2, towerB3]
+var towers
 
-
+var confirmed_my_deployment = false
+var opponent_confirmed_deployment = false
 
 
 
@@ -78,6 +87,11 @@ func _ready():
 		#at game start
 	Base.game_started_yet_bruh = true
 	
+	set_process(false)
+	#multiplayer deployment coordination tool
+	#turned off even in SP cuz it's played by default
+	
+	towers = [towerA1, towerA2, towerA3, towerB1, towerB2, towerB3]
 	new_lane()
 
 func new_lane():
@@ -114,12 +128,37 @@ func new_lane():
 			abarena_rect = abarena_rect3
 
 func _on_pressed():
+	if Lobby.MULTIPLAYER == true:
+		if Base.current_lane == 4:
+			if confirmed_my_deployment == false:
+				confirm_my_deployment()
+		elif Base.initiative == 1:
+			Base.grant_an_action()
+		else:
+			handle_MP_thursday()
+			#since thursday is the combat phase aka afterpass
+	else: the_button_has_been_pressed_frfr()
+		
+func handle_MP_thursday():
+	#only called in MP
+	if Lobby.host == true:
+		the_button_has_been_pressed_frfr()
+		await get_tree().create_timer(Base.FAKE_OMEGA).timeout
+		rpc_id(Lobby.opponent_peer_id, "the_button_has_been_pressed_frfr")
+	else:
+		rpc_id(Lobby.opponent_peer_id, "the_button_has_been_pressed_frfr")
+		await get_tree().create_timer(Base.FAKE_OMEGA).timeout
+		the_button_has_been_pressed_frfr()
+		
+@rpc("any_peer", "call_remote", "reliable")
+func the_button_has_been_pressed_frfr():
 	if UI_layer.has_node("Tooltip_container"):
 		var target = UI_layer.get_node("Tooltip_container")
 		target.disappear_when_THE_BUTTON_is_pushed()
 	#to get rid of tooltips
-		
+	
 	print("unlocked? " + str(Base.CAN_CLICK_BUTTON_NOW))
+	
 	if  Base.Combat_phase == 0 and Base.CAN_CLICK_BUTTON_NOW == 1:
 		Base.Main_phase = 0 #determines which curving to use, rng or anull
 		# "when you can play cards"
@@ -167,7 +206,7 @@ func _on_pressed():
 				
 		Base.Main_phase = 1
 		#disabled = false in move_to_next_lane()
-			
+		
 	
 func THE_COMBAT():
 	var population = arena_rect.get_child_count()
@@ -186,9 +225,9 @@ func THE_COMBAT():
 		var T = population - (i+1)
 		var Target_unit1 = arena_rect.get_child(T)
 		var Target_unit2 = abarena_rect.get_child(T)
-		if Target_unit1.TYPE == 0:
+		if Target_unit1.TYPE == "unit":
 			Target_unit1.take_combat_damage()
-		if Target_unit2.TYPE == 0:
+		if Target_unit2.TYPE == "unit":
 			Target_unit2.take_combat_damage()
 	
 	
@@ -238,15 +277,70 @@ func move_to_next_lane():
 		spawn_rect.more_enemies()
 		await graveyard_showcase.update_both()
 		
-		while spawn_rect.colliding_units != 0 or camera_2d.moving == true:
+		while spawn_rect.colliding_units != 0 and opponent_spawn_rect.colliding_units != 0 and camera_2d.moving == true:
 #			print("Button is waiting for collision of units in spawner to complete: " +str(spawn_rect.colliding_units))
 			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		#wait until the units are collided
 #		push_error("Button is NOT waiting for collision of units in spawner to complete: " +str(spawn_rect.colliding_units) +str(camera_2d.moving))
 		spawner.visible = true
+		
+	if Lobby.MULTIPLAYER == true:
+		if Base.current_lane == 4:
+			Base.receive_granted_action()	
+		elif Base.current_lane != 4:		
+			if Base.initiative == 1:
+				Base.receive_granted_action()
+			else:
+				Base.granted_action = 0
+				Base.refresh_pass_button()
+				show_opponent_turn_begins()
 
 
+func confirm_my_deployment():
+	#decides which hero's my_target_deployment_lane has to be send over to opponent
+	
+	confirmed_my_deployment = true
+	var increment = 5
+	if Lobby.host == true:
+		increment = 0
+		
+	for i in Base.HERO_COUNT:
+		i += increment
+		var target = Lobby.universal_global_unit_array[i]
+		if target.my_target_deployment_lane != 0:
+			rpc_id(Lobby.opponent_peer_id,"confirm_deployment_of_hero", i, target.my_target_deployment_lane) 
+	
+		
+	rpc_id(Lobby.opponent_peer_id, "confirm_deployment_status")
+	start_waiting_on_opponent_to_finish_deploying() 
+	
+	
+	
+@rpc("any_peer", "call_remote", "reliable")
+func confirm_deployment_of_hero(key, lane):
+	#sets hero's my_target_deployment_lane to the what the opponent decided
+	Lobby.universal_global_unit_array[key].my_target_deployment_lane = lane
+	
+@rpc("any_peer", "call_remote", "reliable")
+func confirm_deployment_status():
+	#tells oppponent I'm done deploying
+	opponent_confirmed_deployment = true
+	
+func start_waiting_on_opponent_to_finish_deploying():
+	set_process(true)
+	
+func _process(delta = Base.FAKE_DELTA):
+	if opponent_confirmed_deployment == true:
+		the_button_has_been_pressed_frfr()
+		set_process(false)
+		opponent_confirmed_deployment = false
+		confirmed_my_deployment = false
+	else:
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 
+				
+
+			
 #######################################################################
 ###							GLOBALING   							###
 #######################################################################
@@ -258,7 +352,8 @@ func global_prep_phase():
 	card_layer3.prep_phase()
 	
 	if Base.current_lane != 4:
-		Base.Main_phase = 1
+			Base.Main_phase = 1
+	
 	
 func global_zoom_clicking_lanes_possible():
 	card_layer1.make_zoom_clicking_lanes_possible()
@@ -348,12 +443,11 @@ func round_end():
 func round_start():
 	scrollh.draw_cards(2)
 	
-	tower_max_mana1.increase_max_mana(1)
-	tower_current_mana1.refill_mana()
-	tower_max_mana2.increase_max_mana(1)
-	tower_current_mana2.refill_mana()
-	tower_max_mana3.increase_max_mana(1)
-	tower_current_mana3.refill_mana()
+	for i in len(towers):
+		towers[i].max_mana.increase_max_mana(1)
+		towers[i].current_mana.refill_mana()
+		
+
 
 func transfer_tower_mana_to_player_mana():
 	var mana1 = tower_current_mana1.current_mana
@@ -361,9 +455,16 @@ func transfer_tower_mana_to_player_mana():
 	var mana3 = tower_current_mana3.current_mana
 	var mana_to_be_added = (mana1 + mana2 + mana3)/3
 	player_mana_display.increase_mana(mana_to_be_added)
-
+	
+	var mana4 = tower_current_mana1B.current_mana
+	var mana5 = tower_current_mana2B.current_mana
+	var mana6 = tower_current_mana3B.current_mana
+	var mana_to_be_added2 = (mana4 + mana5 + mana6)/3
+	opponent_mana.increase_mana(mana_to_be_added)
+	
 func show_opponent_turn_begins():
 	opponent_turn_indicator.active_texture_now()
+	
 	
 func show_opponent_turn_is_over():
 	opponent_turn_indicator.inactive_texture_now()

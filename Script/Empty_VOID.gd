@@ -1,7 +1,7 @@
 extends Control
 
 
-var TYPE = 7
+var TYPE = "void"
 var VOIDING = 0
 
 #card placement empty slots
@@ -14,4 +14,4 @@ var opposable = 1
 #used for two units dying across each other, so that unit doesnt target a dying unit
 
 var besieging_damage = 0
-#so that I don't need to check for TYPE == 0 every siege damage check
+#so that I don't need to check for TYPE == "unit" every siege damage check

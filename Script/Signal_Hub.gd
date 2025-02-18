@@ -2,9 +2,9 @@ extends Control
 
 @onready var lane = $".."
 @onready var camera = $"../../Camera2D"
+@onready var history = $"../../UI_layer/Action_history"
 
-
-var card_played_list 
+var card_played_list = []
 var unit_targeted_list = []
 var lvlup_list = []
 var cleanup_phase_list = []
@@ -14,8 +14,7 @@ var wednesday_phase_list = []
 var friday_phase_list = []
 var unit_order_changed_array = []
 
-var VIP_list = []
-#wtf
+
 
 var my_lane = 0
 
@@ -32,29 +31,33 @@ func _ready():
 			
 	%TowerA.my_lane = my_lane
 	%TowerB.my_lane = my_lane
+	
+	card_played_list.append(history)
 
 
 func basic_requirements(target):
 	var wielder = target.wielder
-	if wielder.TYPE == 0 and wielder.my_lane == my_lane and wielder.alive == 1 :
+	if wielder.TYPE == "unit" and wielder.my_lane == my_lane and wielder.alive == 1 :
 		return true
 	else:
 #		print ("compare these: " +str(my_lane) + str(wielder.TYPE)+str(wielder.my_lane)+str(wielder.alive))
 		return false
 
-func card_played_signal(card):
+func card_played_signal(card:Node):
 	for i in range(card_played_list.size() - 1, -1, -1):
 		#going through list in reverse to prevent issues with shifting indexes
 		# the second -1 is condition, the third is step
 		var target = card_played_list[i]
 		if target != null:
-			if basic_requirements(target) == true: 
+			if target.TYPE == "building" or basic_requirements(target) == true: 
+#				await push_error("array position: " + str(i))
+				#the problem is int multiple appendations
 				await target.card_has_been_played(card)
 		else: card_played_list.remove_at(i)
 		
 func unit_targeted_signal(unit, targeting_entity):
 	#targeting_entity is the function that targeted it
-	if unit.TYPE == 0:
+	if unit.TYPE == "unit":
 		for i in range(unit_targeted_list.size() - 1, -1, -1):
 			var target = unit_targeted_list[i]
 			if target != null:
@@ -76,7 +79,7 @@ func monday_phase_signal():
 	for i in range(monday_phase_list.size() - 1, -1, -1):
 		var target = monday_phase_list[i]
 		if target != null:
-			if  target in VIP_list or basic_requirements(target): 
+			if  target.TYPE == "building" or basic_requirements(target): 
 				await target.monday_phase()
 		else: 
 			monday_phase_list.remove_at(i)
@@ -98,7 +101,7 @@ func wednesday_phase_signal():
 	for i in range(wednesday_phase_list.size() - 1, -1, -1):
 		var target = wednesday_phase_list[i]
 		if target != null:
-			if  target in VIP_list or basic_requirements(target): 
+			if  target.TYPE == "building" or basic_requirements(target): 
 				target.wednesday_phase()
 		else: 
 			wednesday_phase_list.remove_at(i)
@@ -109,7 +112,7 @@ func friday_phase_signal():
 	for i in range(friday_phase_list.size() - 1, -1, -1):
 		var target = friday_phase_list[i]
 		if target != null:
-			if  target in VIP_list or basic_requirements(target):
+			if  target.TYPE == "building" or basic_requirements(target):
 				await target.friday_phase()
 		else: 
 			friday_phase_list.remove_at(i)

@@ -1,7 +1,6 @@
-extends Control
+extends Unit_passive_ability
 
-@onready var tower_layer = $"../../../../../../../../../Tower_layer"
-@onready var wielder = $"../../.."
+
 
 func _ready():
 	tower_layer.cleanup_phase_list.append(self)

@@ -8,14 +8,14 @@ extends Card_In_Hand
 @export var PreviewScene: PackedScene	#PREVIEW WHEN HOVERED OVER
 
 @export var Card_name = "E"
-@export var Build_Pfp = load("res://Assets/CardsPNGS/FAKE.jpg")
+@export var Card_pfp = load("res://Assets/CardsPNGS/FAKE.jpg")
 @export var Card_Cost = 1
 @export var Card_XP = 2
 
 #var UNIT = 0
 #var SPELL = 1
 #BUILDING = 3
-var TYPE = 3
+var TYPE = "building"
 var Identification = 3
 #var Affects = 0
 #which lane: 0 own, 1 enemy, 2 both
@@ -24,13 +24,18 @@ var is_aura = true
 var affects = "allies"
 #allies enemies both
 
+
 func _ready():
 	%NAME.text = Card_name
 	%COST.text = str(Card_Cost)
-	%XP.text = str(Card_XP)
-	%CARD_JPEG.texture = Build_Pfp
+	%CARD_JPEG.texture = Card_pfp
 	
 	%Card_description.text = BuildDB[str(Card_name)+"_description"]
+	if Card_XP == 0:
+		%XP.visible = false
+	else:
+		%XP.visible = true
+		%XP.text = str(Card_XP)
 	
 	new_lane()
 	
@@ -70,12 +75,12 @@ func _get_drag_data(_at_position):
 	if manacheck == true:
 		var herocheck = arena_rect.is_there_a_hero_check()
 		if herocheck == true:
-			var initiative_check
+			var action_check
 			if Lobby.MULTIPLAYER == true:
-				initiative_check = does_player_have_initiative()
+				action_check = does_player_have_action()
 			else:
-				initiative_check = true
-			if initiative_check == true:			
+				action_check = true
+			if action_check == true:			
 				Base.lock_pass_button()
 				#until preview is gone
 				arena.move_roof_to_front()
@@ -94,7 +99,7 @@ func _get_drag_data(_at_position):
 					
 				
 				return [TYPE,Identification, self.get_index()]
-			else: you_dont_have_initiative(self)
+			else: you_dont_have_action(self)
 		else: no_hero_to_cast_this(self)	
 	else: not_enough_mana(self)
 	
@@ -109,7 +114,7 @@ func create_preview(ID):
 
 func assign_stats(preview, ID):
 	preview.Card_name = BuildDB.BUILD_DB[ID][BuildDB.NAMEPOSITION]
-	preview.Build_Pfp = Base.BUILDING_TEXTURES[ID]
+	preview.Card_pfp = Base.BUILDING_TEXTURES[ID]
 	preview.Card_Cost = BuildDB.BUILD_DB[ID][BuildDB.COSTPOSITION]
 	preview.Card_XP = BuildDB.BUILD_DB[ID][BuildDB.XPPOSITION]
 #	preview.Affects = BuildDB.BUILD_DB[ID][BuildDB.AFFPOSITION]

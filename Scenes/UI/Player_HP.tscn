@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://r785avsyfdxf"]
+[gd_scene load_steps=9 format=3 uid="uid://r785avsyfdxf"]
 
 [ext_resource type="Script" path="res://Script/UI_layer/Player_HP.gd" id="1_l3q7a"]
 [ext_resource type="Texture2D" uid="uid://dbrik7o5nd31y" path="res://Assets/Antag.png" id="2_2p88f"]
@@ -6,6 +6,7 @@
 [ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="4_6wx0a"]
 [ext_resource type="Texture2D" uid="uid://iftr6f2txht8" path="res://Assets/Life in lifeing room.jpg" id="5_6ncok"]
 [ext_resource type="LabelSettings" uid="uid://cpeo7l8ht4hdc" path="res://Setts/Labels/Player_name.tres" id="5_farna"]
+[ext_resource type="Texture2D" uid="uid://c2cnaarukl6am" path="res://Assets/PREUI/initiative_marker.png" id="6_sgng6"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_mrgus"]
 font = ExtResource("4_6wx0a")
@@ -60,6 +61,14 @@ label_settings = ExtResource("5_farna")
 horizontal_alignment = 1
 vertical_alignment = 2
 
+[node name="Beta_initiative_marker" type="TextureRect" parent="Beta_pfp"]
+unique_name_in_owner = true
+visible = false
+offset_right = 60.0
+offset_bottom = 60.0
+texture = ExtResource("6_sgng6")
+expand_mode = 1
+
 [node name="Alpha_pfp" type="TextureRect" parent="."]
 layout_mode = 0
 offset_top = 480.0
@@ -101,3 +110,12 @@ text = "didnt load"
 label_settings = ExtResource("5_farna")
 horizontal_alignment = 1
 vertical_alignment = 2
+
+[node name="Alpha_initiative_marker" type="TextureRect" parent="Alpha_pfp"]
+unique_name_in_owner = true
+visible = false
+offset_top = -1.21216
+offset_right = 60.0
+offset_bottom = 58.7878
+texture = ExtResource("6_sgng6")
+expand_mode = 1

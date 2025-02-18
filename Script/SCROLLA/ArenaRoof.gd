@@ -10,7 +10,7 @@ extends ColorRect
 
 @export var BUILDING_SCENE: PackedScene
 
-var my_lane
+var my_lane:int 
 #stolen from MYrena_rect during ready
 
 var my_tower_buildings
@@ -42,7 +42,7 @@ func _drop_data(at_position, DropData):
 	#DROPDATE THESE: 
 	#[controlor.TYPE, controlor.Identification, 
 	#controlor.get_index(), has_ability ]
-	if DropData[0] == 0:
+	if DropData[0] == "unit":
 		MYrena_rect.Carrying = 0
 		#creates the unit
 		MYrena_rect.Adding_Units(at_position, DropData[1], DropData[3])
@@ -54,7 +54,7 @@ func _drop_data(at_position, DropData):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		hand_rect.collide_cards()
 		
-	elif DropData[0] == 1 and DropData[6] == "Lane":
+	elif DropData[0] == "spell" and DropData[6] == "Lane":
 		#DROPDATA SPELL1 THESE: 
 		#[0= TYPE, 1=Identification, 2=self.get_index(), 
 		#3=crosslane, 4=Card_from_lvlup, 5= Secondary_targets
@@ -73,7 +73,7 @@ func _drop_data(at_position, DropData):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		hand_rect.collide_cards()
 	
-	elif DropData[0] == 11 and DropData[6] == "Lane":
+	elif DropData[0] == "lvlup_spell" and DropData[6] == "Lane":
 		#DROPDATA SPELL1 THESE: 
 		#[0= TYPE, 1=Identification, 2=self.get_index(), 
 		#3=crosslane, 4=Card_from_lvlup, 5= Secondary_targets
@@ -90,7 +90,7 @@ func _drop_data(at_position, DropData):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		hand_rect.collide_cards()
 		
-	elif DropData[0] == 3:
+	elif DropData[0] == "building":
 		var house = BUILDING_SCENE.instantiate()
 		house.Build_name = BuildDB.BUILD_DB[DropData[1]][BuildDB.NAMEPOSITION]
 		house.Build_Pfp = Base.BUILDINGS_SMALLS_TEXTURES[DropData[1]]

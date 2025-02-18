@@ -164,9 +164,17 @@ func _process(_delta):
 		pass
 	elif len(TList) == I_want_targets:
 		match I_want_targets:
-			1: handle_one_target()
-			2: handle_two_targets()
-			_: push_error("I_want_targets is set wrong: " +str(I_want_targets))			
+			#the problem might come from here, since we don't stop the process
+				#as soon as we hit I_want_targets
+			1: 
+				handle_one_target()
+				set_process(false)
+			2: 
+				handle_two_targets()
+				set_process(false)
+			_: 
+				push_error("I_want_targets is set wrong: " +str(I_want_targets))			
+				set_process(false)
 	else: 
 		push_error("Too many targets :(")
 		
@@ -175,7 +183,14 @@ func handle_one_target():
 	if Card_ID != null:
 		await tower_layer.unit_targeted_signal(TList[0],DBList[Card_ID])
 		#FOR PASSIVES
-		await DB.call(str(DBList[Card_ID][0]),TList[0])
+		var card_function = str(DBList[Card_ID][0])
+		if Lobby.MULTIPLAYER == true:
+			var cardtype = "spell"
+			if from_lvlup_card == true:
+				cardtype = "lvlup_spell"
+			one_target_handling_multiplayer(cardtype, card_function, TList[0].MY_UNIQUE_UNIT_KEY)
+		else:
+			await DB.call(card_function,TList[0],Lobby.current_player)
 		delete_myself(true)
 		return
 	elif Ability_ID != null:
@@ -191,7 +206,14 @@ func handle_one_target():
 func handle_two_targets():
 	if Card_ID != null:
 		
-		await DB.call(str(DBList[Card_ID][0]),TList[0],TList[1])
+		if Lobby.MULTIPLAYER == true:
+			var cardtype = "spell"
+			if from_lvlup_card == true:
+				cardtype = "lvlup_spell"
+			await two_target_handling_multiplayer(cardtype, DBList[Card_ID][0],
+			 TList[0].MY_UNIQUE_UNIT_KEY,TList[1].MY_UNIQUE_UNIT_KEY)
+		else:
+			await DB.call(DBList[Card_ID][0],TList[0],TList[1],Lobby.current_player)
 		
 		await tower_layer.unit_targeted_signal(TList[0],DBList[Card_ID])
 		await tower_layer.unit_targeted_signal(TList[1],DBList[Card_ID])	
@@ -278,3 +300,28 @@ func write_base_text(target):
 				base_text = "Targeting an enemy creep"
 		"lane":
 			base_text = "Targeting a lane"
+
+func one_target_handling_multiplayer(spelltype:String, function_to_be_called:String, unit_unique_key:int):
+	#think I can't even test this except for ability, which I'm no longer using lol
+	#check here when one such is reimplemented
+	if Lobby.host == true:
+		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, unit_unique_key)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key])
+	else:
+		DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key])
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, unit_unique_key)
+		
+func two_target_handling_multiplayer(spelltype:String,
+ function_to_be_called:String, unit_unique_key:int, second_unit_unique_key:int):
+	if Lobby.host == true:
+		await Card_layer.make_two_mirror_units_receive_spell_call(spelltype,
+		 function_to_be_called, unit_unique_key, second_unit_unique_key)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		await DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key],Lobby.universal_global_unit_array[second_unit_unique_key])
+	else:
+		await DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key],Lobby.universal_global_unit_array[second_unit_unique_key])
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		await Card_layer.make_two_mirror_units_receive_spell_call(spelltype,
+		 function_to_be_called, unit_unique_key, second_unit_unique_key)		

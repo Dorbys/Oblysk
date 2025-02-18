@@ -57,7 +57,22 @@ func Warmarch(Target):
 
 
 
+###########################################################################
+################			AbilityCalls	 		#######################
+###########################################################################
 
+#used for passives so they can be synced more easily
+	#the target is calced at the passive source
+	
+	
+var MP5_DAMAGE = 3
+var MP5_description = "Monday: I deal " + str(MP5_DAMAGE) + " physical damage to a random enemy"	
+func MP5(target):
+	var expected_damage = MP5_DAMAGE - target.ArmorC
+	if expected_damage < 0:
+		expected_damage = 0
+	#really gotta put this inside take_dmg function.... rly mb
+	target.take_damage(expected_damage)
 
 
 

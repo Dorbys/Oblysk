@@ -1,7 +1,6 @@
-extends Control
+extends Unit_passive_ability
 
-@onready var tower_layer = $"../../../../../../../../../Tower_layer"
-@onready var wielder = $"../../.."
+
 
 func _ready():
 	tower_layer.tuesday_phase_list.append(self)
@@ -21,7 +20,7 @@ func duel_opposer():
 	#nah bruh, both useless and messes up curving
 	
 	var opposer = await wielder.get_opposer(wielder.get_index())
-	if opposer.TYPE == 0 and opposer.HealthC > 0:
+	if opposer.TYPE == "unit" and opposer.HealthC > 0:
 		var my_dmg = wielder.AttackC - opposer.ArmorC
 		var opp_dmg = opposer.AttackC - wielder.ArmorC
 		

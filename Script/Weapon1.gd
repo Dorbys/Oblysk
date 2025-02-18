@@ -6,14 +6,12 @@ extends Card_In_Hand
 @export var PreviewScene: PackedScene
 
 @export var Item_Name = "E"
-@export var Item_Pfp = load("res://Assets/CardsPNGS/FAKE.jpg")
-@export var Item_Stat = 1
-@export var Item_Cost = 2
+@export var Card_pfp = load("res://Assets/Textures/Missing_texture.png")
 var Item_cooldown = 11
 
 #var UNIT = 0
 #var SPELL = 1
-var TYPE = 2
+var TYPE = "upgrade" #2
 var ITEMM = 0
 #ITEMM stands for whether its weapon0 special1 or armor2
 #currently tring to play CARDTYPE 2 to be ITEMS
@@ -25,16 +23,21 @@ var showing = 0
 #to prevent making multiple CIH previews
 
 var Card_from_lvlup = false
+var Card_XP = 0
 var Card_Cost = -1
 #so that it doesnt trigger manaspending
+
+
 
 func _ready():
 	%NAME.text = Item_Name
 	
-	%COST.text = str(Item_Cost)
-	%WEAPON_JPEG.texture = Item_Pfp
+#	%COST.text = str(Item_Cost)
+	#I've hidden the cost cuz no used
+	%WEAPON_JPEG.texture = Card_pfp
 	
 	%STATS.text = ItemsDB[str(Item_Name)+"_description"]
+
 	
 	new_lane()
 	
@@ -69,12 +72,12 @@ func new_lane():
 
 		
 func _get_drag_data(_at_position):
-	var initiative_check
+	var action_check
 	if Lobby.MULTIPLAYER == true:
-		initiative_check = does_player_have_initiative()
+		action_check = does_player_have_action()
 	else:
-		initiative_check = true
-	if initiative_check == true:
+		action_check = true
+	if action_check == true:
 		Base.lock_pass_button()
 		#until preview is gone
 		var drag_preview = create_preview(Identification)
@@ -91,7 +94,7 @@ func _get_drag_data(_at_position):
 		
 		return [TYPE,Identification, self.get_index(), cross_lane]
 		
-	else: you_dont_have_initiative(self)
+	else: you_dont_have_action(self)
 	
 func create_preview(ID):
 	var preview = Scene.instantiate()
@@ -102,9 +105,9 @@ func create_preview(ID):
 func assign_stats(preview, ID):
 	preview.Item_Name = ItemsDB.ITEMS_DB[ID][ItemsDB.NAMEPOSITION]
 	preview.ITEMM = ItemsDB.ITEMS_DB[ID][ItemsDB.ITEMMPOSITION]
-	preview.Item_Pfp = Base.ITEM_TEXTURES[ID]
-	preview.Item_Stat = ItemsDB.ITEMS_DB[ID][ItemsDB.STATPOSITION]
-	preview.Item_Cost = ItemsDB.ITEMS_DB[ID][ItemsDB.COSTPOSITION]
+	preview.Card_pfp = Base.ITEM_TEXTURES[ID]
+#	preview.Item_Stat = ItemsDB.ITEMS_DB[ID][ItemsDB.STATPOSITION]
+	preview.Card_Cost = ItemsDB.ITEMS_DB[ID][ItemsDB.COSTPOSITION]
 	preview.Item_cooldown = ItemsDB.ITEMS_DB[ID][ItemsDB.COOLDOWNPOSITION]
 	preview.Identification = ID
 

@@ -11,7 +11,7 @@ var Identification = 3
 var Card_Cost = 0
 #var UNIT = 1
 #var SPELL = 0
-var TYPE = 0
+var TYPE = "unit"
 var has_ability = false
 #var actually_exiting = 1
 

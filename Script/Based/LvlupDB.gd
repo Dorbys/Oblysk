@@ -11,7 +11,10 @@ var CROSSLANEPOSITION = 5
 var ISPLAYEDONPOSITION = 6
 
 
+
 #TYPE 1 for spells and 11 for lvlup spell, also 0 for units and 10 for lvlup units
+	#outdated and converted to strings
+
 var LVLUPS_DB = [
 ["Fresh_on", 3, Enums.Targeting.one_ally,11,Enums.Targeting.none,false, "Unit"],
 ["Duplicate",1,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"], 
@@ -24,13 +27,13 @@ var LVLUPS_DB = [
 ["Extreality", 88,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"]]
 # Called when the node enters the scene tree for the first time.
 
-func Fresh_on(Target):
+func Fresh_on(Target, _current_player = ""):
 	var diff = Target.HealthM - Target.HealthC
 	await Target.increase_HealthC(2)
 	if diff >= 2:
 		Target.MYrena_rect.scrollh.draw_cards(1)
 	
-func Duplicate(lane):
+func Duplicate(lane, _current_player = ""):
 	var ITEM_ID = 1
 	
 	
@@ -39,7 +42,7 @@ func Duplicate(lane):
 	handa.add_child(item)
 	await handa.collide_cards()
 	
-func Legion(allied_row):
+func Legion(allied_row, _current_player = ""):
 	var target_lanes = [allied_row.BUTTON.arena_rect1, allied_row.BUTTON.arena_rect2,
 	allied_row.BUTTON.arena_rect3]
 	if Base.current_lane < 4:
@@ -50,17 +53,35 @@ func Legion(allied_row):
 		for j in 2:
 			await target_lanes[i].spawn_unit(Legionare_index)
 	
-var Railgun_damage = 3	
-func Railgun(target):
-	target.take_damage(Railgun_damage)
-	Railgun_damage += 1
-	Railgun_description = str("Deal " +str(Railgun_damage) + " magical damage to a unit in any lane,
+var railgun_host_owner:int 	
+var railgun_join_owner:int
+#Unique key of heroes with the ability
+var opponent_railgun_damage = 3
+var Railgun_damage = 3
+func Railgun(target, current_player:String = ""):
+	if Lobby.MULTIPLAYER == false or current_player == Lobby.player:
+		#If I cast this, use my damage
+		target.take_damage(Railgun_damage)
+	else:
+		#else use opponents damage and increase it
+		target.take_damage(opponent_railgun_damage)
+		opponent_railgun_damage +=1
+		
+	if Lobby.MULTIPLAYER == false or current_player == Lobby.player:
+		Railgun_damage += 1
+		Railgun_description = str("Deal " +str(Railgun_damage) + " magical damage to a unit in any lane,
 increase cost and damage of future railguns by 1")
-	var connection_to_p = Base.Player_heroes[3].Ability1.get_child(2)
-	await connection_to_p.new_snipe_damage(Railgun_damage)
+		var owner = railgun_host_owner
+		if current_player == "join":
+			owner = railgun_join_owner
+
+		push_error("owner value here: " +str(owner) +  "host: " 
+		+str(railgun_host_owner) + " join: " +str(railgun_join_owner))
+		var connection_to_p = Lobby.universal_global_unit_array[owner].Ability1.get_child(2)
+		await connection_to_p.new_snipe_damage(Railgun_damage)
 	
 
-func Exreality(lane):
+func Exreality(lane, _current_player = ""):
 	var opp_buildings
 	if lane.OP_identity == 1:
 		opp_buildings = lane.OPTower.buildings

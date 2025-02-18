@@ -8,13 +8,13 @@ extends Card_In_Hand
 @export var PreviewScene: PackedScene	#PREVIEW WHEN HOVERED OVER
 
 @export var Card_name = "E"
-@export var Card_Pfp = load("res://Assets/CardsPNGS/FAKE.jpg")
+@export var Card_pfp = load("res://Assets/Textures/Missing_texture.png")
 @export var Card_Cost = 1
 @export var Card_XP = 2
 
 #var UNIT = 0
 #var SPELL = 1
-var TYPE = 1
+var TYPE = "spell"
 var Identification = 3
 var Targets = 0
 #eg 1 unit, lane, 2 units, 1 ally
@@ -27,17 +27,25 @@ var Secondary_targets
 #which need additional targets after they are played on a unit
 #assigned in ready()
 
+
 func _ready():
 	%NAME.text = Card_name
 	%COST.text = str(Card_Cost)
-	%XP.text = str(Card_XP)
-	%SPELL_JPEG.texture = Card_Pfp
+	
+	%SPELL_JPEG.texture = Card_pfp
 	%Card_description.text = SpellsDB[str(Card_name)+"_description"]
 	#Yeaah, new scenes time......
+	if Card_XP == 0:
+		%XP.visible = false
+	else:
+		%XP.visible = true
+		%XP.text = str(Card_XP)
 	Secondary_targets = SpellsDB.SPELLS_DB[Identification][SpellsDB.BONUSTARGPOSITION]
 		#this is how to acess a variable from there, not an index of list
-		
+
+	
 	new_lane()
+	
 	
 
 
@@ -54,12 +62,12 @@ func _get_drag_data(_at_position):
 	if manacheck == true:
 		var herocheck = arena_rect.is_there_a_hero_check()
 		if herocheck == true:
-			var initiative_check
+			var action_check
 			if Lobby.MULTIPLAYER == true:
-				initiative_check = does_player_have_initiative()
+				action_check = does_player_have_action()
 			else:
-				initiative_check = true
-			if initiative_check == true:
+				action_check = true
+			if action_check == true:
 				Base.lock_pass_button()
 				#until preview is gone
 				the_button.global_lets_hide_abilities_and_items()
@@ -84,13 +92,9 @@ func _get_drag_data(_at_position):
 			#	abarena.move_arena_to_front()
 					
 				
-				return [TYPE,Identification, self.get_index(),
-				  cross_lane, Card_from_lvlup, Secondary_targets, 
-				Is_played_on]
-			else: you_dont_have_initiative(self)
-			#[0= TYPE, 1=Identification, 2=self.get_index(), 
-		#3=crosslane, 4=Card_from_lvlup, 5 = Secondary_targets,
-		#6 = Is_played_on]
+				return [TYPE,Identification, self.get_index(), cross_lane, 
+				Card_from_lvlup, Secondary_targets, Is_played_on, Lobby.current_player]
+			else: you_dont_have_action(self)
 		else: no_hero_to_cast_this(self)
 	else: not_enough_mana(self)
 	
@@ -106,7 +110,7 @@ func create_preview(ID):
 
 func assign_stats(preview, ID):
 	preview.Card_name = SpellsDB.SPELLS_DB[ID][SpellsDB.NAMEPOSITION]
-	preview.Card_Pfp = Base.SPELL_TEXTURES[ID]
+	preview.Card_pfp = Base.SPELL_TEXTURES[ID]
 	preview.Card_Cost = SpellsDB.SPELLS_DB[ID][SpellsDB.COSTPOSITION]
 	preview.Card_XP = SpellsDB.SPELLS_DB[ID][SpellsDB.XPPOSITION]
 	preview.Targets = SpellsDB.SPELLS_DB[ID][SpellsDB.TARGPOSITION]

@@ -6,10 +6,14 @@ extends ColorRect
 
 @export var LVLUP_spell_scene:PackedScene
 
+
 @onready var XP_panel = $"../../../../XP_Panel"
 @onready var BUTTON = $"../../../../THE_BUTTON"
-
-
+@onready var scrollh = $"../../.."
+#for unit1.pretend_LVLUP()
+@onready var tower_layer1 = $"../../../../../First_lane/Tower_layer"
+@onready var tower_layer2 = $"../../../../../Mid_lane/Tower_layer"
+@onready var tower_layer3 = $"../../../../../Last_lane/Tower_layer"
 
 
 var CardsDrawn = 0
@@ -50,7 +54,7 @@ func drawing():
 func create_creep(ID):
 	var another = Unit_scene.instantiate()
 	var DB_slot = CreepsDB.CREEPS_DB[ID]
-	another.Unit_Pfp = Base.CREEP_TEXTURES[ID]	
+	another.Card_pfp = Base.CREEP_TEXTURES[ID]	
 	another.Unit_Name = DB_slot[CreepsDB.NAMEPOSITION]
 	another.Unit_Attack = DB_slot[CreepsDB.ATTACKPOSITION]
 	another.Unit_Health = DB_slot[CreepsDB.HEALTHPOSITION]
@@ -71,7 +75,7 @@ func create_creep(ID):
 func create_spell(ID):
 	var another = Spell_scene.instantiate()
 	var DB_slot = SpellsDB.SPELLS_DB[ID]
-	another.Card_Pfp = Base.SPELL_TEXTURES[ID]
+	another.Card_pfp = Base.SPELL_TEXTURES[ID]
 	another.Card_name = DB_slot[SpellsDB.NAMEPOSITION]
 	another.Card_Cost = DB_slot[SpellsDB.COSTPOSITION]
 	another.Card_XP = DB_slot[SpellsDB.XPPOSITION]
@@ -88,9 +92,10 @@ func create_item(ID):
 	var DB_slot = ItemsDB.ITEMS_DB[ID]
 	another.Item_Name = DB_slot[ItemsDB.NAMEPOSITION]
 	another.ITEMM = DB_slot[ItemsDB.ITEMMPOSITION]
-	another.Item_Pfp = Base.ITEM_TEXTURES[ID]
-	another.Item_Stat = DB_slot[ItemsDB.STATPOSITION]
-	another.Item_Cost = DB_slot[ItemsDB.COSTPOSITION]
+	another.Card_pfp = Base.ITEM_TEXTURES[ID]
+#	another.Item_Stat = DB_slot[ItemsDB.STATPOSITION]
+	another.Card_Cost = DB_slot[ItemsDB.COSTPOSITION]
+	#incosistance for simplicity of hand.gd
 	another.Item_cooldown = DB_slot[ItemsDB.COOLDOWNPOSITION]
 	another.Identification = ID
 	
@@ -100,7 +105,7 @@ func create_building(ID):
 	var another = Building_scene.instantiate()
 	var DB_slot = BuildDB.BUILD_DB[ID]
 	another.Card_name = DB_slot[BuildDB.NAMEPOSITION]
-	another.Build_Pfp = Base.BUILDING_TEXTURES[ID]
+	another.Card_pfp = Base.BUILDING_TEXTURES[ID]
 	another.Card_Cost = DB_slot[BuildDB.COSTPOSITION]
 	another.Card_XP = DB_slot[BuildDB.XPPOSITION]
 	another.is_aura = DB_slot[BuildDB.ISAURAPOSITION]
@@ -124,28 +129,33 @@ func create_lvlup_spell(ID):
 	var another = LVLUP_spell_scene.instantiate()
 	var DB_slot = LvlupDB.LVLUPS_DB[ID]
 	another.Card_name = DB_slot[LvlupDB.NAMEPOSITION]
-	another.Card_Pfp = Base.LVLUP_CARDS_TEXTURES[ID]
+	another.Card_pfp = Base.LVLUP_CARDS_TEXTURES[ID]
 	another.Card_Cost = DB_slot[LvlupDB.COSTPOSITION]
 	another.Card_XP = 0
 	another.Targets = DB_slot[LvlupDB.TARGPOSITION]
 	another.Is_played_on = DB_slot[LvlupDB.ISPLAYEDONPOSITION]
 #	another.Secondary_targets = DB_slot[LvlupDB.BONUSTARGPOSITION]
 	another.cross_lane = DB_slot[LvlupDB.CROSSLANEPOSITION]
-	another.TYPE = 11
+	another.TYPE = "lvlup_spell"
 	another.Identification = ID
 	
 	
 	return another
 
-func used_card(which):
+func used_card(which:int):
 	var target = self.get_child(which)
 	var cards_xp = target.Card_XP
 	var manacost = target.Card_Cost
 	XP_panel.increase_xp(cards_xp)
-	target.queue_free()
 	if manacost >= 0:
 		#so that its easy to skip cards like items
 		BUTTON.tower_current_mana.spend_mana(manacost)
+		
+	var layer_to_call = get("tower_layer" + str(Base.current_lane)) 
+	await layer_to_call.card_played_signal(target)
+	#signal
+	
+	target.queue_free()	
 	if Lobby.MULTIPLAYER == true:
 		Base.pass_the_initiative()
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout

@@ -54,7 +54,7 @@ var OP_identity
 var OPTower
 var MYTower
 
-var TYPE = 3000
+var TYPE:String = "arena_rect"
 #since this can be targeted, it also has to be able to TYPEChecked
 #reason of implementation : unit targeted in covering might be this lane
 	#when using blink_axe
@@ -66,7 +66,7 @@ var AOFFSET = 100
 var collide_time = 0.25
 # animation time of collide_units()
 
-var my_lane = 0
+var my_lane:int = 0
 #calced from 'lane' during ready()
 
 var Are_creeps_being_played_on = false
@@ -164,7 +164,7 @@ func Adding_Units(_at_position, ID, forced_here = null):
 	var DB_slot = CreepsDB.CREEPS_DB[ID]
 	another.VOIDING = 0
 #	another.Unit_Name = Base.UNITS_DB[ID][Base.NAMEPOSITION]
-	another.Unit_Pfp = Base.CREEP_TEXTURES[ID]
+	another.Card_pfp = Base.CREEP_TEXTURES[ID]
 	
 	another.Unit_Name = DB_slot[CreepsDB.NAMEPOSITION]
 	another.Unit_Attack = DB_slot[CreepsDB.ATTACKPOSITION]
@@ -201,8 +201,9 @@ func Adding_Units(_at_position, ID, forced_here = null):
 		push_error("mult true and lobbyhost false")
 	else:
 		await get_tree().create_timer(Base.FAKE_OMEGA).timeout 
-		another.second_ready()
+		another.second_ready_without_curve_rng() #on adding no curving
 		#these two lines also work for SP
+			
 
 	UNITS_MOVED_YO()
 	#signal yo
@@ -215,7 +216,7 @@ func Cheating_Units(ID, has_ability):
 	
 	another.VOIDING = 0
 #	another.Unit_Name = Base.UNITS_DB[ID][Base.NAMEPOSITION]
-	another.Unit_Pfp = Base.CREEP_TEXTURES[ID]
+	another.Card_pfp = Base.CREEP_TEXTURES[ID]
 	
 	var DB_slot = CreepsDB.CREEPS_DB[ID]
 	another.Unit_Name = DB_slot[CreepsDB.NAMEPOSITION]
@@ -276,7 +277,7 @@ func spawn_unit(ID, rpced_slot = null, forced_here = false):
 	
 	another.VOIDING = 0
 #	another.Unit_Name = Base.UNITS_DB[ID][Base.NAMEPOSITION]
-	another.Unit_Pfp = Base.CREEP_TEXTURES[ID]
+	another.Card_pfp = Base.CREEP_TEXTURES[ID]
 	
 	another.Unit_Attack = CreepsDB.CREEPS_DB[ID][CreepsDB.ATTACKPOSITION]
 	another.Unit_Health = CreepsDB.CREEPS_DB[ID][CreepsDB.HEALTHPOSITION]
@@ -321,14 +322,22 @@ func spawn_unit(ID, rpced_slot = null, forced_here = false):
 	
 
 			
-func Remove_Unit(which):	
+func Remove_Unit(which):
+	var over_void:bool = false
+	var target = get_child(which)
+	#used only when dragging a unit and exiting the select area (ArenaRoof)	
+	if target.Replaced_a_void == 1:
+		over_void = true
+		
 	if get_child_count() > which:
-		RIP_BOZO(get_child(which)) 
+		RIP_BOZO(target) 
 		#Dunno how else to wait 1 frame......................
 		#Because queue_free takes place at the end of frame
 #		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		#RIP_BOZO should make it so that I don't need to wait a frame now
-		collide_units()
+		
+		if over_void == false:
+			collide_units()  #rip
 		
 	else: push_error("attempted to remove unit over population")
 
@@ -347,7 +356,7 @@ func collide_units():
 #		if curve == true:
 #			for i in population:
 #				var target = get_child(i)
-#				if target.TYPE == 0:
+#				if target.TYPE == "unit:
 #					target.curve_rng()
 
 		
@@ -408,7 +417,7 @@ func _on_arena_roof_mouse_exited():
 
 	if Carrying == 1:
 		if self.get_child_count() >= New_Slot+1:
-			if get_child(New_Slot).TYPE == 8:
+			if get_child(New_Slot).TYPE == "shadow":
 				if get_child(New_Slot).Replaced_a_void == 1:
 					replacing_replacer = 1
 				Remove_Unit(New_Slot)
@@ -420,10 +429,10 @@ func _on_arena_roof_mouse_exited():
 			else:
 				var population = get_child_count()
 				for i in population:
-					if get_child(i).TYPE == 8:
+					if get_child(i).TYPE == "shadow":
 						Remove_Unit((get_child(i).get_index()))
 						#this basically doesnt happen anymore, but just for sure
-						print("KICKED ASS")
+						push_error("KICKED ASS")
 		else: push_error("Almost crashed by UFM mexit lol")
 
 
@@ -461,7 +470,7 @@ func Shadow_preview():
 	else:
 		#voidstuff
 		var Rtarget = self.get_child(New_Slot)
-		if Rtarget.TYPE == 7:
+		if Rtarget.TYPE == "void":
 			if Rtarget.SETT == 1:
 				another.Replaced_a_void = 1
 			RIP_BOZO(Rtarget)
@@ -503,7 +512,7 @@ func Shadow_follow():
 					#necessary if statement because of frame 1 shenenigans
 					move_child(get_child(Shadow_index), New_Slot)
 #				if Shadow_index < OPrena_rect.get_child_count():
-#					if OPrena_rect.get_child(Shadow_index).TYPE == 7:
+#					if OPrena_rect.get_child(Shadow_index).TYPE == "shadow:
 #						OPrena_rect.move_child(OPrena_rect.get_child(Shadow_index), New_Slot)
 				
 				collide_units()
@@ -516,7 +525,7 @@ func Shadow_follow():
 #			print("SI: " +str(Shadow_index))
 #			print("NS: " +str(New_Slot))
 #			move_child(get_child(Shadow_index), New_Slot)
-			if self.get_child(New_Slot).TYPE == 7:
+			if self.get_child(New_Slot).TYPE == "void":
 				swap_children(Shadow_index, New_Slot)	
 			else: move_child(get_child(Shadow_index), New_Slot)	
 			
@@ -552,7 +561,7 @@ func new_slot_for_shadow_follow():
 	empty_slots = []
 	for i in self.get_child_count():
 		if self.get_child(i).SITT == 1:
-			if self.get_child(i).TYPE == 7 or self.get_child(i).Replaced_a_void == 1:
+			if self.get_child(i).TYPE == "void" or self.get_child(i).Replaced_a_void == 1:
 				empty_slots.append(i)
 	if len(empty_slots) != 0:
 		New_Slot = round_to_closest_empty(New_Slot, empty_slots)
@@ -651,7 +660,7 @@ func maybe_clean_two_voids(index):
 		var A1 = self.get_child(index)
 		var B1 = await get_opposer(index)
 		if A1 != null and B1 != null:
-			if A1.TYPE == 7 and B1.TYPE == 7:	
+			if A1.TYPE == "void" and B1.TYPE == "void":	
 				RIP_BOZO(A1)
 				RIP_BOZO(B1)
 	#			await get_tree().create_timer(Base.FAKE_DELTA).timeout
@@ -666,7 +675,7 @@ func get_opposer(Index):
 	#which would ruin the primary purpose of this function
 	var opposer = OPrena_rect.get_child(Index)
 #	var mb_opposer
-	while opposer == null or (opposer.TYPE == 0 and opposer.alive == 0):
+	while opposer == null or (opposer.TYPE == "unit" and opposer.alive == 0):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 		opposer = OPrena_rect.get_child(Index)
 
@@ -737,7 +746,7 @@ func create_hero(ID):
 	var another = CARD.instantiate()
 	var DB_slot = HeroesDB.HEROES_DB[ID]
 	
-	another.Unit_Pfp = Base.HERO_TEXTURES[ID]
+	another.Card_pfp = Base.HERO_TEXTURES[ID]
 	another.Unit_Icon = Base.ICON_TEXTURES[ID] 		#TESTUS HEREEEEEEEEE
 	
 	another.Unit_Ability_texture = Base.ABILITY_TEXTURES[ID]
@@ -894,11 +903,11 @@ func spawn_lane_creep(rpced_slot = null, forced_here = false):
 	another.HERO = false
 	another.Identification = ID
 	if MY_identity == "A":
-		another.Unit_Pfp = Base.SPECIAL_TEXTURES[ID]
+		another.Card_pfp = Base.SPECIAL_TEXTURES[ID]
 		another.position.y = AOFFSET
 	elif MY_identity == "B": 
 		another.position.y = BOFFSET
-		another.Unit_Pfp = Base.SPECIAL_TEXTURES[ID+1]
+		another.Card_pfp = Base.SPECIAL_TEXTURES[ID+1]
 		
 	another.my_lane = my_lane
 	#to track which lane a unit is in
@@ -920,7 +929,7 @@ func reset_curving():
 	var population = get_child_count()
 	for i in population:
 		var target = get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.reset_curve()
 			
 	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
@@ -928,7 +937,7 @@ func reset_curving():
 			
 	for i in population:
 		var target = get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.curve_rng()		
 	
 	
@@ -938,7 +947,7 @@ func is_there_a_hero_check():
 		var target
 		for i in population:
 			target = get_child(i)
-			if target.TYPE == 0 and target.HERO == true:
+			if target.TYPE == "unit" and target.HERO == true:
 				return true
 		return false
 	print("there is always a caster")
@@ -949,7 +958,7 @@ func is_there_a_unit_check():
 	var target
 	for i in population:
 		target = get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			return true
 	return false
 
@@ -964,7 +973,7 @@ func refresh_annulled_units():
 	var target
 	for i in population:
 		target = get_child(i)
-		if target.TYPE == 0 and target.my_damage_was_annuled == true:
+		if target.TYPE == "unit" and target.my_damage_was_annuled == true:
 			target.refresh_me_from_being_annulled()
 		
 		

@@ -2,15 +2,15 @@ extends Control
 
 @onready var spawn_rect = %SpawnRect
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
+var colliding_units = 0
+#to know whether I can make Spawner visible already
+#count of how many units still moving to hide their movement
+
+
 
 
 
 func collide_units():
-#	colliding_units += 1
-	#increased when the child enters tree
 	var collide_time = 0.2
 	var target
 	var destinationX
@@ -50,9 +50,15 @@ func collide_units():
 		 collide_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 		
 	get_tree().create_timer(collide_time).timeout
-	spawn_rect.colliding_units -= 1
+	colliding_units -= 1
+
+#func _on_child_entered_tree(node):
+#	spawn_rect.colliding_units += 1
+#
+
 
 func _on_child_entered_tree(node):
-	spawn_rect.colliding_units += 1
-	node.scale = Vector2(0.5,0.5)
+	colliding_units += 1
+	node.pre_deploy_respawn()
+	node.scale = Vector2(0.7,0.7)
 	collide_units()

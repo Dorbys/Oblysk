@@ -1,7 +1,6 @@
-extends Control
+extends Unit_passive_ability
 
-@onready var tower_layer = $"../../../../../../../../../Tower_layer"
-@onready var wielder = $"../../.."
+
 
 func _ready():
 	tower_layer.monday_phase_list.append(self)
@@ -17,13 +16,13 @@ func find_new_head():
 	#nah bruh, both useless and messes up curving
 	
 	
-	if await wielder.get_opposer(wielder.get_index()).TYPE != 0:
+	if await wielder.get_opposer(wielder.get_index()).TYPE != "unit":
 		var arena = wielder.MYrena_rect
 		var population = arena.get_child_count()
 		var empty_voids = []
 		for i in population:
 			var target = arena.get_child(i)
-			if target.TYPE == 7:
+			if target.TYPE == "void":
 				empty_voids.append(target.get_index())
 		var voidcount = len(empty_voids)
 		if voidcount > 0:

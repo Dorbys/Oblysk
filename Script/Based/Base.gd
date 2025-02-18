@@ -12,10 +12,12 @@ var PLAYTEST = 0
 #turns off alwayscaster
 #you can play all units into enemy side
 #Bombard building doesnt bombard
+var STARTING_XP = 10
 
-var INITIATIVE = 0
+var initiative = 0
 #You can only play if you have initiative
 #not bool since I want to implement fleeting initiative 
+var granted_action = 0
 
 
 
@@ -131,6 +133,8 @@ var FAKE_GAMMA = 1/42.0
 var FAKE_OMEGA = 1/9.0
 var MICRO_TIME = 1/240.0
 #cuz nearsimultaneous shit
+var HERO_COUNT = 5
+#How many heroes per player
 
 var Red_color = Color(250,0,0)
 var Green_color = Color(0,250,0)
@@ -138,6 +142,7 @@ var Blue_color = Color(0,0,250)
 var Black_color = Color(0,0,0)
 var White_color = Color(1,1,1)
 var Orange_color = Color(1, 0.6, 0)
+
 
 var Combat_phase = 0
 var CAN_CLICK_BUTTON_NOW = 1
@@ -148,7 +153,7 @@ var Main_phase = 0
 #for unit gd   combat_damage_refresh
 #determined by BUTTON
 
-var current_lane =1
+var current_lane = 1
 var viewed_lane = 1
 #used for scrolling lanes
 
@@ -181,7 +186,7 @@ func _ready():
 	while game_started_yet_bruh == false:
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	if Lobby.MULTIPLAYER == true:
-		if INITIATIVE == 0:
+		if initiative == 0:
 		#If I wasnt chosen as the starting player in the Main_menu.gd
 			pass_the_initiative()
 			#calls receive for opp
@@ -350,7 +355,7 @@ func lock_pass_button():
 	
 func unlock_pass_button(forced = false):
 	if Lobby.MULTIPLAYER == true:
-		if INITIATIVE == 1:
+		if granted_action == 1:
 			if forced == true:
 				CAN_CLICK_BUTTON_NOW = 1
 				the_button.set_disabled(false)
@@ -369,24 +374,46 @@ func unlock_pass_button(forced = false):
 				
 func refresh_pass_button():
 	#only in Multiplayer because locking thebutton increases lock by 1
-	if Base.INITIATIVE == 1:
+	if granted_action == 1: #initiative
 		the_button.set_disabled(false)
-	elif Base.INITIATIVE == 0:
+	elif granted_action == 0:
 		the_button.set_disabled(true)
-	else: push_error("Unknown Base.INITIATIVE value")
+	else: push_error("Unknown Base.granted_action value") #initiative
 
 @rpc("any_peer", "call_remote", "reliable")
 func receive_the_initiative():
-	INITIATIVE = 1
+	initiative = 1
+	granted_action = 1
 	unlock_pass_button(true)
 	the_button.show_opponent_turn_is_over()
+	the_button.player_hp.show_alpha_initiative()
+	Lobby.update_current_player()
 	
 func pass_the_initiative():
-	INITIATIVE = 0
+	#after you do an action that takes away initiative (play card, use ability...)
+	initiative = 0
+	granted_action = 0
 	refresh_pass_button()
 	rpc_id(Lobby.opponent_peer_id, "receive_the_initiative")
 	the_button.show_opponent_turn_begins()
+	the_button.player_hp.show_beta_initiative()
+	Lobby.update_current_player()
 	
+@rpc("any_peer", "call_remote", "reliable")
+func receive_granted_action():
+	granted_action = 1
+	unlock_pass_button(true)
+	the_button.show_opponent_turn_is_over()
+	Lobby.update_current_player()
+	
+func grant_an_action():
+	#after you do an action that passes the turn to opponent
+	#used when you don't pass the initiative (passing with initiative)
+	granted_action = 0
+	refresh_pass_button()
+	rpc_id(Lobby.opponent_peer_id, "receive_granted_action")
+	the_button.show_opponent_turn_begins()
+	Lobby.update_current_player()
 	
 
 	

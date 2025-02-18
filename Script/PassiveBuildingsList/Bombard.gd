@@ -1,6 +1,5 @@
-extends Node
+extends Building_passive_ability
 
-@onready var BUTTON = $"../../../../../../UI_layer/THE_BUTTON"
 
 
 func _ready():
@@ -43,7 +42,7 @@ func shoot_at_random(lane):
 	var population = lane.get_child_count()
 	for i in population:
 		var mb_target = lane.get_child(i)
-		if mb_target.TYPE == 0:
+		if mb_target.TYPE == "unit":
 			targs.append(mb_target)
 	var length = len(targs)
 	if length>0:

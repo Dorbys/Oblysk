@@ -6,10 +6,11 @@ extends Control
 func _ready():
 	if Base.PLAYTEST == 1:
 		%DevTools.visible = false
-		%XP_Panel.XP = 10
+		%XP_Panel.XP = Base.STARTING_XP
+		%Opponent_XP_panel.XP = Base.STARTING_XP
 		
 func lets_stop_targeting():
 	for i in get_child_count():
 		var target = get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.Im_no_longer_clickable()			

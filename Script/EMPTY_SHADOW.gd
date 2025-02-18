@@ -1,7 +1,7 @@
 extends Control
 
 
-var TYPE = 8
+var TYPE = "shadow"
 var VOIDING = 1
 var SETT = 0
 var Replaced_a_void = 0

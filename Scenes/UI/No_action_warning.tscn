@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://1ii2eu8a2p22"]
 
-[ext_resource type="Texture2D" uid="uid://ccvinpywghouh" path="res://Assets/PREUI/STOP.png" id="1_xal1n"]
-[ext_resource type="Script" path="res://Script/UI_layer/No_mana_warning.gd" id="2_14f23"]
+[ext_resource type="Texture2D" uid="uid://ccvinpywghouh" path="res://Assets/PREUI/STOP.png" id="1_s6qr5"]
+[ext_resource type="Script" path="res://Script/UI_layer/No_mana_warning.gd" id="2_ic2bs"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_nlwki"]
 font_size = 72
@@ -16,15 +16,15 @@ offset_right = 1087.0
 offset_bottom = 791.0
 scale = Vector2(1.5, 1.5)
 mouse_filter = 2
-texture = ExtResource("1_xal1n")
+texture = ExtResource("1_s6qr5")
 expand_mode = 1
-script = ExtResource("2_14f23")
+script = ExtResource("2_ic2bs")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
-offset_left = 2.66667
-offset_top = -46.6667
-offset_right = 415.667
-offset_bottom = 55.3333
-text = "no initiative"
+offset_left = -21.3333
+offset_top = -48.0
+offset_right = 427.667
+offset_bottom = 54.0
+text = "not ur action"
 label_settings = SubResource("LabelSettings_nlwki")

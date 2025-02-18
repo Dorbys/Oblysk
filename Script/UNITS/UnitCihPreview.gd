@@ -5,7 +5,7 @@ extends Control
 #past copy of UnitCIHPreview
 
 var Unit_Name = "AlphaCreep"
-var Unit_Pfp 
+var Card_pfp 
 var Unit_Ability_texture
 var Unit_Ability_cooldown
 var Unit_Attack = 1
@@ -15,7 +15,7 @@ var Identification = 3
 var Card_Cost = 0
 #var UNIT = 1
 #var SPELL = 0
-var TYPE = 0
+var TYPE = "unit"
 var has_ability = false
 #var actually_exiting = 1
 var HERO = false
@@ -26,7 +26,7 @@ func _ready():
 	%ATK.text = str(Unit_Attack)
 	%HP.text = str(Unit_Health)
 	%AR.text = str(Unit_Armor)
-	%HERO_JPEG.texture = Unit_Pfp
+	%HERO_JPEG.texture = Card_pfp
 	var loaded_script = load("res://Script/Creep_abilities_list/" + str(CreepsDB.CREEPS_DB[Identification][CreepsDB.NAMEPOSITION]) + "_passive.gd")
 	var script_instance
 	if loaded_script != null:

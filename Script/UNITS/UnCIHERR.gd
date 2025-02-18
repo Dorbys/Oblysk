@@ -11,7 +11,7 @@ var showing = 0
 
 
 var Unit_Name = "E"
-var Unit_Pfp 
+var Card_pfp 
 var Unit_Ability_texture
 var Unit_Ability_cooldown
 var Unit_Attack = 1
@@ -20,7 +20,7 @@ var Unit_Armor = 0
 var Card_Cost = 0
 
 #var UNIT = 1
-var TYPE = 0
+var TYPE = "unit"
 var Identification = 3
 var HERO
 var has_ability = false
@@ -33,15 +33,20 @@ func _ready():
 	%ATK.text = str(Unit_Attack)
 	%HP.text = str(Unit_Health)
 	%AR.text = str(Unit_Armor)
-	%HERO_JPEG.texture = Unit_Pfp
+	%HERO_JPEG.texture = Card_pfp
 	%Ability1.texture = Unit_Ability_texture
 	if Unit_Armor != 0:
 		%AR.modulate = Base.Black_color
 	%COST.text = str(Card_Cost)
-	%XP.text = str(Card_XP)
+	if Card_XP == 0:
+		%XP.visible = false
+	else:
+		%XP.visible = true
+		%XP.text = str(Card_XP)
 	
 	if has_ability == false:
 		%Ability1.visible = false
+
 	
 	new_lane()
 	
@@ -77,12 +82,12 @@ func _get_drag_data(_at_position):
 	if manacheck == true:
 		var herocheck = arena_rect.is_there_a_hero_check()
 		if herocheck == true:
-			var initiative_check
+			var action_check
 			if Lobby.MULTIPLAYER == true:
-				initiative_check = does_player_have_initiative()
+				action_check = does_player_have_action()
 			else:
-				initiative_check = true
-			if initiative_check == true:
+				action_check = true
+			if action_check == true:
 				Base.lock_pass_button()
 				#until preview is gone
 				var drag_preview = create_preview(Identification)
@@ -98,7 +103,7 @@ func _get_drag_data(_at_position):
 				
 				
 				return [TYPE, Identification, self.get_index(), has_ability]
-			else: you_dont_have_initiative(self)
+			else: you_dont_have_action(self)
 		else: no_hero_to_cast_this(self)
 	else: not_enough_mana(self)
 
@@ -113,7 +118,7 @@ func create_preview(ID):
 	
 func assign_stats(preview, ID):
 	var DB_slot = CreepsDB.CREEPS_DB[ID]
-	preview.Unit_Pfp = Base.CREEP_TEXTURES[ID]
+	preview.Card_pfp = Base.CREEP_TEXTURES[ID]
 	preview.Unit_Name = DB_slot[CreepsDB.NAMEPOSITION]
 	preview.Unit_Attack = DB_slot[CreepsDB.ATTACKPOSITION]
 	preview.Unit_Health = DB_slot[CreepsDB.HEALTHPOSITION]

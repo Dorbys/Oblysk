@@ -18,6 +18,7 @@ func _on_hand_rect_child_exiting_tree(_node):
 var handwidth = 1200	
 var limit 
 var capacity = 8
+#how many it fits until stretching required
 func Resize_HANDA():
 	limit = %HandRect.limit
 	var ChildCount = hand_rect.get_child_count() 

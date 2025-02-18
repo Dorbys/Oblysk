@@ -31,8 +31,8 @@ func _ready():
 	arena_rects = [arena_rect1, arena_rect2,arena_rect3,
 	beta_arena_rect1,beta_arena_rect2,beta_arena_rect3]
 	
-	if opp_spawn_rect:
-		opp_spawn_rect.connect("child_entered_tree",_on_child_entered_tree)
+#	if opp_spawn_rect:
+#		opp_spawn_rect.connect("child_entered_tree",_on_child_entered_tree)
 
 func INITIATE_THE_GAME():
 		
@@ -234,6 +234,21 @@ func deploy_all():
 	var deploy_function = "deploy_unit"
 	if Lobby.MULTIPLAYER == true:
 		deploy_function = "deploy_unit_MP"
+		var herocount = opp_spawn_rect.get_child_count()
+		for i in range(herocount - 1, -1, -1):
+			var target = opp_spawn_rect.get_child(i)
+			match target.my_target_deployment_lane:
+				1: 
+					target.reparent(%BetaFirstLaneDeployRect)
+					target.my_target_deployment_lane = 0
+				2: 
+					target.reparent(%BetaFirstLaneDeployRect)
+					target.my_target_deployment_lane = 0
+				3: 
+					target.reparent(%BetaFirstLaneDeployRect)
+					target.my_target_deployment_lane = 0
+				_: push_error("unkown target.my_target_deployment_lane value: " +str(target.my_target_deployment_lane))
+		await get_tree().create_timer(Base.FAKE_GAMMA).timeout
 		
 	var alpha_squadron = []
 	var beta_squadron = []
@@ -283,10 +298,15 @@ func deploy_all():
 				deploy_target = starting_squadron[k/2]
 				if deploy_target != null:
 					await starting_deployer.call(deploy_function,deploy_target)
+					await get_tree().create_timer(Base.FAKE_DELTA).timeout
+					#added when void appearing in opposite lane it was supposed to
+						#is still around, hoply fix
 			if k%2 == 1:
 				deploy_target = second_squadron[floor(k/2)]
 				if deploy_target != null:
 					await second_deployer.call(deploy_function,deploy_target)
+					await get_tree().create_timer(Base.FAKE_DELTA).timeout
+
 		#deploys the units switching between starting and second deployer
 		# skipping when its null
 				

@@ -1,6 +1,7 @@
 extends Panel
 
 @onready var UI_layer = $".."
+@onready var opponent_xp_panel = $"../Opponent_info/Opponent_XP_panel"
 
 @export var covering : PackedScene
 
@@ -25,8 +26,15 @@ var hero_xp_labels_in_deck_order
 var XP = 1000
 func increase_xp(amount):
 	XP += amount
-	
 	%XP_Count.text = str(XP)
+	
+	if Lobby.MULTIPLAYER == true:
+		rpc_id(Lobby.opponent_peer_id, "mirror_my_xp_change", amount)
+	
+@rpc("any_peer", "call_remote", "reliable")
+func mirror_my_xp_change(amount):
+	opponent_xp_panel.increase_xp(amount)
+	
 	
 
 
@@ -60,13 +68,18 @@ func _on_mouse_exited():
 
 
 func _on_button_pressed():
+	if Lobby.MULTIPLAYER == true:
+		if Base.granted_action == 1:
+			lvlupping()
+	else:
+		lvlupping()
+	
+func lvlupping():
 #	var loaded_covering = load("res://Scenes/Covering_LVLUP.tscn")
-	var another = covering.instantiate()
-	#MUST USE ":" when exporting packed scenes
-	UI_layer.add_child(another)
-	#starts the lvlup selection
-	
-	
+		var another = covering.instantiate()
+		#MUST USE ":" when exporting packed scenes
+		UI_layer.add_child(another)
+		#starts the lvlup selection	
 	
 	
 

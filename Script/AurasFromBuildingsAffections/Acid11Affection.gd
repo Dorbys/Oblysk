@@ -7,6 +7,6 @@ var Build_name
 var text_for_tooltip = "-1 armor to enemies"
 
 func do_I_affect_this(target):
-	if target.TYPE == 0:
+	if target.TYPE == "unit":
 		return true
 	else: return false

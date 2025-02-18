@@ -2,20 +2,24 @@ extends Card_preview
 
 
 @export var Card_name = "E"
-@export var Build_Pfp = load("res://Assets/CardsPNGS/FAKE.jpg")
+@export var Card_pfp = load("res://Assets/Textures/Missing_texture.png")
 @export var Card_Cost = 1
 @export var Card_XP = 2
 
 #var UNIT = 0
 #var SPELL = 1
-var TYPE = 1
+var TYPE = "building"  #1 wtf
 var Identification = 3
 
 func _ready():
 	%NAME.text = Card_name
 	%COST.text = str(Card_Cost)
-	%XP.text = str(Card_XP)
-	%CARD_JPEG.texture = Build_Pfp
+	if Card_XP == 0:
+		%XP.visible = false
+	else:
+		%XP.visible = true
+		%XP.text = str(Card_XP)
+	%CARD_JPEG.texture = Card_pfp
 	
 	%Card_description.text = BuildDB[str(Card_name)+"_description"]
 	

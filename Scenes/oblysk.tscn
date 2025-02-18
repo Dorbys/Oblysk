@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://cak63fd13ipg1"]
+[gd_scene load_steps=33 format=3 uid="uid://cak63fd13ipg1"]
 
 [ext_resource type="Script" path="res://Script/Based/INPUT_B.gd" id="1_kus8j"]
 [ext_resource type="PackedScene" uid="uid://b1u0py0ci1rgi" path="res://Scenes/Base.tscn" id="1_v73vy"]
@@ -30,6 +30,7 @@
 [ext_resource type="AudioStream" uid="uid://jdretbttic7c" path="res://Assets/Sounds/kyOresu - DORIME__ (loli cover) (320kbps).mp3" id="20_36a0s"]
 [ext_resource type="AudioStream" uid="uid://ym44ll3g45pw" path="res://Assets/Sounds/Vine thud.mp3" id="24_8jte2"]
 [ext_resource type="PackedScene" uid="uid://3au5ircxans" path="res://Scenes/Menu/Main_menu.tscn" id="25_ersvt"]
+[ext_resource type="PackedScene" uid="uid://bebg654ub0p52" path="res://Scenes/UI/History/History.tscn" id="28_musle"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_qwlda"]
 font = ExtResource("17_iqa2t")
@@ -144,7 +145,6 @@ allow_reselect = true
 script = ExtResource("7_inl2i")
 
 [node name="Opponent_info" type="Control" parent="UI_layer"]
-z_index = 1
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -172,6 +172,7 @@ offset_right = 1560.0
 offset_bottom = 35.0
 
 [node name="Opponent_XP_panel" parent="UI_layer/Opponent_info" instance=ExtResource("13_iuwkg")]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1759.0
 offset_top = 35.0
@@ -274,6 +275,10 @@ volume_db = -24.374
 [node name="Main_menu" parent="UI_layer" instance=ExtResource("25_ersvt")]
 visible = false
 z_index = 200
+
+[node name="Action_history" parent="UI_layer" instance=ExtResource("28_musle")]
+offset_top = 180.0
+offset_bottom = 180.0
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("13_virw5")

@@ -8,6 +8,7 @@ font = ExtResource("2_fm15n")
 font_size = 64
 
 [node name="Covering" type="Control"]
+z_index = 12
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

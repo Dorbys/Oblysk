@@ -18,7 +18,7 @@ extends Control
 var my_lane 
 	#calced in ready() of arena_rect
 
-var VOIDTYPE = 7
+#var VOIDTYPE = 7
 var Targeting_now = 0
 
 #var Mirror = []
@@ -105,13 +105,13 @@ func Hero_death_care(node, identification, parent):
 
 #	if parent == arena_rect:
 #		var opposite = abarena_rect.get_child(identification)
-#		if opposite.TYPE == 0 and opposite.HealthC>0:
+#		if opposite.TYPE == "unit and opposite.HealthC>0:
 ##			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 #			parent.insert_void(identification,1,1)
 #			abarena_rect.collide_units()
 #
 #
-#		elif opposite.TYPE == 0:
+#		elif opposite.TYPE == "unit:
 #			pass
 #
 #		else:
@@ -122,13 +122,13 @@ func Hero_death_care(node, identification, parent):
 #
 #	elif parent == abarena_rect:
 #		var opposite = arena_rect.get_child(identification)
-#		if opposite.TYPE == 0 and opposite.HealthC>0:
+#		if opposite.TYPE == "unit and opposite.HealthC>0:
 ##			node.queue_free()
 ##			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 #			parent.insert_void(identification,1,1)
 #			arena_rect.collide_units()
 #
-#		elif opposite.TYPE == 0:
+#		elif opposite.TYPE == "unit:
 #			pass
 #
 #		else:
@@ -145,14 +145,14 @@ func Death_care(node, identification, parent):
 		parent.maybe_clean_two_voids(identification)
 #	if parent == arena_rect:
 #		var opposite = abarena_rect.get_child(identification)
-#		if opposite.TYPE == 0 and opposite.HealthC>0:
+#		if opposite.TYPE == "unit and opposite.HealthC>0:
 ##			print("My alive oppposite is: "+ str(opposite.get_index()))
 #			node.queue_free()
 #			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 #			parent.insert_void(identification,1,1)
 #			abarena_rect.collide_units()
 #
-#		elif opposite.TYPE == 0:
+#		elif opposite.TYPE == "unit:
 #			node.queue_free()
 #			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 #			arena_rect.collide_units()
@@ -166,14 +166,14 @@ func Death_care(node, identification, parent):
 #
 #	elif parent == abarena_rect:
 #		var opposite = arena_rect.get_child(identification)
-#		if opposite.TYPE == 0 and opposite.HealthC>0:
+#		if opposite.TYPE == "unit and opposite.HealthC>0:
 ##			print("My alive ABoppposite is: "+ str(opposite.get_index()))
 #			node.queue_free()
 #			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 #			parent.insert_void(identification,1,1)
 #			arena_rect.collide_units()
 #
-#		elif opposite.TYPE == 0:
+#		elif opposite.TYPE == "unit:
 #			node.queue_free()
 #			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 #			abarena_rect.collide_units()
@@ -191,88 +191,88 @@ func lets_target_a_unit(caller):
 	Targeting_now = 1
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.Im_clickable(caller)			
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.Im_clickable(caller)		
 
 func lets_stop_targeting():
 	Targeting_now = 0
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.Im_no_longer_clickable()			
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.Im_no_longer_clickable()		
 			
 			
 func lets_hide_abilities_and_items():
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 #			print("reshowing abilities")
 			target.hide_ability_and_items_mb()
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.hide_ability_and_items_mb()	
 			
 func lets_reshow_abilities_and_items():
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 #			print("reshowing abilities")
 			target.reshow_ability_and_items_mb()
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.reshow_ability_and_items_mb()	
 	
 func lets_disconnect_abilities_and_items():
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 #			print("reshowing abilities")
 			target.disconnect_ability_and_items_mb()
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.disconnect_ability_and_items_mb()	
 			
 func lets_reconnect_abilities_and_items():
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 #			print("reshowing abilities")
 			target.reconnect_ability_and_items_mb()
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.reconnect_ability_and_items_mb()
 				
 func lets_reshow_abilities():
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 #			print("reshowing abilities")
 			target.reshow_ability()
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.reshow_ability()	
 			
 func lets_lvlup(XP, caller):
 #	print("letslvlup with " + str(XP) +" xp")
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0 and target.HERO == true:
+		if target.TYPE == "unit" and target.HERO == true:
 			target.show_I_can_lvlup(XP, caller)	
 		var target2 = abarena_rect.get_child(i)
-		if target2.TYPE == 0 and target2.HERO == true:
+		if target2.TYPE == "unit" and target2.HERO == true:
 			target2.show_I_can_lvlup(XP, caller)	
 		
 func card_preview_targeting_non_single_exits_tree():				
@@ -312,7 +312,7 @@ func clear_up_both():
 		var T = ACC - (i+1)
 		var A1 = arena_rect.get_child(T)
 		var B1 = abarena_rect.get_child(T)	
-		if A1.TYPE == 7 and B1.TYPE == 7:	
+		if A1.TYPE == "void" and B1.TYPE == "void":	
 			cleansed = true
 			A1.queue_free()
 			B1.queue_free()
@@ -351,11 +351,11 @@ func friday_phase():
 func apply_phase(phase):
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			await target.call(phase)				
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			await target.call(phase)		
 				
 func annul_tower_damage_to_be_done():
@@ -369,11 +369,11 @@ func ability_is_looking_for_targets_visual():
 func curve_rng_both():
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.curve_rng()				
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.curve_rng()	
 
 
@@ -410,9 +410,9 @@ func lane_aura_check_both():
 	for i in population:
 		var target1 = arena_rect.get_child(i)
 		var target2 = abarena_rect.get_child(i)
-		if target1.TYPE == 0:
+		if target1.TYPE == "unit":
 			target1.lane_aura_check()
-		if target2.TYPE == 0:
+		if target2.TYPE == "unit":
 			target2.lane_aura_check()
 	
 	
@@ -436,12 +436,12 @@ func lane_is_no_longer_being_picked():
 func lets_check_cooldown_penetrability():
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 #			print("reshowing abilities")
 			target.check_cooldown_penetrability()
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
-		if target.TYPE == 0:
+		if target.TYPE == "unit":
 			target.check_cooldown_penetrability()	
 			
 			
@@ -457,23 +457,73 @@ func lets_check_cooldown_penetrability():
 	
 @rpc("any_peer", "call_remote", "reliable")
 func make_mirror_unit_curve(direction, unique_key:int):
-	if multiplayer.get_remote_sender_id() != 0:
-		#if I was RPCed
-		push_error("get_remote_sender_id s mp funguje")
-		var fun_to_call = "curve_" + direction
-		Lobby.universal_global_unit_array[unique_key].call(fun_to_call)
-	else:
+	#only from host to join, hmm
+	if multiplayer.get_remote_sender_id() == 0:
 		#if I was called localy
 		rpc_id(Lobby.opponent_peer_id, "make_mirror_unit_curve", direction, unique_key)
+	else:
+		#if I was RPCed
+#		push_error("get_remote_sender_id s mp funguje")
+		var fun_to_call = "curve_" + direction
+		Lobby.universal_global_unit_array[unique_key].call(fun_to_call)
 			
+@rpc("any_peer", "call_remote", "reliable")
+func make_mirror_unit_receive_spell_call(spelltype:String,
+ fun_to_call:String, unique_key:int, concurrent_player:String):			
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_mirror_unit_receive_spell_call",
+		 spelltype,fun_to_call,unique_key,concurrent_player)
+		push_error("sending function: " +fun_to_call +" " +"to unit " +str(unique_key))
+	else:
+		var DB = SpellsDB
+		if spelltype == "lvlup_spell":
+			DB = LvlupDB
+		DB.call(fun_to_call, Lobby.universal_global_unit_array[unique_key], concurrent_player)
+		push_error("calling function: " +fun_to_call +" " +"on unit " +str(unique_key))
 			
+@rpc("any_peer", "call_remote", "reliable")
+func make_two_mirror_units_receive_spell_call(spelltype:String,
+ funcall:String, first_unit_unique_key:int, second_unit_unique_key:int):
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_two_mirror_units_receive_spell_call",
+		 spelltype,funcall,first_unit_unique_key,second_unit_unique_key)
+		push_error("sending function: " +funcall +" " +"to units " +str(first_unit_unique_key,second_unit_unique_key))
+	else:
+		var DB = SpellsDB
+		if spelltype == "lvlup_spell":
+			DB = LvlupDB
+		DB.call(funcall, Lobby.universal_global_unit_array[first_unit_unique_key],Lobby.universal_global_unit_array[second_unit_unique_key])
+		push_error("calling function: " +funcall +" " +"on units " +str(first_unit_unique_key,second_unit_unique_key))		
 			
-			
-			
-			
-			
-			
-			
+		
+@rpc("any_peer", "call_remote", "reliable")		
+func make_my_mirror_unit_equip_item(item_ID:int, unit_unique_key:int):
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_my_mirror_unit_equip_item",
+		 item_ID,unit_unique_key)
+		push_error("sending equip command: " + str(item_ID) +" " +"to unit " +str(unit_unique_key))
+	else:
+		Lobby.universal_global_unit_array[unit_unique_key].equip_item(item_ID)
+		push_error("equipping item: " + str(item_ID) +" " +"to unit " +str(unit_unique_key))
+
+@rpc("any_peer", "call_remote", "reliable")		
+func make_my_mirror_unit_lvlup(unit_unique_key:int):
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_my_mirror_unit_lvlup", unit_unique_key)
+		push_error("sending rpc to lvlup unit " +str(unit_unique_key))
+	else:
+		Lobby.universal_global_unit_array[unit_unique_key].pretend_LVLUP()
+		push_error("lvlupping unit " +str(unit_unique_key))
+		
+@rpc("any_peer", "call_remote", "reliable")		
+func make_my_mirror_unit_receive_ability_call(unit_unique_key:int, funcall:String):
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_my_mirror_unit_receive_ability_call", unit_unique_key, funcall)
+		push_error("sending rpc to receive ability_call to unit " +str(unit_unique_key) +" " +funcall)
+	else:
+		AbilitiesDB.call(funcall,Lobby.universal_global_unit_array[unit_unique_key])
+		push_error("unit receiving abilitycall " +str(unit_unique_key))
+	
 #================================================================
 #						SYNCINGONE
 #================================================================

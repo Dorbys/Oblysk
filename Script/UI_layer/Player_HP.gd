@@ -60,3 +60,12 @@ func set_opponent_name(given_name):
 		
 func set_my_name(given_name):
 	$Alpha_pfp/Alpha_name.text = given_name
+
+
+func show_alpha_initiative():
+	%Alpha_initiative_marker.visible = true
+	%Beta_initiative_marker.visible = false
+	
+func show_beta_initiative():
+	%Alpha_initiative_marker.visible = false
+	%Beta_initiative_marker.visible = true

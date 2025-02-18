@@ -1,15 +1,12 @@
-extends Node
-
-
-@onready var BUTTON = $"../../../../../../UI_layer/THE_BUTTON"
-@onready var tower_layer = $"../../../../"
+extends Building_passive_ability
 
 
 var my_lane
+
 func _ready():
 	get_parent().text_for_tooltip = "Friday: spawn a 3/1 zombie"
 	tower_layer.friday_phase_list.append(self)
-	tower_layer.VIP_list.append(self)
+#	tower_layer.VIP_list.append(self)
 	#to exlude me from Unit checks
 	my_lane = BUTTON.abarena_rect3
 	

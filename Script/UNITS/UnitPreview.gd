@@ -3,7 +3,7 @@ extends Card_preview
 
 
 var Unit_Name = "E"
-var Unit_Pfp 
+var Card_pfp 
 var Unit_Ability_texture
 var Unit_Ability_cooldown
 var Unit_Attack = 1
@@ -13,7 +13,7 @@ var Identification = 3
 var Card_Cost = 0
 #var UNIT = 1
 #var SPELL = 0
-var TYPE = 0
+var TYPE = "unit"
 var has_ability = false
 
 var Card_XP
@@ -25,7 +25,7 @@ func _ready():
 	%ATK.text = str(Unit_Attack)
 	%HP.text = str(Unit_Health)
 	%AR.text = str(Unit_Armor)
-	%HERO_JPEG.texture = Unit_Pfp
+	%HERO_JPEG.texture = Card_pfp
 	%Ability1.texture = Unit_Ability_texture
 	if Unit_Armor != 0:
 		%AR.visible = 1

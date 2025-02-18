@@ -52,7 +52,7 @@ var FANT = 0.15 	#FOCUS_ANIMATION_TIME
 
 var no_mana_warning = load("res://Scenes/UI/No_mana_warning.tscn")
 var no_caster_warning = load("res://Scenes/UI/No_caster_warning.tscn")
-var no_initiative_warning = load("res://Scenes/UI/No_initiative_warning.tscn")
+var no_action_warning = load("res://Scenes/UI/No_action_warning.tscn")
 
 func _ready():
 	new_lane()
@@ -131,15 +131,15 @@ func does_player_have_enough_mana(caller):
 	else:
 		return false
 		
-func does_player_have_initiative():
-	if Base.INITIATIVE == 1:
+func does_player_have_action():
+	if Base.granted_action == 1:
 		return true
 	else:
 		return false
 		
-func you_dont_have_initiative(caller):
-	var initiative_jumpscare = no_initiative_warning.instantiate()
-	caller.UI_layer.add_child(initiative_jumpscare)
+func you_dont_have_action(caller):
+	var action_jumpscare = no_action_warning.instantiate()
+	caller.UI_layer.add_child(action_jumpscare)
 		
 func not_enough_mana(caller):
 	var mana_jumpscare = no_mana_warning.instantiate()
@@ -148,3 +148,10 @@ func not_enough_mana(caller):
 func no_hero_to_cast_this(caller):
 	var caster_jumpscare = no_caster_warning.instantiate()
 	caller.UI_layer.add_child(caster_jumpscare)
+	
+func check_XP_transparency(caller):
+	if caller.Card_XP == 0:
+		caller.XP_node.self_modulate.a = 0
+	else:
+		caller.XP_node.self_modulate.a = 1
+		

@@ -1,0 +1,27 @@
+[gd_scene load_steps=8 format=3 uid="uid://cjrr8kmtjdqo5"]
+
+[ext_resource type="Texture2D" uid="uid://m2f5ywny4i2f" path="res://Assets/CardsSMALLS/Dorbys_small.png" id="1_5k1ry"]
+[ext_resource type="Script" path="res://Script/UI_layer/History/Played_card.gd" id="2_iep5f"]
+[ext_resource type="PackedScene" uid="uid://ji0ds5rcwesv" path="res://Scenes/Spell/Spell1CardInHandPreview.tscn" id="3_l0mwd"]
+[ext_resource type="PackedScene" uid="uid://damy2dodvfesh" path="res://Scenes/LVLUPS/Lvlup_spells/Lvlup_spellCardInHandPreview.tscn" id="4_tsbd7"]
+[ext_resource type="PackedScene" uid="uid://dlw1m0ncyr2sg" path="res://Scenes/UNIT/UnitCihPreview.tscn" id="5_35v2m"]
+[ext_resource type="PackedScene" uid="uid://b7gbw82r5j1vq" path="res://Scenes/Building/Building1CardInHandPreview.tscn" id="6_m3rba"]
+[ext_resource type="PackedScene" uid="uid://1f232kkcqccc" path="res://Scenes/WeaponCardInHandPreview.tscn" id="7_s322x"]
+
+[node name="Played_card" type="TextureRect"]
+custom_minimum_size = Vector2(100, 140)
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("1_5k1ry")
+expand_mode = 1
+script = ExtResource("2_iep5f")
+spell_preview = ExtResource("3_l0mwd")
+lvlup_spell_preview = ExtResource("4_tsbd7")
+unit_preview = ExtResource("5_35v2m")
+building_preview = ExtResource("6_m3rba")
+upgrade_preview = ExtResource("7_s322x")
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

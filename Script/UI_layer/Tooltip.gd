@@ -16,6 +16,8 @@ extends Node
 #####################################
 @export var visuals_res: PackedScene
 @export var owner_node: Node
+	#ability field itself? am I using this somewhere else?
+	#dunno if/why cant I use self
 @export_range (0.0, 10.0, 0.05) var show_delay = 0.5
 @export var follow_mouse: bool = true
 @export_range(0, 100, 1)  var offset_x: float
@@ -74,10 +76,13 @@ func _ready() -> void:
 	_timer = Timer.new()
 	UI_layer.add_child(_timer)
 	_timer.timeout.connect(_delayed_show)
+		#this makes a timer for every unit ???
 
 
 
 func _process(_delta: float) -> void:
+		#moves tooltip to left if there isnt enough space on the right
+			#and down if there isnt enough space top
 #	if _visuals.visible:
 #		var cam_pos = base_camera.global_position
 		var border = Vector2(get_viewport().size)  - padding
@@ -146,14 +151,14 @@ func _get_screen_pos() -> Vector2:
 	
 	
 	var position = Vector2()
-	
-	if owner_node is Node2D:
-		position = owner_node.get_global_transform_with_canvas().origin
-#	elif owner_node is Spatial:
-#		position = get_viewport().get_camera().unproject_position(owner_node.global_transform.origin)
-	#3D stuff ig
-	elif owner_node is Control:
-		position = owner_node.get_global_transform_with_canvas().origin
+	position = owner_node.get_global_transform_with_canvas().origin
+#	if owner_node is Node2D:
+#		position = owner_node.get_global_transform_with_canvas().origin
+##	elif owner_node is Spatial:
+##		position = get_viewport().get_camera().unproject_position(owner_node.global_transform.origin)
+#	#3D stuff ig
+#	elif owner_node is Control:
+#		position = owner_node.get_global_transform_with_canvas().origin
 		#idk what this does but it's exactly what I need
 			#we working without follow mouse
 		

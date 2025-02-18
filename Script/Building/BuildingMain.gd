@@ -27,10 +27,11 @@ var text_for_tooltip = "tooltip didn't load properly"
 func _ready():
 #	print("My tower is: " + str(my_tower.name))
 	texture = Build_Pfp
-	aura_unique_id = Base.aura_unique_id
-	Base.increase_aura_unique_id()
+	
 	
 	if is_aura == true:
+		aura_unique_id = Base.aura_unique_id
+		Base.increase_aura_unique_id()
 		var affectionload = load("res://Script/AurasFromBuildingsAffections/" +str(Build_name) +"Affection.gd")
 		%Affection.set_script(affectionload)
 		%Affection.aura_unique_id = aura_unique_id
@@ -87,7 +88,7 @@ func _ready():
 		if affects == "allies":
 			for i in population:
 				wielder = (my_lane.get_child(i))
-				if wielder.TYPE == 0:
+				if wielder.TYPE == "unit":
 					target	= wielder.lane_auras
 					#to attach the aura into auras slot not on hero itself
 					affect_unit(target,wielder)
@@ -95,19 +96,19 @@ func _ready():
 		elif affects == "enemies":
 			for i in population:
 				wielder = (opp_lane.get_child(i))
-				if wielder.TYPE == 0:
+				if wielder.TYPE == "unit":
 					target	= wielder.lane_auras
 					affect_unit(target,wielder)
 					
 		elif affects == "both":
 			for i in population:
 				wielder = (my_lane.get_child(i))
-				if wielder.TYPE == 0:
+				if wielder.TYPE == "unit":
 					target	= wielder.lane_auras
 					affect_unit(target,wielder)
 				
 				wielder = (opp_lane.get_child(i))
-				if wielder.TYPE == 0:
+				if wielder.TYPE == "unit":
 					target	= wielder.lane_auras
 					affect_unit(target,wielder)
 

@@ -2,6 +2,7 @@ extends Panel
 
 
 
+
 @onready var h_0 = $Hover/VBoxContainer/HBoxContainer/H0
 @onready var h_1 = $Hover/VBoxContainer/HBoxContainer/H1
 @onready var h_2 = $Hover/VBoxContainer/HBoxContainer2/H2
@@ -40,6 +41,7 @@ func _ready():
 		#the player panel doesn't need the wait
 	update_xp_labels()
 	update_pfps()
+	
 	
 
 func update_xp_labels():
