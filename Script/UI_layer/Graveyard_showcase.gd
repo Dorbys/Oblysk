@@ -31,7 +31,7 @@ func _ready():
 	else:
 		await initiate_heroes(Base.HeroDeck,arena_rect1,towerB)
 
-	await get_tree().create_timer(0.1).timeout
+	await get_tree().create_timer(0.5).timeout
 	#guess I need to wait a moment?
 		#not all nodes probly have time to spawn
 	spawner.INITIATE_THE_GAME()
@@ -39,6 +39,7 @@ func _ready():
 
 var herocount = 5
 func initiate_heroes(deck, arena_rect, tower):
+	#tower that must have damage to be taken refreshed
 	for i in herocount:
 		#crates the five heroes from players hero deck
 		arena_rect.create_hero(deck[i%herocount])
@@ -46,8 +47,12 @@ func initiate_heroes(deck, arena_rect, tower):
 	
 	arena_rect.move_child(arena_rect.get_child(3),5)
 	#because that hero is to respawn before hero on last slot
+		#the five is 1based 
 	
-	Add_grave(arena_rect.get_child(4), arena_rect)
+	var target = arena_rect.get_child(4)
+	target.force_remove_myself_from_trigger_array()
+	#so that their lane is also set to 4 and they can reconnect
+	Add_grave(target, arena_rect)
 	arena_rect.insert_void(4,1,1)
 	
 	if arena_rect == arena_rect1:
@@ -62,7 +67,9 @@ func initiate_heroes(deck, arena_rect, tower):
 	#HERE FOR AGROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO DEPLOY
 	#11111111111111111111111111111111111111111111111111111111111111111111111111
 	
-	Add_grave(arena_rect.get_child(3), arena_rect)
+	target = arena_rect.get_child(3)
+	target.force_remove_myself_from_trigger_array()
+	Add_grave(target, arena_rect)
 	arena_rect.insert_void(3,1,1)
 	#takes the hero out and places a void,
 	
@@ -73,7 +80,7 @@ func initiate_heroes(deck, arena_rect, tower):
 	
 	for i in 3:
 		#3 of them will be randomly deployed to a lane
-		var target = arena_rect.get_child(i)
+		target = arena_rect.get_child(i)
 		#has to be 0 else it will take the third and fifth basly
 		#has to be i actually cuz I'm replacing them with voids as we go
 		await arena_rect.transfer_hero_to_spawner(target)
@@ -117,7 +124,7 @@ func Add_grave(node, parent):
 #				parent.insert_void(index,1,1)
 #				target.add_child(node)
 			node.visible = false
-			node.alive = 0
+			node.alive = false
 			#twice cuz initiating the game doesnt actually kill them
 			#and wanna have sure opposer stays fine
 			node.reparent(target)

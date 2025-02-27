@@ -22,7 +22,7 @@ func create_preview(ID):
 	
 func assign_stats(preview, ID):
 	var DB_slot = HeroesDB.HEROES_DB[ID]
-	preview.Unit_Pfp = Base.HERO_TEXTURES[ID]
+	preview.Card_pfp = Base.HERO_TEXTURES[ID]
 	preview.Unit_Name = DB_slot[HeroesDB.NAMEPOSITION]
 	preview.Unit_Attack = DB_slot[HeroesDB.ATTACKPOSITION]
 	preview.Unit_Health = DB_slot[HeroesDB.HEALTHPOSITION]

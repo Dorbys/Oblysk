@@ -104,6 +104,7 @@ func start_game():
 	
 	var new_scene_path = "res://Scenes/oblysk.tscn"  # Replace with your scene path
 	get_tree().change_scene_to_file(new_scene_path)
+
 	
 @rpc("any_peer", "call_remote", "reliable")
 func gain_starting_initiative():

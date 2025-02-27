@@ -7,8 +7,11 @@ var TYPE = "building"
 var animation_time = 0.25
 var rotation_time = 0.15
 
+var starting_x:int
 
-#func _ready():
+
+func _ready():
+	starting_x = position.x
 	#Tower_layer appends me to card_played list
 
 
@@ -33,11 +36,11 @@ func _on_show_hide_button_pressed():
 func hide_history():
 	var tween = get_tree().create_tween().set_parallel(true)
 	tween.tween_property(self,
-			 "position:x", - %TextureRect.size.x, animation_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
+			 "position:x", starting_x , animation_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 	tween.tween_property(%Show_hide_button, "rotation_degrees", 90, rotation_time)
 
 func show_history():
 	var tween = get_tree().create_tween().set_parallel(true)
 	tween.tween_property(self,
-			 "position:x", 0 , animation_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
+			 "position:x", starting_x + %TextureRect.size.x , animation_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 	tween.tween_property(%Show_hide_button, "rotation_degrees", -90, rotation_time)

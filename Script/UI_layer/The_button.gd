@@ -11,6 +11,7 @@ extends TextureButton
 @onready var spawner = %Spawner
 @onready var spawn_rect = $"../Spawner/SpawnRect"
 @onready var opponent_spawn_rect = $"../Spawner/Opponent_spawn_rect_fake"
+@onready var passing_status_indicator = $"../DevTools/Passing_status_indicator"
 
 @onready var player_mana_display = $"../Player_mana_display"
 @onready var opponent_mana = $"../Opponent_info/Opponent_mana"
@@ -168,6 +169,8 @@ func the_button_has_been_pressed_frfr():
 				if Lobby.host == true:
 					#If I'm the host
 					await spawn_rect.deploy_all()
+				elif Lobby.host == false:
+					await spawn_rect.clear_creeps_and_undraggable_heroes()
 			else: await spawn_rect.deploy_all()
 			
 			await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
@@ -254,7 +257,6 @@ func move_to_next_lane():
 		disabled = false
 		
 		await card_layer.monday_phase()
-		#currently for kimmedi
 #		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 		await card_layer.tuesday_phase()
 		#currently for duelyst

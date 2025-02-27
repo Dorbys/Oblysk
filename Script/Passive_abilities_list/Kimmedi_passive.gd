@@ -33,10 +33,21 @@ func _ready():
 
 func new_lane(new_tower_layer):
 	if self not in new_tower_layer.monday_phase_list:
+		push_error("appending Kimmedi to: " +str(new_tower_layer))
 		new_tower_layer.monday_phase_list.append(self)
-	if self not in new_tower_layer.lvlup_list:	
-		tower_layer.lvlup_list.append(self)
+#	if self not in new_tower_layer.lvlup_list:	
+#		tower_layer.lvlup_list.append(self)
 
+func remove_myself_from_old_array(old_tower_layer):
+	#when I enter a new lane, I need to remove myself from the old one
+	#dunno how to get this to class
+	if self in old_tower_layer.monday_phase_list:
+#		push_error("length of monday list: " +str(len(old_tower_layer.monday_phase_list)))
+		old_tower_layer.monday_phase_list.erase(self)
+#		push_error("length of monday list: " +str(len(old_tower_layer.monday_phase_list)))
+	
+	
+	
 func monday_phase():
 	if Lobby.MULTIPLAYER == false or wielder.faction == "alpha":
 		MP5()
@@ -69,7 +80,7 @@ func unit_lvlups(unit):
 		
 func MP5():
 	var sister = "MP5"
-	print("MPING")
+	push_error("MPING")
 	var population = wielder.OPrena.get_child_count()
 	var potential_targets = []
 	for i in population:

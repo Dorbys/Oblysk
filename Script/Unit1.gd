@@ -156,7 +156,7 @@ var NATURAL_CHILD_COUNT = 5
 var my_lane = 0
 #used for multilane spells to be able to target and normal don't
 
-var alive = 1
+var alive:bool = true
 #so that I can stop their passives from triggering when they're in graveyardnshit
 
 var opposable = 1
@@ -191,7 +191,7 @@ var my_target_deployment_lane: int = 0
 		
 #================================================================
 
-var sent_over_to_opponent:bool = false
+#var sent_over_to_opponent:bool = false
 #Trying to implement sending data about unit deployment in waves,
 	#this will be checked and modified in such wave
 
@@ -201,6 +201,7 @@ var sent_over_to_opponent:bool = false
 #Used for special cases such as being able to lvlup, which are rarely modified
 
 var can_lvlup = true
+
 
 
 
@@ -359,7 +360,7 @@ func second_ready_without_curve_rng():
 	
 	
 func respawn(silent = 0):
-	sent_over_to_opponent = false
+#	sent_over_to_opponent = false
 	#because my slot has to be synced again
 	
 	appear_alive()
@@ -557,11 +558,14 @@ func Death_sudden(DMG):
 	var opposer = await get_opposer()
 		
 	if Base.Combat_phase == 0:
+		push_error("nolongering")
 		if targeting == "straight":
+			push_error("nolongering straight")
 			if straight_target != null:
 				straight_target.Im_no_longer_attacked_only_by(self,Siege)
 #				print(str(Unit_Name) +"is no longer attacking str target")
 		else:
+			push_error("nolongering to a side")
 			if side_target != null:
 				side_target.Im_no_longer_side_attacked_by(self)
 			if straight_target != null:
@@ -1058,11 +1062,17 @@ func clean_myself_from_effects():
 
 func _on_ColorRect_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if Im_targeted == 0 and Targeter != null and leveling == 0:
-			if event.is_pressed():
-				already_a_target(Targeter)
-		elif leveling == 1:
-			LVLUP()
+		if Base.debugging == false:
+			if Im_targeted == 0 and Targeter != null and leveling == 0:
+				if event.is_pressed():
+					already_a_target(Targeter)
+			elif leveling == 1:
+				LVLUP()
+		else:
+			if Base.minus_HPing == true:
+				minus_hp()
+			elif Base.plus_HPing == true:
+				plus_hp()
 				
 
 
@@ -1076,6 +1086,8 @@ func curve_rng():
 		
 	if opposer.TYPE == "unit":
 		curve_straight()
+		if Lobby.MULTIPLAYER == true and Lobby.host == true:
+			make_my_mirror_self_curve("straight")
 		
 	#there might be a bug if this setting is turned off 
 	#which might happen when naturally placing or spawning units
@@ -1123,7 +1135,7 @@ func start_waiting_for_curve_data():
 #@rpc("any_peer", "call_remote", "reliable")
 func curve_left():
 	targeting = "left"
-#	push_error("curving left")
+	push_error(str(Unit_Name) +" is curving left")
 	%Arrow_combat.curve_left()
 	if OPrena.get_child(get_index()-1).TYPE == "unit":
 		redirect_damage(OPrena.get_child(get_index()-1))
@@ -1133,7 +1145,7 @@ func curve_left():
 #@rpc("any_peer", "call_remote", "reliable")
 func curve_right():
 	targeting = "right"
-#	push_error("curving right")
+	push_error(str(Unit_Name +" is curving right"))
 	%Arrow_combat.curve_right()	
 	if OPrena.get_child(get_index()+1).TYPE == "unit":
 		redirect_damage(OPrena.get_child(get_index()+1))
@@ -1143,7 +1155,7 @@ func curve_right():
 #@rpc("any_peer", "call_remote", "reliable")
 func curve_straight():
 	targeting = "straight"	
-#	push_error("curving straight")
+#	push_error(str(Unit_Name +" is curving straight"))
 	%Arrow_combat.curve_straight()
 	var opposer = await get_opposer()
 	if opposer.TYPE == "unit":
@@ -1289,7 +1301,7 @@ func curve_straight():
 #		MYrena_rect.OPTower.Im_no_longer_straight_attacked_by(self, false, 0)
 		
 func refresh_combat_damage():
-	if Base.Main_phase == 0 and alive == 1:
+	if Base.Main_phase == 0 and alive == true:
 		match targeting:
 			"left": 
 					curve_left()
@@ -1306,7 +1318,7 @@ func refresh_combat_damage():
 					curve_straight()
 			"right":
 					curve_right()
-	elif Base.Main_phase == 0 and alive == 0:
+	elif Base.Main_phase == 0 and alive == false:
 		pass
 		#this happens during game start and causes no problems
 	else: push_error("Unknown Base.Main_phase value")
@@ -1432,6 +1444,8 @@ func annul_my_damage():
 func redirect_damage(target):
 	var opposer = await get_opposer()
 #	print("REDIRECTING")
+	if HERO == true:
+		push_error(Unit_Name + " is redirecting dmg")
 	
 	if straight_target == null:
 		damage_used_up_1 = 0
@@ -1661,6 +1675,8 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 	#wtf is preopposer
 	
 	if problem == true:
+		#no idea how this becomes true	
+			#Manually when a problem comes up roflmao
 		push_error(" increasing dmg tbt by: " +str(amount) +" " + str( damage_to_be_taken) +" " + str( opposer.besieging_damage) + " " +str(get_index()) + " " +str(faction))
 	#Oh nyo, welcome back again master 
 	
@@ -1671,10 +1687,10 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 
 		damage_to_be_taken += opposer.besieging_damage 
 		#voids have besieging damage 0, which is unit default
-		if alive == 1 and damage_to_be_taken >= 0:
+		if alive == true and damage_to_be_taken >= 0:
 			overkill_damage =  damage_to_be_taken - HealthC 
 			#otherwise dying unit recalcs overkill damage
-		if alive == 1 and damage_to_be_taken < 0:
+		if alive == true and damage_to_be_taken < 0:
 			#this means that a unit that inflicted so much damage onto
 				#me that it would oneshot me died and siege is fucked
 			damage_to_be_taken += overkill_damage 
@@ -1708,7 +1724,7 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 		if opposer.besieging_damage> 0 and being_sieged == false:
 			#this only happens if overkill is 0, so that's kept
 			#could cause problems if opposer qufreed early
-				#quefreeing early solved with: 'if alive == 1 and damage_to_be_taken < 0:'
+				#quefreeing early solved with: 'if alive == true and damage_to_be_taken < 0:'
 			Card_layer.unit_no_longer_being_sieged(faction, opposer.besieging_damage)
 			opposer.besieging_damage = 0
 			#I might've been sieged previously, retract that if no longer
@@ -1778,20 +1794,26 @@ func leave_draggable_state():
 
 func new_lane():
 	#when a unit is moved to a new lane, these need to be updated
-	
-	Card_layer = $"../../../../.."
-	tower_layer = $"../../../../../../Tower_layer"
-	tower_mana = $"../../../../../../Tower_layer/TowerA/Mana_display/Current_mana"
-	MYrena_rect = $".."
-	OPrena = MYrena_rect.OPrena_rect
+	var old_lane = my_lane
 	refresh_my_lane_int()
-	
-	
-	if Passiveness == true and has_ability == true:
-#		print("ability shit part of newlane is trigging")
-		Ability1.get_child(2).new_lane(tower_layer)
-	#this connects the unit to the correct signal hub
-		#child 2 of ability is the one that is created during ready
+	if old_lane != my_lane:
+		
+		if Passiveness == true and has_ability == true:
+			Ability1.get_child(2).remove_myself_from_old_array(tower_layer)
+		
+		Card_layer = $"../../../../.."
+		tower_layer = $"../../../../../../Tower_layer"
+		tower_mana = $"../../../../../../Tower_layer/TowerA/Mana_display/Current_mana"
+		MYrena_rect = $".."
+		OPrena = MYrena_rect.OPrena_rect
+		
+		
+		
+		if Passiveness == true and has_ability == true:
+	#		print("ability shit part of newlane is trigging")
+			Ability1.get_child(2).new_lane(tower_layer)
+		#this connects the unit to the correct signal hub
+			#child 2 of ability is the one that is created during ready
 	
 	
 	
@@ -1826,7 +1848,7 @@ func get_opposer(Index = get_index()):
 	#which would ruin the primary purpose of this function
 	var opposer = OPrena.get_child(Index)
 #	var mb_opposer
-	while opposer == null or (opposer.TYPE == "unit" and opposer.alive == 0):
+	while opposer == null or (opposer.TYPE == "unit" and opposer.alive == false):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 		opposer = OPrena.get_child(Index)
 
@@ -1940,3 +1962,40 @@ func check_cooldown_penetrability():
 	%weapon_slot.check_cooldown_penetrability()
 	%special_slot.check_cooldown_penetrability()
 	%armor_slot.check_cooldown_penetrability()
+
+func force_remove_myself_from_trigger_array():
+	#only called when unit is being transfered from arena_rect to spawner
+	#+ when from arenarect to grave transfer
+		#so I have to make their 'my_lane' 4 so that they remember to reconnect
+		#HERE this might break something
+	my_lane = 4	 
+	if Passiveness == true and has_ability == true:
+		Ability1.get_child(2).remove_myself_from_old_array(tower_layer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######################################################################
+### 						Debug functions						###
+#######################################################################
+
+func minus_hp(mirror = true):
+	#mirror set to false only when receiving rpc to not loop
+	increase_HealthM(-1,1)
+	if mirror == true:
+		Card_layer.make_my_mirror_minus_hp(MY_UNIQUE_UNIT_KEY)
+		
+func plus_hp(mirror = true):
+	increase_HealthM(-1,1)
+	if mirror == true:
+		Card_layer.make_my_mirror_plus_hp(MY_UNIQUE_UNIT_KEY)

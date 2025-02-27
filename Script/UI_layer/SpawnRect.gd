@@ -47,11 +47,11 @@ func INITIATE_THE_GAME():
 #	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 
 #	for i in starting_creep_count:
-#		spawn_a_creep_in_random_lane_for_both_players(0)
+#		spawn_a_creep_in_random_lane_for_both_sides(0)
 		
 	if Lobby.MULTIPLAYER == false:
 		for i in starting_creep_count:
-			spawn_a_creep_in_random_lane_for_both_players(0)
+			spawn_a_creep_in_random_lane_for_both_sides(0)
 		
 		%BetaFirstLaneDeployRect.create_a_super_creep()
 		%BetaMidLaneDeployRect.create_a_super_creep()
@@ -68,9 +68,14 @@ func INITIATE_THE_GAME():
 
 	else: push_error("incorrect 'Lobby.MULTIPLAYER' value")
 	
-	await deploy_all()
+	if Lobby.MULTIPLAYER == false or Lobby.host == true: 
+		#only host deploys
+		await deploy_all()
+	else:
+		#joiner just cleans his deployrects
+		clear_creeps_and_undraggable_heroes()
 		
-	await get_tree().create_timer(0.2).timeout
+	await get_tree().create_timer(0.5).timeout
 	#we were starting before all the creeps spawned lol
 	
 	BUTTON.global_prep_phase()
@@ -168,7 +173,7 @@ func new_wave_of_creeps():
 	if Lobby.MULTIPLAYER == true:
 		spawn_a_creep_in_random_lane()
 	else:
-		spawn_a_creep_in_random_lane_for_both_players(1)
+		spawn_a_creep_in_random_lane_for_both_sides(1)
 	
 func spawn_a_creep_in_random_lane():
 	#Can only be called if MULTIPLAYER
@@ -200,7 +205,7 @@ func opponent_spawned_random_creep_in_this_lane(which_lane:int):
 			push_error("incorrect 'client_spawned_random_creep_in_this_lane' input")
 	
 			
-func spawn_a_creep_in_random_lane_for_both_players(include_supers = 1):
+func spawn_a_creep_in_random_lane_for_both_sides(include_supers = 1):
 	var uno = randi()%3
 	match uno:
 		0:
@@ -242,10 +247,10 @@ func deploy_all():
 					target.reparent(%BetaFirstLaneDeployRect)
 					target.my_target_deployment_lane = 0
 				2: 
-					target.reparent(%BetaFirstLaneDeployRect)
+					target.reparent(%BetaMidLaneDeployRect)
 					target.my_target_deployment_lane = 0
 				3: 
-					target.reparent(%BetaFirstLaneDeployRect)
+					target.reparent(%BetaLastLaneDeployRect)
 					target.my_target_deployment_lane = 0
 				_: push_error("unkown target.my_target_deployment_lane value: " +str(target.my_target_deployment_lane))
 		await get_tree().create_timer(Base.FAKE_GAMMA).timeout
@@ -309,7 +314,18 @@ func deploy_all():
 
 		#deploys the units switching between starting and second deployer
 		# skipping when its null
-				
+func clear_creeps_and_undraggable_heroes():
+	#to clear creeps of joiner since he doesn't deploy
+	%FirstLaneDeployRect.clear_creeps_and_undraggable_heroes()
+	%MidLaneDeployRect.clear_creeps_and_undraggable_heroes()
+	%LastLaneDeployRect.clear_creeps_and_undraggable_heroes()
+	%BetaFirstLaneDeployRect.clear_creeps_and_undraggable_heroes()
+	%BetaMidLaneDeployRect.clear_creeps_and_undraggable_heroes()
+	%BetaLastLaneDeployRect.clear_creeps_and_undraggable_heroes()
+	
+	
+	
+					
 #	for i in len(arena_rects):
 #		arena_rects[i].reset_curving()
 			

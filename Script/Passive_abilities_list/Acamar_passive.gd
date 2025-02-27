@@ -13,6 +13,14 @@ func new_lane(new_tower_layer):
 var description = "If I have positive health after being targeted by a card, 
 I get +1 DMG and +2HP"
 
+func remove_myself_from_old_array(old_tower_layer):
+	#when I enter a new lane, I need to remove myself from the old one
+	#dunno how to get this to class
+	if self in old_tower_layer.unit_targeted_list:
+#		push_error("length of unit_targeted_list: " +str(len(old_tower_layer.unit_targeted_list)))
+		old_tower_layer.unit_targeted_list.erase(self)
+#		push_error("length of unit_targeted_list: " +str(len(old_tower_layer.unit_targeted_list)))
+		
 func unit_has_been_targeted(unit, trigger):
 	if unit == wielder:
 		if trigger in SpellsDB.SPELLS_DB:

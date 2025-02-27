@@ -338,7 +338,9 @@ func prep_phase():
 	await apply_phase("prep_phase")
 	
 func monday_phase():
+	push_error("monday phase")
 	await tower_layer.monday_phase_signal()
+
 func tuesday_phase():
 	await tower_layer.tuesday_phase_signal()
 func wednesday_phase():
@@ -524,6 +526,23 @@ func make_my_mirror_unit_receive_ability_call(unit_unique_key:int, funcall:Strin
 		AbilitiesDB.call(funcall,Lobby.universal_global_unit_array[unit_unique_key])
 		push_error("unit receiving abilitycall " +str(unit_unique_key))
 	
-#================================================================
-#						SYNCINGONE
-#================================================================
+#kinda no point in having the "unit" in make_my_mirror_unit
+	
+	
+@rpc("any_peer", "call_remote", "reliable")		
+func make_my_mirror_minus_hp(unit_unique_key:int):
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_my_mirror_minus_hp", unit_unique_key)
+		push_error("sending rpc to minus hp unit " +str(unit_unique_key))
+	else:
+		Lobby.universal_global_unit_array[unit_unique_key].minus_hp(false)
+		push_error("minus_HPing unit " +str(unit_unique_key))
+		
+@rpc("any_peer", "call_remote", "reliable")		
+func make_my_mirror_plus_hp(unit_unique_key:int):
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_my_mirror_plus_hp", unit_unique_key)
+		push_error("sending rpc to plus hp unit " +str(unit_unique_key))
+	else:
+		Lobby.universal_global_unit_array[unit_unique_key].plus_hp(false)
+		push_error("plus_HPing unit " +str(unit_unique_key))

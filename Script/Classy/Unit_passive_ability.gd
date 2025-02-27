@@ -11,3 +11,5 @@ var TYPE = "unit_passive_ability"
 @onready var wielder = $"../../.."
 
 
+
+	

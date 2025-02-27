@@ -122,11 +122,21 @@ TYPE:
 add cardplayed signal to drop func
     Added it to used_card() in hand.gd instead
 
-######################################
 dynamic card_type and card_ID allocation
     from the card played signal, connected to somewhere in history
     also pfp
 
+######################################
+
+When hosts units curve, joiner doesnt get proper damage allignment
+    mb it's just during deployment
+        mb it's just heroes
+Heroes landing in front of heroes:
+    lander doesnt take combat damage
+BOTH of above
+
+Heroes still don't leave the starting tower passive trigger array
+    Kimmedi and Plott monday
 
 
     

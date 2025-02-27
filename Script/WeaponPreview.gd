@@ -2,7 +2,7 @@ extends Card_preview
 
 
 @export var Item_Name = "E"
-@export var Item_Pfp = load("res://Assets/CardsPNGS/FAKE.jpg")
+@export var Card_pfp = load("res://Assets/CardsPNGS/FAKE.jpg")
 #@export var Item_Stat = 1
 @export var Card_Cost = 2
 var Item_cooldown
@@ -17,7 +17,7 @@ var Identification = 3
 func _ready():
 	%NAME.text = Item_Name
 #	%COST.text = str(Item_Cost)
-	%WEAPON_JPEG.texture = Item_Pfp
+	%WEAPON_JPEG.texture = Card_pfp
 	%STATS.text = ItemsDB[str(Item_Name)+"_description"]
 	
 	new_lane()

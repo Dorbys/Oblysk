@@ -11,6 +11,7 @@ var colliding_units = 0
 
 
 func collide_units():
+	#I don't think this needs tweens
 	var collide_time = 0.2
 	var target
 	var destinationX

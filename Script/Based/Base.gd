@@ -14,6 +14,8 @@ var PLAYTEST = 0
 #Bombard building doesnt bombard
 var STARTING_XP = 10
 
+
+
 var initiative = 0
 #You can only play if you have initiative
 #not bool since I want to implement fleeting initiative 
@@ -109,12 +111,7 @@ var HeroDeck = [1,4,2,3,0]
 #this is copied over and reordered to OpponentDeck atm 
 var OpponentHeroDeck = [0,3,1,4,2]
 
-func swap_player_decks():
-	#this will be replaced by sending playerdecks later on
-	var temp = HeroDeck.duplicate()
-	HeroDeck = []
-	HeroDeck = OpponentHeroDeck.duplicate()
-	OpponentHeroDeck = temp.duplicate()
+
 	
 var Player_heroes = []
 #this array is appended by hero nodes 
@@ -177,6 +174,16 @@ var aura_unique_id = 0
 
 var game_started_yet_bruh = false
 	#set to true in THEbutton's _ready()
+	
+#######################################################################
+### 					DEBUGGING VARIABLES 						###
+#######################################################################	
+var debugging = false
+var minus_HPing = false
+var plus_HPing = false
+#set to true by Covering_-1HP ready() which can be summoned via optionbutton
+var passing = true
+#used to turn off passing so that debugging is easier [P]
 
 func _ready():
 	if PLAYTEST == 1:
@@ -191,7 +198,12 @@ func _ready():
 			pass_the_initiative()
 			#calls receive for opp
 			
-		
+func swap_player_decks():
+	#this will be replaced by sending playerdecks later on
+	var temp = HeroDeck.duplicate()
+	HeroDeck = []
+	HeroDeck = OpponentHeroDeck.duplicate()
+	OpponentHeroDeck = temp.duplicate()		
 ####################################SHUFFLE HERE
 	
 
@@ -340,7 +352,7 @@ func _notification(notification_type):
 #		print(FakeID)
 #		var another = card.instantiate()
 #		another.Unit_Name = UNIT_STATS[FakeID][NAMEPOSITION]
-#		#another.Unit_Pfp = UNIT_TEXTURES[FakeID]
+#		#another.Card_pfp = UNIT_TEXTURES[FakeID]
 #		another.Unit_Attack = UNIT_STATS[FakeID][ATTACKPOSITION]
 #		another.Unit_Health = UNIT_STATS[FakeID][HEALTHPOSITION]
 #		# This is how to get the highest node of your tree
@@ -391,13 +403,14 @@ func receive_the_initiative():
 	
 func pass_the_initiative():
 	#after you do an action that takes away initiative (play card, use ability...)
-	initiative = 0
-	granted_action = 0
-	refresh_pass_button()
-	rpc_id(Lobby.opponent_peer_id, "receive_the_initiative")
-	the_button.show_opponent_turn_begins()
-	the_button.player_hp.show_beta_initiative()
-	Lobby.update_current_player()
+	if passing == true:
+		initiative = 0
+		granted_action = 0
+		refresh_pass_button()
+		rpc_id(Lobby.opponent_peer_id, "receive_the_initiative")
+		the_button.show_opponent_turn_begins()
+		the_button.player_hp.show_beta_initiative()
+		Lobby.update_current_player()
 	
 @rpc("any_peer", "call_remote", "reliable")
 func receive_granted_action():
@@ -409,11 +422,12 @@ func receive_granted_action():
 func grant_an_action():
 	#after you do an action that passes the turn to opponent
 	#used when you don't pass the initiative (passing with initiative)
-	granted_action = 0
-	refresh_pass_button()
-	rpc_id(Lobby.opponent_peer_id, "receive_granted_action")
-	the_button.show_opponent_turn_begins()
-	Lobby.update_current_player()
+	if passing == true:
+		granted_action = 0
+		refresh_pass_button()
+		rpc_id(Lobby.opponent_peer_id, "receive_granted_action")
+		the_button.show_opponent_turn_begins()
+		Lobby.update_current_player()
 	
 
 	
@@ -423,5 +437,13 @@ func increase_aura_unique_id():
 
 
 
-
-
+#######################################################################
+### 					DEBUGGING FUNCTIONS 						###
+#######################################################################	
+func switch_passing_status():
+	if passing == true:
+		passing = false
+		the_button.passing_status_indicator.visible = true
+	else:
+		passing = true
+		the_button.passing_status_indicator.visible = false

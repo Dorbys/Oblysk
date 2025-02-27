@@ -675,7 +675,7 @@ func get_opposer(Index):
 	#which would ruin the primary purpose of this function
 	var opposer = OPrena_rect.get_child(Index)
 #	var mb_opposer
-	while opposer == null or (opposer.TYPE == "unit" and opposer.alive == 0):
+	while opposer == null or (opposer.TYPE == "unit" and opposer.alive == false):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 		opposer = OPrena_rect.get_child(Index)
 
@@ -777,6 +777,8 @@ func create_hero(ID):
 func transfer_hero_to_spawner(target):
 	#used at the beginning of the game to move the heroes that were created here
 	#to spawner from which they can be sent elsewhere
+	
+	target.force_remove_myself_from_trigger_array()
 	await target.appear_dead()
 #	push_error("transfering: " +str(target.Unit_Name) + " to spawner")
 	remove_child(target)
@@ -790,14 +792,11 @@ func transfer_hero_to_spawner(target):
 
 	
 	#otherwise they would've remember they are already attacking the tower
-	
-#	fake_number += 1
-#	OPrena_rect.get_child(fake_number).queue_free()
-	#this removes the temporary void 
-	#which is necc for the full ready function of unit
+		#???
 	
 @rpc("any_peer", "call_remote", "reliable")
 func respawn_here(target, rpced_slot = null, faction = null):
+	#target starts as int of ID and becomes node of Hero
 	if faction != null:
 		push_error(faction + " hero is respawning at " +str(rpced_slot))
 		if faction == "alpha":
@@ -831,6 +830,8 @@ func respawn_here(target, rpced_slot = null, faction = null):
 	#sends signal yo
 	
 	if Lobby.MULTIPLAYER == true and rpced_slot == null:
+		#if we need to send over information where to land to joiner
+		#we must turn hero into ID again
 		var opposite_faction = "beta"
 		var index = Base.Player_heroes.find(target)
 		#returns index of target in the Herodeck

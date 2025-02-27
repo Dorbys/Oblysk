@@ -1,5 +1,8 @@
 extends TextureButton
+@export var hp_minus_covering: PackedScene
+
 @onready var option_button = $"../OptionButton"
+@onready var ui_layer = $"../.."
 
 @onready var arena_rect1 = $"../../../First_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
 @onready var abarena_rect1 = $"../../../First_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
@@ -39,19 +42,27 @@ func new_lane():
 
 func _on_pressed():
 	#print(get_index())
-	#ArenaRect.Remove_Unit(option_button.get_selected_id())
-	if option_button.get_selected_id() == 0:
+	#ArenaRect.Remove_Unit(option_button.get_selected_text())
+	if option_button.text == "Cheat units":
 		arena_rect.Cheating_Units(randi() % 3, false)
 		abarena_rect.Cheating_Units(randi() % 3, false)
-	elif option_button.get_selected_id() == 1:
+	elif option_button.text == "Remove units":
 		for i in arena_rect.get_child_count():
 			arena_rect.get_child(i).queue_free()
 		for i in abarena_rect.get_child_count():
 			abarena_rect.get_child(i).queue_free()
-	elif option_button.get_selected_id() == 2:
+	elif option_button.text == "Curve rng":
 		card_layer.curve_rng_both()
-	elif option_button.get_selected_id() == 3:
+	elif option_button.text == "Hurt yourself":
 		%Player_HP.decrease_alpha_players_HP(5)
-	elif option_button.get_selected_id() == 4:
+	elif option_button.text == "Hurt opponent":
 		%Player_HP.decrease_beta_players_HP(5)
+	elif option_button.text == "Monday phase":
+		card_layer.monday_phase()
+	elif option_button.text == "-1HP target unit":
+		ui_layer.add_child(hp_minus_covering.instantiate())
+	elif option_button.text == "PLUS 1HP target unit":
+		var another = hp_minus_covering.instantiate()
+		another.hp_modifier = "+"
+		ui_layer.add_child(another)	
 

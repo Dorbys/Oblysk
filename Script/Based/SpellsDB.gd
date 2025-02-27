@@ -68,7 +68,7 @@ func Morning(target, _current_player = ""):
 		target.XP_panel.increase_xp(2* (previous_health+1))
 		
 func Annihilate(target, _current_player = ""):
-	var DAMAGE = 12
+	var DAMAGE = 4
 	var HP = target.HealthC
 	var expected_damage = DAMAGE
 	if expected_damage > HP:

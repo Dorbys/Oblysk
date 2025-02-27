@@ -37,7 +37,7 @@ func _ready():
 
 func basic_requirements(target):
 	var wielder = target.wielder
-	if wielder.TYPE == "unit" and wielder.my_lane == my_lane and wielder.alive == 1 :
+	if wielder.TYPE == "unit" and wielder.my_lane == my_lane and wielder.alive == true :
 		return true
 	else:
 #		print ("compare these: " +str(my_lane) + str(wielder.TYPE)+str(wielder.my_lane)+str(wielder.alive))
@@ -71,6 +71,8 @@ func cleanup_phase_signal():
 		if target != null:
 			if  basic_requirements(target): 
 				await target.cleanup_phase()
+			else:
+				cleanup_phase_list.remove_at(i)
 		else: 
 			cleanup_phase_list.remove_at(i)
 			print("gonzo cleanup")
@@ -81,6 +83,8 @@ func monday_phase_signal():
 		if target != null:
 			if  target.TYPE == "building" or basic_requirements(target): 
 				await target.monday_phase()
+			else:
+				monday_phase_list.remove_at(i)
 		else: 
 			monday_phase_list.remove_at(i)
 			print("gonzo monday")	

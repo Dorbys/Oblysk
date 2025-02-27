@@ -57,7 +57,7 @@ func create_a_creep():
 		another.Card_pfp = Base.SPECIAL_TEXTURES[0]
 	elif faction == "Beta":
 		another.Card_pfp = Base.SPECIAL_TEXTURES[1]
-	else: push_error("spawnrect doesnt belong to any know faction")
+	else: push_error("spawnrect doesnt belong to any known faction")
 	
 	another.Unit_Attack = DB_slot[CreepsDB.ATTACKPOSITION]
 	another.Unit_Health = DB_slot[CreepsDB.HEALTHPOSITION]
@@ -262,13 +262,13 @@ func deploy_unit_MP(target):
 	if target.HERO == true:
 		target.appear_alive()
 		target.leave_draggable_state()
-		if Lobby.opponent_peer_id != 1:
+		if Lobby.host == true:
 			my_lane.respawn_here(target)
 		
 		
 		
 	elif target.Unit_Name == "AlphaCreep":
-		if Lobby.opponent_peer_id != 1:
+		if Lobby.host == true:
 			my_lane.spawn_lane_creep()
 		target.queue_free()
 	#since Alphacreeps aren't units but UnitCIHPreviews 
@@ -276,3 +276,13 @@ func deploy_unit_MP(target):
 		
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	
+func clear_creeps_and_undraggable_heroes():
+	#since joiner doesnt actually deploy, deploy rects need to clean up
+	for i in range(get_child_count() - 1, -1, -1):
+		var target = get_child(i)
+		if target.HERO == true:
+			target.appear_alive()
+			target.leave_draggable_state()
+		elif target.Unit_Name == "AlphaCreep":
+			target.queue_free()
+			

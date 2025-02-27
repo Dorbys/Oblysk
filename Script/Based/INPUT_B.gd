@@ -101,6 +101,9 @@ func _input(event):
 			if target.visible == true:
 				target.visible = false
 			else: target.visible = true
+			
+	elif Input.is_action_just_pressed("Switch_passing"):
+		Base.switch_passing_status()
 
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 		var MOUSEY = get_local_mouse_position().y-camera_2d.position.y
