@@ -71,11 +71,11 @@ func Railgun(target, current_player:String = ""):
 		Railgun_damage += 1
 		Railgun_description = str("Deal " +str(Railgun_damage) + " magical damage to a unit in any lane,
 increase cost and damage of future railguns by 1")
-		var owner = railgun_host_owner
+		var rg_owner = railgun_host_owner
 		if current_player == "join":
-			owner = railgun_join_owner
+			rg_owner = railgun_join_owner
 
-		push_error("owner value here: " +str(owner) +  "host: " 
+		push_error("rg_owner value here: " +str(rg_owner) +  "host: " 
 		+str(railgun_host_owner) + " join: " +str(railgun_join_owner))
 		var connection_to_p = Lobby.universal_global_unit_array[owner].Ability1.get_child(2)
 		await connection_to_p.new_snipe_damage(Railgun_damage)

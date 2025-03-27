@@ -7,7 +7,7 @@ extends ScrollContainer
 
 
 func _on_draw_1_pressed():
-	draw_cards(1)
+	draw_cards(12)
 	push_error("drawing here")
 		
 func draw_cards(amount):

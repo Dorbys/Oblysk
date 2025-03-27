@@ -92,7 +92,7 @@ func create_item(ID):
 	var DB_slot = ItemsDB.ITEMS_DB[ID]
 	another.Item_Name = DB_slot[ItemsDB.NAMEPOSITION]
 	another.ITEMM = DB_slot[ItemsDB.ITEMMPOSITION]
-	another.Card_pfp = Base.ITEM_TEXTURES[ID]
+	another.Card_pfp = Base.UPGRADE_TEXTURES[ID]
 #	another.Item_Stat = DB_slot[ItemsDB.STATPOSITION]
 	another.Card_Cost = DB_slot[ItemsDB.COSTPOSITION]
 	#incosistance for simplicity of hand.gd
@@ -129,7 +129,7 @@ func create_lvlup_spell(ID):
 	var another = LVLUP_spell_scene.instantiate()
 	var DB_slot = LvlupDB.LVLUPS_DB[ID]
 	another.Card_name = DB_slot[LvlupDB.NAMEPOSITION]
-	another.Card_pfp = Base.LVLUP_CARDS_TEXTURES[ID]
+	another.Card_pfp = Base.LVLUP_SPELLS_TEXTURES[ID]
 	another.Card_Cost = DB_slot[LvlupDB.COSTPOSITION]
 	another.Card_XP = 0
 	another.Targets = DB_slot[LvlupDB.TARGPOSITION]

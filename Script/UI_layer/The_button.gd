@@ -461,7 +461,7 @@ func transfer_tower_mana_to_player_mana():
 	var mana4 = tower_current_mana1B.current_mana
 	var mana5 = tower_current_mana2B.current_mana
 	var mana6 = tower_current_mana3B.current_mana
-	var mana_to_be_added2 = (mana4 + mana5 + mana6)/3
+	var _mana_to_be_added2 = (mana4 + mana5 + mana6)/3
 	opponent_mana.increase_mana(mana_to_be_added)
 	
 func show_opponent_turn_begins():

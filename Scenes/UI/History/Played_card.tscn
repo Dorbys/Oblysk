@@ -12,7 +12,7 @@
 custom_minimum_size = Vector2(100, 140)
 offset_right = 40.0
 offset_bottom = 40.0
-size_flags_horizontal = 0
+size_flags_horizontal = 2
 size_flags_vertical = 0
 texture = ExtResource("1_5k1ry")
 expand_mode = 1

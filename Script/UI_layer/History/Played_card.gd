@@ -11,14 +11,17 @@ extends TextureRect
 
 
 
-var card_type:String = "upgrade"
+var card_type:String = "spell"
 	#"spell" "lvlup_spell" "unit" "building" "upgrade" 
 var card_ID: int = 0
+#var player:String = "me"
+#	#"me" is default, set to "opponent" when rpced
+#		#used to move me in history to signify who played the card
 
 var my_preview:Node
 
 
-var preview_position = Vector2(220,-100)
+var preview_position = Vector2(220,-150)
 var preview_scale = Vector2(1.2,1.2)
 
 

@@ -546,3 +546,17 @@ func make_my_mirror_plus_hp(unit_unique_key:int):
 	else:
 		Lobby.universal_global_unit_array[unit_unique_key].plus_hp(false)
 		push_error("plus_HPing unit " +str(unit_unique_key))
+		
+@rpc("any_peer", "call_remote", "reliable")
+func make_mirror_lane_receive_spell_call(spelltype:String,
+ fun_to_call:String, concurrent_player:String):
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_mirror_lane_receive_spell_call",
+		 spelltype,fun_to_call,concurrent_player)
+		push_error("sending function: " + fun_to_call +" to lane " + self.name)
+	else:
+		var DB = SpellsDB
+		if spelltype == "lvlup_spell":
+			DB = LvlupDB
+		DB.call(fun_to_call, arena_rect, concurrent_player, true)
+		push_error("calling function: " + fun_to_call +" on lane " + self.name)		

@@ -171,6 +171,11 @@ var my_damage_was_annuled = false
 #used when a unit that I'm attacking is having it's presence annulled 
 #for example when blinking
 
+var readied = false
+#turns true after any second_ready function
+	#used for spawning units without second_readying them
+	#to then mass ready them
+
 #######################################################################
 ### 					MULTIPLAYER VARIABLES						###
 #######################################################################
@@ -257,8 +262,8 @@ func _ready():
 	if Unit_Armor != 0:
 		%AR.visible = true
 		%AR.modulate = Base.Black_color
-	increase_damage_to_be_taken(0)
-	#HERE
+	#increase_damage_to_be_taken(0)
+	check_damage_to_be_taken()
 
 	
 	%UNIT_JPEG.texture = Card_pfp
@@ -349,6 +354,8 @@ func second_ready():
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	lane_aura_check()	
 	
+	readied = true
+	
 func second_ready_without_curve_rng():
 	#Used in multiplayer since curving is done only for at host
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
@@ -357,6 +364,8 @@ func second_ready_without_curve_rng():
 	lane_aura_check()	
 	
 	refresh_combat_damage()
+	
+	readied = true
 	
 	
 func respawn(silent = 0):
@@ -806,8 +815,6 @@ func _drop_data(_at_position, DropData):
 		var DB = SpellsDB
 		var DBList = SpellsDB.SPELLS_DB
 		if DropData[0] == "lvlup_spell":
-		#Useless, will be removed
-#			print("calling from lvldb")
 			DB = LvlupDB
 			DBList = LvlupDB.LVLUPS_DB
 			#If the card is from lvlup, we need to change the DB 
@@ -893,7 +900,7 @@ func equip_item(ID):
 		Target_slot.get_child(2).being_replaced(equipped_item)
 		#because child 0 is Cooldown
 	
-func drop_data_multiplayer_funcall(spelltype:String, function_to_be_called:String, concurrent_player:String):
+func drop_data_multiplayer_funcall(spelltype:String, function_to_be_called:String, current_player:String):
 	#can only be called if MP yes
 	#handles that join gets the function first, 
 		#since curving can't be fucked from there
@@ -902,13 +909,13 @@ func drop_data_multiplayer_funcall(spelltype:String, function_to_be_called:Strin
 		DB = LvlupDB
 			
 	if Lobby.host == true:
-		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, MY_UNIQUE_UNIT_KEY, concurrent_player)
+		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, MY_UNIQUE_UNIT_KEY, current_player)
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		DB.call(function_to_be_called,self,concurrent_player)
+		DB.call(function_to_be_called,self,current_player)
 	else:
-		DB.call(function_to_be_called,self,concurrent_player)
+		DB.call(function_to_be_called,self,current_player)
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, MY_UNIQUE_UNIT_KEY, concurrent_player)
+		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, MY_UNIQUE_UNIT_KEY, current_player)
 
 	
 	
@@ -1135,7 +1142,7 @@ func start_waiting_for_curve_data():
 #@rpc("any_peer", "call_remote", "reliable")
 func curve_left():
 	targeting = "left"
-	push_error(str(Unit_Name) +" is curving left")
+	#push_error(str(Unit_Name) +" is curving left")
 	%Arrow_combat.curve_left()
 	if OPrena.get_child(get_index()-1).TYPE == "unit":
 		redirect_damage(OPrena.get_child(get_index()-1))
@@ -1145,7 +1152,7 @@ func curve_left():
 #@rpc("any_peer", "call_remote", "reliable")
 func curve_right():
 	targeting = "right"
-	push_error(str(Unit_Name +" is curving right"))
+	#push_error(str(Unit_Name +" is curving right"))
 	%Arrow_combat.curve_right()	
 	if OPrena.get_child(get_index()+1).TYPE == "unit":
 		redirect_damage(OPrena.get_child(get_index()+1))
@@ -1444,8 +1451,8 @@ func annul_my_damage():
 func redirect_damage(target):
 	var opposer = await get_opposer()
 #	print("REDIRECTING")
-	if HERO == true:
-		push_error(Unit_Name + " is redirecting dmg")
+#	if HERO == true:
+#		push_error(Unit_Name + " is redirecting dmg")
 	
 	if straight_target == null:
 		damage_used_up_1 = 0
@@ -1849,8 +1856,11 @@ func get_opposer(Index = get_index()):
 	var opposer = OPrena.get_child(Index)
 #	var mb_opposer
 	while opposer == null or (opposer.TYPE == "unit" and opposer.alive == false):
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
-		opposer = OPrena.get_child(Index)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		if MYrena_rect.get_child_count() == OPrena.get_child_count():
+			#testing this to solve problem where last slot A 
+			#becomes second to last due to bonus void in B (spawning)
+			opposer = OPrena.get_child(Index)
 
 	return opposer
 		

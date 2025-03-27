@@ -43,9 +43,13 @@ func Duel(Caster, Target1, _current_player = ""):
 	#hero_death_Care in CardLayer can manage heroes dying at the "same" time
 	await Target1.take_damage(attack1)
 
-func SummonTwo(allied_row, _current_player = ""):
-	for i in 2:
-		await allied_row.spawn_unit(6)
+func SummonTwo(allied_row, _current_player = "", rpced = false):
+	if rpced == false:
+		for i in 2:
+			await allied_row.spawn_unit(6, null, false, false)
+			await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	allied_row.mass_second_ready()
 		
 func My_peak(target, _current_player = ""):
 	target.can_lvlup = false
@@ -68,7 +72,7 @@ func Morning(target, _current_player = ""):
 		target.XP_panel.increase_xp(2* (previous_health+1))
 		
 func Annihilate(target, _current_player = ""):
-	var DAMAGE = 4
+	var DAMAGE = 12
 	var HP = target.HealthC
 	var expected_damage = DAMAGE
 	if expected_damage > HP:

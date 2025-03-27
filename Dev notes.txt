@@ -24,6 +24,9 @@ one of the most valuable weapons, doesnt look very valuable, element of surprise
 karma ==
 wait a minute - counterargument for attack, oh ok nvm
 Taking a phrase of a deceased partner
+a pair of coworkers together, noone else apparently knows they are, boss calls one on a mission
+    the other just receives a call "I want you there too"
+
 
 
 #########     ###########            ##########            ########            ########
@@ -126,7 +129,10 @@ dynamic card_type and card_ID allocation
     from the card played signal, connected to somewhere in history
     also pfp
 
-######################################
+Second round:
+    MP,JOIN only
+    When trying to deploy Plott to lane2, she goes to lane1 on her own
+        and doesnt rejoin the array
 
 When hosts units curve, joiner doesnt get proper damage allignment
     mb it's just during deployment
@@ -137,14 +143,59 @@ BOTH of above
 
 Heroes still don't leave the starting tower passive trigger array
     Kimmedi and Plott monday
+        They are being removed after respawning, but monday seems to trigger before
+    They now leave the array, but have problems getting back
+        Getting back problem only when dragged to lane, startgame now works
+    Keep an eye out for this one
+
+Debug tool
+    Phase applicator
+    HP modifying button
+    Nonpass when
+    Mirroring it all
+
+history
+    mirror
+
+SummonTwo
+    summoned zombie in front of enemy and then moved it keeping dmtbt
+        mb when 1 slot is forced and second is open anew
+    Fixed, tested by landing in front of curved sieger + unit spawning leftmost
+
+######################################
+
+MP frfr
+
+Dying duelist caused opposer-bug possibly due to there being another duelist opposite of him
 
 
-    
+
+
+
+ 
 
 
 
 
 
+
+
+
+
+
+Kimmedi passive on kill
+        refreshes dmbt on the side of the shooter but not the other, if shot from joiner
+            might be due to low priviliges
+        worked last time, siege not confirmed
+    DOES work when there is no phase overlap, siege not confirmed
+
+
+
+((((((((((((((((((((((((((((( look out for )))))))))))))))))))))))))))))
+Curving to sides for joiner
+()
+Passive_trigger_arrays joining/leaving
+((((((((((((((((((((((((((((( look out for )))))))))))))))))))))))))))))
 
 
 
@@ -277,7 +328,14 @@ Future fixes:
         could be divided to lspellsdb and lcreepsdb when creeps
     Item => upgrade 
         i dont even know
-
+    Opponent_spawn_rect_fake
+        doesn't need tweens
+    Restart match
+        as option
+    Monday might still be too early
+        before dmg redirection completes on all lanes
+    Mirror > mirror unit
+        no point in having the "unit" in make_my_mirror_unit
 
 
 

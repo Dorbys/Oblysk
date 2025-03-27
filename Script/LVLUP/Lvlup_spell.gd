@@ -111,7 +111,7 @@ func _get_drag_data(_at_position):
 	#DROPDATA SPELL1 THESE: 
 	#[0= TYPE, 1=Identification, 2=self.get_index(), 
 	#3=crosslane, 4=Card_from_lvlup, 5 = Secondary_targets,
-	#6 = Is_played_on]
+	#6 = Is_played_on #7 = current_player]
 	
 func create_preview(ID):
 	var preview = Scene.instantiate()
@@ -124,7 +124,7 @@ func create_preview(ID):
 
 func assign_stats(preview, ID):
 	preview.Card_name = LvlupDB.LVLUPS_DB[ID][LvlupDB.NAMEPOSITION]
-	preview.Card_pfp = Base.LVLUP_CARDS_TEXTURES[ID]
+	preview.Card_pfp = Base.LVLUP_SPELLS_TEXTURES[ID]
 	preview.Card_Cost = LvlupDB.LVLUPS_DB[ID][LvlupDB.COSTPOSITION]
 	preview.Card_XP = 0
 	preview.Targets = LvlupDB.LVLUPS_DB[ID][LvlupDB.TARGPOSITION]

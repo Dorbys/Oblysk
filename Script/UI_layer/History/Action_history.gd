@@ -22,7 +22,49 @@ func card_has_been_played(card:Node):
 	card_icon.texture = card.Card_pfp
 	
 	%History.add_child(card_icon)
+	if Lobby.MULTIPLAYER == true:
+		mirror_played_card(card.TYPE,card.Identification)
+			#can't send 'card' cuz nodes can't be rpced
 
+@rpc("any_peer", "call_remote", "reliable")
+func mirror_played_card(card_type, card_ID):
+	if multiplayer.get_remote_sender_id() == 0:
+		#called locally
+		push_error("rpcing mirror_played_card")
+		rpc_id(Lobby.opponent_peer_id,"mirror_played_card",card_type, card_ID)
+	else:
+		push_error("rpc of mirror_played_card received")
+		var card_icon = played_card_scene.instantiate()
+		card_icon.card_type = card_type
+		card_icon.card_ID = card_ID
+		var db = extract_texture_db_from_card_type(card_type)
+		card_icon.texture = db[card_ID]
+		card_icon.size_flags_horizontal = Control.SIZE_SHRINK_END
+
+		%History.add_child(card_icon)
+		
+func extract_texture_db_from_card_type(card_type):
+	#"spell" "unit" "lvlup_spell"  "building" "upgrade" 
+	var db
+	match card_type:
+		"spell":
+			db = Base.SPELL_TEXTURES
+		"unit":
+			db = Base.CREEP_TEXTURES
+		"lvlup_spell":
+			db = Base.LVLUP_SPELLS_TEXTURES
+		"building":
+			db = Base.BUILDING_TEXTURES
+		"upgrade":
+			db = Base.UPGRADE_TEXTURES
+		_:
+			push_error("unknown card_type in opponent's history")
+		
+	return db
+			
+			
+	
+	
 var shown:bool = false
 func _on_show_hide_button_pressed():
 	if shown == true:

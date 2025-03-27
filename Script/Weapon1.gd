@@ -105,7 +105,7 @@ func create_preview(ID):
 func assign_stats(preview, ID):
 	preview.Item_Name = ItemsDB.ITEMS_DB[ID][ItemsDB.NAMEPOSITION]
 	preview.ITEMM = ItemsDB.ITEMS_DB[ID][ItemsDB.ITEMMPOSITION]
-	preview.Card_pfp = Base.ITEM_TEXTURES[ID]
+	preview.Card_pfp = Base.UPGRADE_TEXTURES[ID]
 #	preview.Item_Stat = ItemsDB.ITEMS_DB[ID][ItemsDB.STATPOSITION]
 	preview.Card_Cost = ItemsDB.ITEMS_DB[ID][ItemsDB.COSTPOSITION]
 	preview.Item_cooldown = ItemsDB.ITEMS_DB[ID][ItemsDB.COOLDOWNPOSITION]

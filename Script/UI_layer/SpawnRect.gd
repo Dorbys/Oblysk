@@ -147,7 +147,7 @@ func collide_units(skip_target = -1):
 			destinationX =  center + ((i-mid) * Base.CARD_WIDTH)
 
 		var tween = create_tween().set_parallel(true)
-		await tween.tween_property(target,"position",
+		tween.tween_property(target,"position",
 		 Vector2(destinationX,0),
 		 collide_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 	if colliding_units > 0 : 

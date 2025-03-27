@@ -191,14 +191,17 @@ func Adding_Units(_at_position, ID, forced_here = null):
 		add_child(another)
 	else:
 		another.position.x= STARTSET + Shadow_index * (Card_and_offset)
+		#same as above, mb historical diff
 		add_child(another)
-		for i in (population-Shadow_index):
-			move_child(get_child(population-(i+1)),population-i)
+#		for i in (population-Shadow_index):
+#			move_child(get_child(population-(i+1)),population-i)
+				#ancient
+		move_child(another, Shadow_index)
 		collide_units()
 	if Lobby.MULTIPLAYER == true and Lobby.host == false:
 		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, Shadow_index,  false)
 		another.second_ready_without_curve_rng()
-		push_error("mult true and lobbyhost false")
+		#push_error("mult true and lobbyhost false")
 	else:
 		await get_tree().create_timer(Base.FAKE_OMEGA).timeout 
 		another.second_ready_without_curve_rng() #on adding no curving
@@ -243,10 +246,10 @@ func Cheating_Units(ID, has_ability):
 	add_child(another)
 	
 @rpc("any_peer", "call_remote", "reliable")
-func spawn_unit(ID, rpced_slot = null, forced_here = false):
+func spawn_unit(ID, rpced_slot = null, forced_here = false, readied = true):
 	#THIS function is for when units are spawned from effect 
 	var spawning_slot
-	if rpced_slot == null:
+	if multiplayer.get_remote_sender_id()== 0:
 		spawning_slot = await new_random_slot()		
 	else:
 		if forced_here == false:
@@ -295,6 +298,7 @@ func spawn_unit(ID, rpced_slot = null, forced_here = false):
 		
 	another.my_lane = my_lane
 	#to track which lane a unit is in
+
 	
 		
 	
@@ -303,6 +307,7 @@ func spawn_unit(ID, rpced_slot = null, forced_here = false):
 	if Lobby.MULTIPLAYER == true and Lobby.host == false and rpced_slot == null:
 	#multiplayer check isn't necessary here, but I want to signify all parts
 		#of the code that are for MP purpose only
+			#wtf it is else it would trigger in SP
 		push_error("Joiner calling to spawn_unit " +str(ID))
 		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, spawning_slot, forced_here)
 		#so that the unit is created also at host, but after mine
@@ -311,13 +316,15 @@ func spawn_unit(ID, rpced_slot = null, forced_here = false):
 	move_child(another, spawning_slot)
 	collide_units()
 	UNITS_MOVED_YO()
-	await get_tree().create_timer(Base.FAKE_DELTA).timeout
-	if Lobby.MULTIPLAYER == true:
-		if Lobby.host == true:
-			another.second_ready()
-		else:
-			another.second_ready_without_curve_rng()
-	else: another.second_ready()		
+	
+	if readied == true:
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		if Lobby.MULTIPLAYER == true:
+			if Lobby.host == true:
+				another.second_ready()
+			else:
+				another.second_ready_without_curve_rng()
+		else: another.second_ready()		
 	
 	
 
@@ -798,7 +805,7 @@ func transfer_hero_to_spawner(target):
 func respawn_here(target, rpced_slot = null, faction = null):
 	#target starts as int of ID and becomes node of Hero
 	if faction != null:
-		push_error(faction + " hero is respawning at " +str(rpced_slot))
+#		push_error(faction + " hero is respawning at " +str(rpced_slot))
 		if faction == "alpha":
 			target = Base.Player_heroes[target]
 		elif faction == "beta":
@@ -985,8 +992,19 @@ func RIP_BOZO(target):
 	target.queue_free()
 		
 		
-		
-		
+func mass_second_ready():
+	var population = get_child_count()
+	var target
+	for i in range(population - 1, -1, -1): 
+		target = get_child(i)
+		if target.TYPE == "unit" and target.readied == false:
+			if Lobby.MULTIPLAYER == true:
+				if Lobby.host == true:
+					target.second_ready()
+				else:
+					target.second_ready_without_curve_rng()
+			else:
+				target.second_ready()
 		
 		
 		

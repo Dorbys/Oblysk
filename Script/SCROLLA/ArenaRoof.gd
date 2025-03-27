@@ -2,7 +2,7 @@ extends ColorRect
 
 
 @onready var hand_rect = $"../../../../../../UI_layer/SCROLLH/HANDA/SIZECHECK/HandRect"
-
+@onready var card_layer = $"../../../.."
 @onready var JustArena = $"../../../../SCROLLA/Arena/SIZECHECK/ArenaRect"
 @onready var MYrena_rect = $"../ArenaRect"
 @onready var MYrena_mid = $"../ArenaMid"
@@ -18,11 +18,12 @@ var my_tower_buildings
 func _ready():
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 
-	if MYrena_rect.OP_identity == 1:
+	if MYrena_rect.MY_identity == "A":
 		my_tower_buildings = $"../../../../../Tower_layer/TowerA/Buildings"
-	elif MYrena_rect.OP_identity == 0:
-		my_tower_buildings = $"../../../../../Tower_layer/TowerA/Buildings"
+	elif MYrena_rect.MY_identity == "B":
+		my_tower_buildings = $"../../../../../Tower_layer/TowerB/Buildings"
 	######################3 HERE WE DO A LITTLE TROLLING FOR NOW 
+		#wut?
 				
 		
 	else: push_error("MYrenaRect has OP identity crisis i guess")
@@ -54,41 +55,26 @@ func _drop_data(at_position, DropData):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		hand_rect.collide_cards()
 		
-	elif DropData[0] == "spell" and DropData[6] == "Lane":
+	elif DropData[0] == "spell" or DropData[0] == "lvlup_spell":
 		#DROPDATA SPELL1 THESE: 
 		#[0= TYPE, 1=Identification, 2=self.get_index(), 
 		#3=crosslane, 4=Card_from_lvlup, 5= Secondary_targets
-		#6 = Targets]
-		
-
-		SpellsDB.call(str(SpellsDB.SPELLS_DB[DropData[1]][SpellsDB.NAMEPOSITION]),
-		JustArena)
-		############################################# JUST ARENA ########
-		#Resolves the spell
-#		tower_mana.spend_mana(SpellsDB.SPELLS_DB[DropData[1]][SpellsDB.COSTPOSITION])		
-		#Spends mana
-		#MOVING THIS TO CARD USED
+		#6 = Targets #7 = current player]
+		var DB = SpellsDB
+		var DBList = SpellsDB.SPELLS_DB
+		if DropData[0] == "lvlup_spell":
+			DB = LvlupDB
+			DBList = LvlupDB.LVLUPS_DB
+		var which_function:String = str(DBList[DropData[1]][DB.NAMEPOSITION])
+		if Lobby.MULTIPLAYER == true:
+			drop_data_multiplayer_funcall(DropData[0],which_function, DropData[7])
+		else:
+			SpellsDB.call(which_function, MYrena_rect)
+			
 		hand_rect.used_card(DropData[2])
-		#removes the card
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		hand_rect.collide_cards()
-	
-	elif DropData[0] == "lvlup_spell" and DropData[6] == "Lane":
-		#DROPDATA SPELL1 THESE: 
-		#[0= TYPE, 1=Identification, 2=self.get_index(), 
-		#3=crosslane, 4=Card_from_lvlup, 5= Secondary_targets
-		#6 = Targets]
 		
-
-		LvlupDB.call(str(LvlupDB.LVLUPS_DB[DropData[1]][LvlupDB.NAMEPOSITION]),
-		MYrena_rect)
-		#Resolves the spell
-#		tower_mana.spend_mana(LvlupDB.LVLUPS_DB[DropData[1]][LvlupDB.COSTPOSITION])		
-		#Spends mana
-		hand_rect.used_card(DropData[2])
-		#removes the card
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		hand_rect.collide_cards()
 		
 	elif DropData[0] == "building":
 		var house = BUILDING_SCENE.instantiate()
@@ -111,25 +97,24 @@ func _drop_data(at_position, DropData):
 		print("unknown card dropped in ArenaRoof")
 #		print(str(DropData[6]))
 		
-#	if DropData[0] == 1:
-#		MYrena_rect.TargetingSpell = 0
-#		MYrena_rect.ResolvingSingleTargetSpell(at_position, DropData[1])
-#		hand_rect.get_child(DropData[2]).queue_free()
-#		if MYrena_mid.get_child_count()>0:
-#			MYrena_mid.get_child(0).queue_free()
-#		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-#		hand_rect.collide_cards()
-#
-#	if DropData[0] == 2:
-#		MYrena_rect.EquippingItem = 0
-#		MYrena_rect.equipping_the_item(at_position, DropData[1])
-#
-#		hand_rect.get_child(DropData[2]).queue_free()
-#		if MYrena_mid.get_child_count()>0:
-#			MYrena_mid.get_child(0).queue_free()
-#		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-#		hand_rect.collide_cards()
 
+
+func drop_data_multiplayer_funcall(spelltype:String, function_to_be_called:String, current_player:String):
+	#can only be called if MP yes
+	#handles that join gets the function first, 
+		#since curving can't be fucked from there
+	var DB = SpellsDB
+	if spelltype == "lvlup_spell":
+		DB = LvlupDB
+
+	if Lobby.host == true:
+		card_layer.make_mirror_lane_receive_spell_call(spelltype, function_to_be_called, current_player)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		DB.call(function_to_be_called,MYrena_rect,current_player)
+	else:
+		DB.call(function_to_be_called,MYrena_rect,current_player)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		card_layer.make_mirror_lane_receive_spell_call(spelltype, function_to_be_called, current_player)
 
 
 

@@ -46,7 +46,7 @@ preload("res://Assets/CardsSMALLS/Kajus_small.png"),
 preload("res://Assets/CardsSMALLS/Kimmedi_small.png"),
 preload("res://Assets/CardsSMALLS/Plott_small.jpg")]
 
-var ITEM_TEXTURES = [preload("res://Assets/Items/Weapons/Blink_axe.jpg"),
+var UPGRADE_TEXTURES = [preload("res://Assets/Items/Weapons/Blink_axe.jpg"),
 preload("res://Assets/Items/Weapons/OBLYSK.png")]
 
 var ABILITY_TEXTURES = [preload("res://Assets/CardsPNGS/Abilities/AcamarAbility.png"),
@@ -63,7 +63,7 @@ var BUILDINGS_SMALLS_TEXTURES = [preload("res://Assets/BuildingsSMALLS/Acid11.pn
 preload("res://Assets/BuildingsSMALLS/Bombard.png"),
 preload("res://Assets/BuildingsSMALLS/Drill.png"),
 preload("res://Assets/BuildingsSMALLS/Gate.png")]
-var LVLUP_CARDS_TEXTURES = [preload("res://Assets/CardsPNGS/LVLUP_cards/Acamar_lvlup.jpg"),
+var LVLUP_SPELLS_TEXTURES = [preload("res://Assets/CardsPNGS/LVLUP_cards/Acamar_lvlup.jpg"),
 preload("res://Assets/CardsPNGS/LVLUP_cards/Dorbys_lvlup.png"),
 preload("res://Assets/CardsPNGS/LVLUP_cards/Kajus_lvlup.jpg"),
 preload("res://Assets/CardsPNGS/LVLUP_cards/Kimmedi_lvlup.png"),
