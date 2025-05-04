@@ -97,7 +97,7 @@ func _get_drag_data(_at_position):
 
 				arena_rect.Carrying = 1
 				arena.move_roof_to_front()
-				if Base.PLAYTEST == 0:
+				if Base.PLAYTEST == false:
 					abarena_rect.Carrying = 1
 					abarena.move_roof_to_front()
 				

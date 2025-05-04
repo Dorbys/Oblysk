@@ -8,7 +8,7 @@ extends ColorRect
 @onready var MYrena_mid = $"../ArenaMid"
 @onready var tower_mana = $"../../../../../Tower_layer/TowerA/Mana_display/Current_mana"
 
-@export var BUILDING_SCENE: PackedScene
+
 
 var my_lane:int 
 #stolen from MYrena_rect during ready
@@ -69,7 +69,7 @@ func _drop_data(at_position, DropData):
 		if Lobby.MULTIPLAYER == true:
 			drop_data_multiplayer_funcall(DropData[0],which_function, DropData[7])
 		else:
-			SpellsDB.call(which_function, MYrena_rect)
+			DB.call(which_function, MYrena_rect)
 			
 		hand_rect.used_card(DropData[2])
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
@@ -77,17 +77,9 @@ func _drop_data(at_position, DropData):
 		
 		
 	elif DropData[0] == "building":
-		var house = BUILDING_SCENE.instantiate()
-		house.Build_name = BuildDB.BUILD_DB[DropData[1]][BuildDB.NAMEPOSITION]
-		house.Build_Pfp = Base.BUILDINGS_SMALLS_TEXTURES[DropData[1]]
-#		house.Card_Cost = BuildDB.BUILD_DB[DropData[1]][BuildDB.COSTPOSITION]
-#		house.Build_XP = BuildDB.BUILD_DB[DropData[1]][BuildDB.XPPOSITION]
-		house.is_aura = BuildDB.BUILD_DB[DropData[1]][BuildDB.ISAURAPOSITION]
-		house.affects = BuildDB.BUILD_DB[DropData[1]][BuildDB.AFFPOSITION]
-#		house.Identification = DropData[1]
-		house.position.x = 50+ my_tower_buildings.get_child_count() * 110
-		#For now placement
-		my_tower_buildings.add_child(house)
+		if Lobby.MULTIPLAYER == true:
+			card_layer.make_mirror_lane_building(DropData[1])
+		my_tower_buildings.make_building(DropData[1])
 		
 		hand_rect.used_card(DropData[2])
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout

@@ -48,8 +48,9 @@ func SummonTwo(allied_row, _current_player = "", rpced = false):
 		for i in 2:
 			await allied_row.spawn_unit(6, null, false, false)
 			await get_tree().create_timer(Base.FAKE_DELTA).timeout
-	await get_tree().create_timer(Base.FAKE_DELTA).timeout
-	allied_row.mass_second_ready()
+		allied_row.mass_second_ready()
+	await get_tree().create_timer(0.2).timeout
+	
 		
 func My_peak(target, _current_player = ""):
 	target.can_lvlup = false
@@ -93,9 +94,9 @@ func Swap(swapped_unit, swapping_unit, _current_player = ""):
 	
 
 	
-	var retarged = swapped_unit.targeting
+	var retarget = swapped_unit.targeting
 	swapped_unit.targeting = swapping_unit.targeting
-	swapping_unit.targeting = retarged
+	swapping_unit.targeting = retarget
 	#swap their targeting
 	
 	var straiged = swapped_unit.straight_target
@@ -115,8 +116,8 @@ func Swap(swapped_unit, swapping_unit, _current_player = ""):
 	
 	swapped_unit.redirect_damage_to_me_again()
 	swapping_unit.redirect_damage_to_me_again()
-	swapped_unit.curve_rng()
-	swapping_unit.curve_rng()
+	swapped_unit.refresh_my_combat_damage()
+	swapping_unit.refresh_my_combat_damage()
 	
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	await swapped_unit.tower_layer.unit_order_changed_signal(swapped_unit.my_lane)

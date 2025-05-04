@@ -32,8 +32,10 @@ func unit_has_been_targeted(unit, trigger):
 			if trigger[LvlupDB.TARGPOSITION] == Enums.Targeting.one_unit or trigger[LvlupDB.TARGPOSITION] == Enums.Targeting.one_ally:
 				if wielder.HealthC > 0:
 					Chill_up()
-#	else:
-#		print("Acamarpassive's target is not the wielder")
+		else:
+			push_error("neither spell nor lvlupspell")
+	else:
+		push_error("Acamarpassive's target is not the wielder")
 		
 		
 func Chill_up():

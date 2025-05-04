@@ -20,7 +20,7 @@ var cooldown
 #==========================================================
 
 func _ready():
-	item_slot.texture = Base.ITEM_TEXTURES[Item_ID]
+	item_slot.texture = Base.UPGRADE_TEXTURES[Item_ID]
 	cooldown = ItemsDB.ITEMS_DB[Item_ID][ItemsDB.COOLDOWNPOSITION]
 	item_slot.text_for_tooltip = "Cooldown(" +str(cooldown) + "): Teleport to chosen lane"
 	item_slot.active_item_equipped(cooldown)

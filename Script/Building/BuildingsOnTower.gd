@@ -2,6 +2,8 @@ extends Control
 
 @onready var card_layer = $"../../../Card_layer"
 
+@export var BUILDING_SCENE: PackedScene
+
 func refresh_aura(target,faction,wielder):
 	var population = get_child_count()
 	for i in population:
@@ -29,7 +31,18 @@ func collide_buildings():
 		tween.tween_property(get_child(i),"position:x",50 + (i * 110), collide_time)
 
 	
-	
+func make_building(ID):
+	var house = BUILDING_SCENE.instantiate()
+	house.Build_name = BuildDB.BUILD_DB[ID][BuildDB.NAMEPOSITION]
+	house.Build_Pfp = Base.BUILDINGS_SMALLS_TEXTURES[ID]
+#		house.Card_Cost = BuildDB.BUILD_DB[ID][BuildDB.COSTPOSITION]
+#		house.Build_XP = BuildDB.BUILD_DB[ID][BuildDB.XPPOSITION]
+	house.is_aura = BuildDB.BUILD_DB[ID][BuildDB.ISAURAPOSITION]
+	house.affects = BuildDB.BUILD_DB[ID][BuildDB.AFFPOSITION]
+#		house.Identification = ID
+	house.position.x = 50+ get_child_count() * 110
+	#For now placement
+	add_child(house)
 	
 	
 	

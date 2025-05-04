@@ -124,10 +124,14 @@ func gain_starting_initiative():
 	
 	
 func _input(event):
-	if Input.is_action_just_pressed("ui_cancel"):
+	if Input.is_action_just_pressed("Terminate") and Base.PLAYTEST == false:
 		get_tree().quit()
 
 
 
 func _on_line_edit_text_changed(new_text):
 	Lobby.player_name = new_text
+
+
+func _on_exit_pressed():
+	get_tree().quit()

@@ -1,11 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://bpjm166rvmupf"]
+[gd_scene load_steps=11 format=3 uid="uid://bpjm166rvmupf"]
 
 [ext_resource type="Theme" uid="uid://k8fg2sxs4p6k" path="res://Themes/Empty H scrollbar.tres" id="1_rwa2n"]
 [ext_resource type="PackedScene" uid="uid://fa87ub5cj205" path="res://Scenes/Empty_shadow.tscn" id="2_ks0je"]
 [ext_resource type="Script" path="res://Script/SCROLLA/SCROLLA.gd" id="2_p58ki"]
 [ext_resource type="Script" path="res://Script/SCROLLA/Arena.gd" id="3_6kukc"]
 [ext_resource type="Script" path="res://Script/SCROLLA/ArenaRect.gd" id="4_sj4ya"]
-[ext_resource type="PackedScene" uid="uid://c4np20856wsq8" path="res://Scenes/Building/BuildingMain.tscn" id="5_t3sdu"]
 [ext_resource type="PackedScene" uid="uid://bayidy5c8jqm4" path="res://Scenes/UNIT/Unit1.tscn" id="6_mayyw"]
 [ext_resource type="PackedScene" uid="uid://dmaqk1n41c6o5" path="res://Scenes/EFFECTS/SEffect.tscn" id="7_fwx8v"]
 [ext_resource type="Script" path="res://Script/SCROLLA/ArenaRoof.gd" id="8_kdq13"]
@@ -45,7 +44,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 color = Color(0.654902, 0.443137, 1, 0)
 script = ExtResource("8_kdq13")
-BUILDING_SCENE = ExtResource("5_t3sdu")
 
 [node name="ArenaMid" type="TextureRect" parent="Arena/SIZECHECK"]
 layout_mode = 2

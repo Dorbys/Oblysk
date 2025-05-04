@@ -15,7 +15,7 @@ extends Card_In_Hand
 
 #var UNIT = 0
 #var SPELL = 1
-var TYPE = "lvlup_spell"          #1 wtf
+var TYPE = "lvlup_spell"          #1 wtf 
 var Identification = 3
 var Targets = 0
 var Card_from_lvlup = true

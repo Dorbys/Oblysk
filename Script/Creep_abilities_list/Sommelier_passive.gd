@@ -103,7 +103,7 @@ func refresh_my_aura():
 	
 	
 func unit_order_changed():
-	if wielder.alive == 1:	
+	if wielder.alive == true:	
 		refresh_my_aura()
 	
 func remove_aura_on_death():

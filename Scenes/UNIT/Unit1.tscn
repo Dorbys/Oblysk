@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://bayidy5c8jqm4"]
+[gd_scene load_steps=28 format=3 uid="uid://bayidy5c8jqm4"]
 
 [ext_resource type="Script" path="res://Script/Unit1.gd" id="1_58f8m"]
 [ext_resource type="PackedScene" uid="uid://dmaqk1n41c6o5" path="res://Scenes/EFFECTS/SEffect.tscn" id="2_jshfr"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://bxn2mkbkberl1" path="res://Assets/CardsPNGS/CardUI/Inventory sword.png" id="8_kj6o8"]
 [ext_resource type="Texture2D" uid="uid://da11g0qs7vep1" path="res://icon.svg" id="8_xaqce"]
 [ext_resource type="Texture2D" uid="uid://cyabcdh11jaxs" path="res://Assets/CardsPNGS/CardUI/Inventory special.png" id="9_qrgby"]
+[ext_resource type="Texture2D" uid="uid://bsg0uej28g8jr" path="res://Assets/CardsPNGS/Heroes/Dorbys.png" id="9_unpde"]
 [ext_resource type="Texture2D" uid="uid://dpnulmevfgww4" path="res://Assets/CardsPNGS/CardUI/Inventory shield.png" id="10_otp25"]
 [ext_resource type="Texture2D" uid="uid://cebjpxdc1cwq7" path="res://Assets/CardsPNGS/CardUI/Ability_frame.png" id="10_q7bmo"]
 [ext_resource type="Script" path="res://Script/UNITS/Arrow_combat.gd" id="10_wsnbo"]
@@ -106,6 +107,7 @@ offset_bottom = 303.0
 size_flags_vertical = 3
 size_flags_stretch_ratio = 16.0
 mouse_filter = 2
+texture = ExtResource("9_unpde")
 expand_mode = 4
 
 [node name="Ability1" type="TextureRect" parent="Slacksus"]

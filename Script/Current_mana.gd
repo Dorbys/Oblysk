@@ -6,7 +6,7 @@ extends Label
 var current_mana
 
 func _ready():
-	if Base.PLAYTEST == 1:
+	if Base.PLAYTEST == true:
 		%Max_mana.max_mana = 3
 	current_mana = %Max_mana.max_mana
 	#so that mana begins on the same as max mana

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bd5cypnf78qdj"]
+[gd_scene load_steps=11 format=3 uid="uid://bd5cypnf78qdj"]
 
 [ext_resource type="Script" path="res://Script/TOWER_HP_DISPLAY.gd" id="2_k0ois"]
 [ext_resource type="Texture2D" uid="uid://u6qf2spmmadb" path="res://Assets/Boardstuff/Towerr - kopie.jpg" id="2_pbq7b"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://Script/Current_mana.gd" id="6_m1brs"]
 [ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="7_iy82y"]
 [ext_resource type="Script" path="res://Script/Building/BuildingsOnTower.gd" id="8_cbyqh"]
+[ext_resource type="PackedScene" uid="uid://c4np20856wsq8" path="res://Scenes/Building/BuildingMain.tscn" id="9_apk20"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_njhnx"]
 font = ExtResource("7_iy82y")
@@ -103,5 +104,6 @@ anchors_preset = 0
 offset_left = 180.0
 offset_right = 180.0
 script = ExtResource("8_cbyqh")
+BUILDING_SCENE = ExtResource("9_apk20")
 
 [connection signal="child_exiting_tree" from="Buildings" to="Buildings" method="_on_child_exiting_tree"]

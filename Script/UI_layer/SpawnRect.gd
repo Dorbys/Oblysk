@@ -75,7 +75,7 @@ func INITIATE_THE_GAME():
 		#joiner just cleans his deployrects
 		clear_creeps_and_undraggable_heroes()
 		
-	await get_tree().create_timer(0.5).timeout
+	#await get_tree().create_timer(0.5).timeout
 	#we were starting before all the creeps spawned lol
 	
 	BUTTON.global_prep_phase()

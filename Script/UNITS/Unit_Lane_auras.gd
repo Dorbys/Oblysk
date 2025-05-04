@@ -3,7 +3,7 @@ extends Control
 @onready var wielder = $"../.."
 
 func reupdate(faction):
-#	push_error("reupdating with: " +str(get_child_count()))
+	push_error("reupdating with: " +str(get_child_count()))
 	var population = get_child_count()
 	for i in population:
 		get_child(i).CHECKED = false

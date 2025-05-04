@@ -210,7 +210,7 @@ func handle_two_targets():
 			var cardtype = "spell"
 			if from_lvlup_card == true:
 				cardtype = "lvlup_spell"
-			await two_target_handling_multiplayer(cardtype, DBList[Card_ID][0],
+			await two_target_handling_multiplayer(cardtype, Card_ID, DBList[Card_ID][0],
 			 TList[0].MY_UNIQUE_UNIT_KEY,TList[1].MY_UNIQUE_UNIT_KEY)
 		else:
 			await DB.call(DBList[Card_ID][0],TList[0],TList[1],Lobby.current_player)
@@ -304,6 +304,7 @@ func write_base_text(target):
 func one_target_handling_multiplayer(spelltype:String, function_to_be_called:String, unit_unique_key:int):
 	#think I can't even test this except for ability, which I'm no longer using lol
 	#check here when one such is reimplemented
+	#why orderedd?
 	if Lobby.host == true:
 		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, unit_unique_key)
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
@@ -313,15 +314,17 @@ func one_target_handling_multiplayer(spelltype:String, function_to_be_called:Str
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, unit_unique_key)
 		
-func two_target_handling_multiplayer(spelltype:String,
+func two_target_handling_multiplayer(spelltype:String, spell_id:int, 
  function_to_be_called:String, unit_unique_key:int, second_unit_unique_key:int):
+	var target1 = Lobby.universal_global_unit_array[unit_unique_key]
+	var target2 = Lobby.universal_global_unit_array[second_unit_unique_key]
 	if Lobby.host == true:
-		await Card_layer.make_two_mirror_units_receive_spell_call(spelltype,
-		 function_to_be_called, unit_unique_key, second_unit_unique_key)
+		await Card_layer.make_two_mirror_units_receive_spell_call(spelltype, spell_id,
+		  unit_unique_key, second_unit_unique_key)
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		await DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key],Lobby.universal_global_unit_array[second_unit_unique_key])
+		await DB.call(function_to_be_called,target1,target2)
 	else:
-		await DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key],Lobby.universal_global_unit_array[second_unit_unique_key])
+		await DB.call(function_to_be_called,target1,target2)
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		await Card_layer.make_two_mirror_units_receive_spell_call(spelltype,
-		 function_to_be_called, unit_unique_key, second_unit_unique_key)		
+		await Card_layer.make_two_mirror_units_receive_spell_call(spelltype, spell_id,
+		 unit_unique_key, second_unit_unique_key)		

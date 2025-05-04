@@ -7,7 +7,9 @@ extends Node
 #THE_BUTTON declares itself this in it's _ready
 
 
-var PLAYTEST = 0
+
+
+var PLAYTEST = false
 #change to 1 to shuffle deck, set mana and XP, hide tech stuff,
 #turns off alwayscaster
 #you can play all units into enemy side
@@ -88,8 +90,8 @@ preload("res://Assets/CardsPNGS/Creep_abilities/Zombie.png")]
 #currently stores alphacreep and betacreeep
 var card = load("res://Scenes/UNIT/Unit1.tscn")
 #var card = scene.instantiate()
-var PlayerDeck =  [["spell",0],["spell",0],["creep",2],["creep",6],["spell",7],
-	["spell",3],["creep",0],["creep",1],["build", 0],["item", 0]]
+var PlayerDeck =  [["spell",0],["spell",8],["creep",2],["creep",6],["spell",7],
+	["spell",7],["creep",0],["creep",1],["build", 0],["item", 0]]
 	
 	
 	
@@ -186,7 +188,7 @@ var passing = true
 #used to turn off passing so that debugging is easier [P]
 
 func _ready():
-	if PLAYTEST == 1:
+	if PLAYTEST == true:
 		PlayerDeck= playtest_deck
 		PlayerDeck.shuffle()
 		

@@ -919,6 +919,7 @@ func spawn_lane_creep(rpced_slot = null, forced_here = false):
 		
 	another.my_lane = my_lane
 	#to track which lane a unit is in
+	#another.readied = true #ig HERE
 	
 	add_child(another)
 	move_child(another, spawning_slot)
@@ -950,7 +951,7 @@ func reset_curving():
 	
 	
 func is_there_a_hero_check():
-	if Base.PLAYTEST == 1:
+	if Base.PLAYTEST == true:
 		var population = get_child_count()
 		var target
 		for i in population:

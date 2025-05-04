@@ -11,8 +11,8 @@ extends Control
 @onready var tower_layer = $"../Tower_layer"
 @onready var tower_a = $"../Tower_layer/TowerA"
 @onready var tower_b = $"../Tower_layer/TowerB"
-@onready var lane_auras_A = $"../Tower_layer/TowerA/Buildings"
-@onready var lane_auras_B = $"../Tower_layer/TowerB/Buildings"
+@onready var lane_buildings_A = $"../Tower_layer/TowerA/Buildings"
+@onready var lane_buildings_B = $"../Tower_layer/TowerB/Buildings"
 
 
 var my_lane 
@@ -383,12 +383,12 @@ func curve_rng_both():
 func refresh_lane_auras(target,faction,wielder):
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	#waiting for a building to queue free possibly
-	lane_auras_A.refresh_aura(target,faction, wielder)
-	lane_auras_B.refresh_aura(target,faction, wielder)
+	lane_buildings_A.refresh_aura(target,faction, wielder)
+	lane_buildings_B.refresh_aura(target,faction, wielder)
 
 			
 func unit_being_sieged(faction, siege_dmg):
-	print("siege dmg is: " +str(siege_dmg))
+	push_error("siege dmg is: " +str(siege_dmg))
 	match faction:
 		"alpha":
 			tower_a.increase_damage_to_be_taken(siege_dmg)
@@ -398,7 +398,7 @@ func unit_being_sieged(faction, siege_dmg):
 			print("faction in unit_being_sieged doesnt match again")	
 	
 func unit_no_longer_being_sieged(faction, siege_dmg):
-	print("UN siege dmg is: " +str(siege_dmg))
+	push_error("UN siege dmg is: " +str(siege_dmg))
 	match faction:
 		"alpha":
 			tower_a.increase_damage_to_be_taken(-siege_dmg)
@@ -471,31 +471,41 @@ func make_mirror_unit_curve(direction, unique_key:int):
 			
 @rpc("any_peer", "call_remote", "reliable")
 func make_mirror_unit_receive_spell_call(spelltype:String,
- fun_to_call:String, unique_key:int, concurrent_player:String):			
+ spell_id:int, unique_key:int, concurrent_player:String):			
 	if multiplayer.get_remote_sender_id() == 0:
 		rpc_id(Lobby.opponent_peer_id, "make_mirror_unit_receive_spell_call",
-		 spelltype,fun_to_call,unique_key,concurrent_player)
-		push_error("sending function: " +fun_to_call +" " +"to unit " +str(unique_key))
+		 spelltype,spell_id,unique_key,concurrent_player)
+		push_error("sending function: " + str(spell_id) +" to unit " +str(unique_key))
 	else:
 		var DB = SpellsDB
+		var DB_full = SpellsDB.SPELLS_DB
 		if spelltype == "lvlup_spell":
 			DB = LvlupDB
-		DB.call(fun_to_call, Lobby.universal_global_unit_array[unique_key], concurrent_player)
+			DB_full = LvlupDB.LVLUPS_DB
+		var fun_to_call:String = DB_full[spell_id][0]
+		var unit_to_target = Lobby.universal_global_unit_array[unique_key]
+		DB.call(fun_to_call, unit_to_target, concurrent_player)
 		push_error("calling function: " +fun_to_call +" " +"on unit " +str(unique_key))
-			
+		tower_layer.unit_targeted_signal(Lobby.universal_global_unit_array[unique_key], DB_full[spell_id])
+
 @rpc("any_peer", "call_remote", "reliable")
 func make_two_mirror_units_receive_spell_call(spelltype:String,
- funcall:String, first_unit_unique_key:int, second_unit_unique_key:int):
+ spell_id:int, first_unit_unique_key:int, second_unit_unique_key:int):
 	if multiplayer.get_remote_sender_id() == 0:
 		rpc_id(Lobby.opponent_peer_id, "make_two_mirror_units_receive_spell_call",
-		 spelltype,funcall,first_unit_unique_key,second_unit_unique_key)
-		push_error("sending function: " +funcall +" " +"to units " +str(first_unit_unique_key,second_unit_unique_key))
+		 spelltype,spell_id,first_unit_unique_key,second_unit_unique_key)
+		push_error("sending function: " +str(spell_id) +" to units " +str(first_unit_unique_key,second_unit_unique_key))
 	else:
 		var DB = SpellsDB
+		var DB_full = SpellsDB.SPELLS_DB
 		if spelltype == "lvlup_spell":
 			DB = LvlupDB
-		DB.call(funcall, Lobby.universal_global_unit_array[first_unit_unique_key],Lobby.universal_global_unit_array[second_unit_unique_key])
-		push_error("calling function: " +funcall +" " +"on units " +str(first_unit_unique_key,second_unit_unique_key))		
+			DB_full = LvlupDB.LVLUPS_DB
+		var fun_to_call:String = DB_full[spell_id][0]
+		var target1 = Lobby.universal_global_unit_array[first_unit_unique_key]
+		var target2 = Lobby.universal_global_unit_array[second_unit_unique_key]
+		DB.call(fun_to_call, target1, target2)
+		push_error("calling function: " + fun_to_call +" " +"on units " +str(first_unit_unique_key,second_unit_unique_key))		
 			
 		
 @rpc("any_peer", "call_remote", "reliable")		
@@ -560,3 +570,13 @@ func make_mirror_lane_receive_spell_call(spelltype:String,
 			DB = LvlupDB
 		DB.call(fun_to_call, arena_rect, concurrent_player, true)
 		push_error("calling function: " + fun_to_call +" on lane " + self.name)		
+
+@rpc("any_peer", "call_remote", "reliable")
+func make_mirror_lane_building(building_id:int,):
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_mirror_lane_building",
+		 building_id)
+		push_error("sending building command: " + str(building_id))
+	else:
+		lane_buildings_B.make_building(building_id)
+		#currently only B

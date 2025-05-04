@@ -27,7 +27,7 @@ func round_end():
 		
 		randolane = targetable_lanes[gamba]
 		
-		if Base.PLAYTEST == 1:
+		if Base.PLAYTEST == true:
 			shoot_at_random(randolane)
 	
 	else: 

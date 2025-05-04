@@ -16,7 +16,7 @@ var Damage = 5
 #==========================================================
 
 func _ready():
-	item_slot.texture = Base.ITEM_TEXTURES[Item_ID]
+	item_slot.texture = Base.UPGRADE_TEXTURES[Item_ID]
 	item_slot.text_for_tooltip = "+ " +str(Damage) +" attack"
 	item_slot.item_equipped()
 	

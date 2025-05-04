@@ -236,7 +236,7 @@ func _ready():
 			else:
 				my_slot = 5 + Base.OpponentHeroDeck.find(Identification)
 		else: 
-			if faction == "alpha": #HERE
+			if faction == "alpha": 
 				my_slot = 5+ Base.HeroDeck.find(Identification)
 			else:
 				my_slot = Base.OpponentHeroDeck.find(Identification)
@@ -347,25 +347,27 @@ func _ready():
 func second_ready():
 	#needs to be called together with _ready() for a proper initiation
 		#of a unit, but the delay between the two can be modified
-	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
-	curve_rng()
-	await get_tree().create_timer(Base.FAKE_DELTA).timeout
-	increase_damage_to_be_taken(0)
-	await get_tree().create_timer(Base.FAKE_DELTA).timeout
-	lane_aura_check()	
-	
-	readied = true
+	if readied == false:
+		await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
+		curve_rng()
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		increase_damage_to_be_taken(0)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		lane_aura_check()	
+		
+		readied = true
 	
 func second_ready_without_curve_rng():
 	#Used in multiplayer since curving is done only for at host
-	await get_tree().create_timer(Base.FAKE_DELTA).timeout
-	increase_damage_to_be_taken(0)
-	await get_tree().create_timer(Base.FAKE_DELTA).timeout
-	lane_aura_check()	
-	
-	refresh_combat_damage()
-	
-	readied = true
+	if readied == false:
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		increase_damage_to_be_taken(0)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		lane_aura_check()	
+		
+		refresh_my_combat_damage()
+		
+		readied = true
 	
 	
 func respawn(silent = 0):
@@ -375,6 +377,7 @@ func respawn(silent = 0):
 	appear_alive()
 	scale = Vector2(1,1)
 	new_lane()
+	lane_aura_check()
 	HealthC = HealthM
 	AttackC = AttackM
 	if MYrena_rect.MY_identity == "B":
@@ -386,18 +389,20 @@ func respawn(silent = 0):
 
 	
 	
-	updateS(silent)
-	# silent value is USED FOR DEPLOYMENT
+	updateS(0) #HERE
+	# silent value is USED FOR DEPLOYMENT #wtf
 	
 	my_damage_was_annuled = false
 	
 	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
 
 	check_if_I_put_space_between_curving()
+	
 
 func land():
 	#blink ig
 	new_lane()
+	
 	
 	var opposer = await get_opposer()
 	if opposer.TYPE == "unit":
@@ -486,12 +491,15 @@ func increase_HealthC(how_much):
 	if HealthC > HealthM:
 		HealthC = HealthM
 	updateS()
+	refresh_combat_damage_on_me()
+	
 		
 func increase_HealthM(how_much, loudness):
 	HealthM += how_much
 	HealthC += how_much
 	if loudness == 1:
 		updateS()
+	refresh_combat_damage_on_me()
 		
 func increase_ArmorM(how_much,loudness = 1):
 	await annul_damage_directed_to_me()
@@ -544,7 +552,7 @@ func updateS(silent = 0):
 	check_damage_to_be_taken()
 		
 	if silent == 0:
-		refresh_combat_damage()
+		refresh_my_combat_damage()
 
 	
 func take_damage(Damage):
@@ -667,7 +675,7 @@ func refresh_neighbours_from_my_death(id, _parent, opposer):
 #						target.curve_rng()
 #						#recurve if they are curved into me
 #					else:
-#						target.refresh_combat_damage() 
+#						target.refresh_my_combat_damage() 
 #
 						
 						# Yeaah this needs more work
@@ -701,7 +709,9 @@ func cleanup_phase():
 #that I wrote for the second time LULE
 
 func before_prep_phase():
-	increase_damage_to_be_taken(-damage_to_be_taken)
+	#increase_damage_to_be_taken(-damage_to_be_taken)
+	damage_to_be_taken = 0
+	check_damage_to_be_taken() #HERE
 	straight_target = null
 	side_target = null
 	damage_used_up_1 = 0
@@ -713,7 +723,7 @@ func prep_phase():
 		if Lobby.host == true:
 			curve_rng()
 		else:
-			refresh_combat_damage()
+			refresh_my_combat_damage()
 	elif Lobby.MULTIPLAYER == false:
 		curve_rng()
 ################################################################
@@ -827,7 +837,7 @@ func _drop_data(_at_position, DropData):
 			
 			var which_function:String = str(DBList[DropData[1]][DB.NAMEPOSITION])
 			if Lobby.MULTIPLAYER == true:
-				drop_data_multiplayer_funcall(DropData[0],which_function, DropData[7])
+				drop_data_multiplayer_funcall(DropData[0],DropData[1],which_function, DropData[7])
 			else:
 				DB.call(which_function,self, DropData[7])
 			#Resolves spell effect
@@ -900,7 +910,7 @@ func equip_item(ID):
 		Target_slot.get_child(2).being_replaced(equipped_item)
 		#because child 0 is Cooldown
 	
-func drop_data_multiplayer_funcall(spelltype:String, function_to_be_called:String, current_player:String):
+func drop_data_multiplayer_funcall(spelltype:String, spell_id:int, function_to_be_called:String, current_player:String):
 	#can only be called if MP yes
 	#handles that join gets the function first, 
 		#since curving can't be fucked from there
@@ -909,13 +919,13 @@ func drop_data_multiplayer_funcall(spelltype:String, function_to_be_called:Strin
 		DB = LvlupDB
 			
 	if Lobby.host == true:
-		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, MY_UNIQUE_UNIT_KEY, current_player)
+		Card_layer.make_mirror_unit_receive_spell_call(spelltype, spell_id, MY_UNIQUE_UNIT_KEY, current_player)
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		DB.call(function_to_be_called,self,current_player)
 	else:
 		DB.call(function_to_be_called,self,current_player)
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, MY_UNIQUE_UNIT_KEY, current_player)
+		Card_layer.make_mirror_unit_receive_spell_call(spelltype, spell_id, MY_UNIQUE_UNIT_KEY, current_player)
 
 	
 	
@@ -1307,7 +1317,7 @@ func curve_straight():
 #	if opposer.TYPE == "void:
 #		MYrena_rect.OPTower.Im_no_longer_straight_attacked_by(self, false, 0)
 		
-func refresh_combat_damage():
+func refresh_my_combat_damage():
 	if Base.Main_phase == 0 and alive == true:
 		match targeting:
 			"left": 
@@ -1330,6 +1340,10 @@ func refresh_combat_damage():
 		#this happens during game start and causes no problems
 	else: push_error("Unknown Base.Main_phase value")
 	#lets keep it till a diff is made
+	
+
+func refresh_combat_damage_on_me():
+	increase_damage_to_be_taken(0)
 				
 func annul_damage_directed_to_me(loudness = false):
 	#for calcing armor and so on 
@@ -1391,7 +1405,8 @@ func redirect_damage_to_me_again():
 	var comp = id-1
 	if comp> -1:
 		var left_opponent = await get_opposer(comp)
-		if left_opponent.TYPE == "unit" and left_opponent.targeting == "right" and left_opponent.side_target == self:
+		# this crashes push_error("redirect check: " +str(left_opponent.TYPE == "unit") + str (left_opponent.targeting == "right") + str(left_opponent.side_target == self))
+		if left_opponent.TYPE == "unit" and left_opponent.targeting == "right": # and left_opponent.side_target == self
 			left_opponent.my_damage_was_annuled = false
 			left_opponent.side_target = self
 			#because I might've landed here and there was someone else b4
@@ -1402,7 +1417,7 @@ func redirect_damage_to_me_again():
 	comp = id+1
 	if comp< MYrena_rect.get_child_count():
 		var right_opponent = await get_opposer(comp)
-		if right_opponent.TYPE == "unit" and right_opponent.targeting == "left" and right_opponent.side_target == self: 
+		if right_opponent.TYPE == "unit" and right_opponent.targeting == "left": # and right_opponent.side_target == self
 			right_opponent.my_damage_was_annuled = false
 			right_opponent.side_target = self
 			#because I might've landed here and there was someone else b4
@@ -1775,6 +1790,7 @@ func hide_incoming_death():
 func lane_aura_check():
 	#push_error("lane_aura_check_at_me")
 	%Lane_auras.reupdate(faction)
+	push_error("lane_aura_checking")
 
 
 
@@ -1928,7 +1944,7 @@ func refresh_me_from_being_annulled():
 				push_error("I was curved to left despite being id0 ")
 		else: push_error("unknown targeting found in refresh_me_from_being_annulled: " +str(targeting))
 		
-		refresh_combat_damage()	
+		refresh_my_combat_damage()	
 			
 	
 	

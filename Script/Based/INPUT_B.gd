@@ -60,7 +60,7 @@ func _input(event):
 				
 			scrollh.get_h_scroll_bar().value += HandScrollSpeed
 #		print(get_h_scroll_bar().value)
-	if Input.is_action_just_pressed("ui_cancel"):
+	if Input.is_action_just_pressed("Terminate") and Base.PLAYTEST == false:
 		get_tree().quit()
 		
 	elif Input.is_action_just_pressed("Camera_Lane_1"):

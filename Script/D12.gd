@@ -4,7 +4,7 @@ extends Control
 #can only have UNIT children
 
 func _ready():
-	if Base.PLAYTEST == 1:
+	if Base.PLAYTEST == true:
 		%DevTools.visible = false
 		%XP_Panel.XP = Base.STARTING_XP
 		%Opponent_XP_panel.XP = Base.STARTING_XP

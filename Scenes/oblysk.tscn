@@ -102,7 +102,7 @@ unique_name_in_owner = true
 offset_left = 1752.0
 offset_top = 565.0
 offset_right = 2006.0
-offset_bottom = 819.0
+offset_bottom = 1015.0
 scale = Vector2(0.66, 0.66)
 
 [node name="Graveyard_showcase" parent="UI_layer" instance=ExtResource("3_cxe43")]

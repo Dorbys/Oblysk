@@ -129,7 +129,10 @@ func new_lane():
 			abarena_rect = abarena_rect3
 
 func _on_pressed():
-	if Lobby.MULTIPLAYER == true:
+	if disabled:
+		pass
+		#using keyboard was able to overcome the disable
+	elif Lobby.MULTIPLAYER == true:
 		if Base.current_lane == 4:
 			if confirmed_my_deployment == false:
 				confirm_my_deployment()
@@ -161,7 +164,7 @@ func the_button_has_been_pressed_frfr():
 	print("unlocked? " + str(Base.CAN_CLICK_BUTTON_NOW))
 	
 	if  Base.Combat_phase == 0 and Base.CAN_CLICK_BUTTON_NOW == 1:
-		Base.Main_phase = 0 #determines which curving to use, rng or anull
+		Base.Main_phase = 0 #determines which curving to use, rng or anull #not anymore
 		# "when you can play cards"
 		disabled = true
 		if Base.current_lane == 4:
@@ -175,7 +178,7 @@ func the_button_has_been_pressed_frfr():
 			
 			await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
 			global_prep_phase()
-		if Base.current_lane != 4:
+		elif Base.current_lane != 4:
 	#		card_layer.combat_phase_start()
 			Base.Combat_phase = 1
 			#So that graveyard doesnt update twice + other probly

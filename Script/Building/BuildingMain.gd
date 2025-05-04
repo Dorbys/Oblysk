@@ -113,7 +113,7 @@ func _ready():
 					affect_unit(target,wielder)
 
 func affect_unit(target, wielder):
-#	print("AFFECTING")
+	push_error("AFFECTING")
 	if %Affection.do_I_affect_this(wielder) == true:
 		var node_name = str(Build_name) + "_" + str(aura_unique_id)
 		if target.has_node(node_name):
