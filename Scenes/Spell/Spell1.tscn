@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://bab3q2vggpesl"]
 
-[ext_resource type="Script" path="res://Script/SPELLS/Spell1.gd" id="1_g8v5x"]
+[ext_resource type="Script" uid="uid://dh1mh7cv3ldq1" path="res://Script/SPELLS/Spell1.gd" id="1_g8v5x"]
 [ext_resource type="PackedScene" uid="uid://cd4pcuuc64j7o" path="res://Scenes/Spell/Spell1Preview.tscn" id="2_0as2w"]
 [ext_resource type="PackedScene" uid="uid://ji0ds5rcwesv" path="res://Scenes/Spell/Spell1CardInHandPreview.tscn" id="3_s2l26"]
 [ext_resource type="Texture2D" uid="uid://byp5tyg4fcg1r" path="res://Assets/SPELL.png" id="4_crosh"]

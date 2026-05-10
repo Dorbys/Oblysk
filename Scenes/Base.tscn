@@ -1,13 +1,15 @@
-[gd_scene load_steps=9 format=3 uid="uid://b1u0py0ci1rgi"]
+[gd_scene load_steps=11 format=3 uid="uid://b1u0py0ci1rgi"]
 
 [ext_resource type="Texture2D" uid="uid://dgxd1byus3b4i" path="res://Assets/Maps/L1.png" id="1_qrtex"]
-[ext_resource type="Script" path="res://Script/Lane_background.gd" id="2_wwcp0"]
-[ext_resource type="Script" path="res://Script/Card_layer.gd" id="3_htty0"]
+[ext_resource type="Script" uid="uid://bbjq25hxub4fq" path="res://Script/Lane_background.gd" id="2_wwcp0"]
+[ext_resource type="Script" uid="uid://dnqixgru110tl" path="res://Script/Card_layer.gd" id="3_htty0"]
 [ext_resource type="PackedScene" uid="uid://bpjm166rvmupf" path="res://Scenes/Arena_rect.tscn" id="5_lscxd"]
 [ext_resource type="PackedScene" uid="uid://b1pqox3lfu6m3" path="res://Scenes/Abarena_rect.tscn" id="6_hdrlq"]
-[ext_resource type="Script" path="res://Script/Signal_Hub.gd" id="7_kvow1"]
-[ext_resource type="Script" path="res://Script/Lane_picker.gd" id="8_luqhd"]
+[ext_resource type="Script" uid="uid://c1j4fb66e47mh" path="res://Script/Signal_Hub.gd" id="7_kvow1"]
+[ext_resource type="Script" uid="uid://3ypwynr2ymc0" path="res://Script/Lane_picker.gd" id="8_luqhd"]
+[ext_resource type="Texture2D" uid="uid://denl5xgb4rcuy" path="res://Assets/Effects/Arena_mid_highlight1.png" id="8_nkrky"]
 [ext_resource type="PackedScene" uid="uid://bd5cypnf78qdj" path="res://Scenes/Tower1.tscn" id="9_qf3s2"]
+[ext_resource type="Texture2D" uid="uid://dyqfg7mhe7wkb" path="res://Assets/Effects/Arena_mid_highlight3.png" id="9_wpf8j"]
 
 [node name="B" type="Control"]
 layout_mode = 3
@@ -44,6 +46,12 @@ offset_top = -60.0
 offset_right = 2150.0
 offset_bottom = 665.0
 
+[node name="Card_drop_block_area" type="Control" parent="Card_layer"]
+anchors_preset = 0
+offset_top = 837.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
 [node name="Tower_layer" type="Control" parent="."]
 anchors_preset = 0
 script = ExtResource("7_kvow1")
@@ -72,9 +80,14 @@ offset_bottom = 1080.0
 [node name="Lane_picker" type="TextureButton" parent="."]
 unique_name_in_owner = true
 visible = false
+modulate = Color(0.164706, 1, 1, 1)
 layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
+texture_normal = ExtResource("8_nkrky")
+texture_pressed = ExtResource("9_wpf8j")
+ignore_texture_size = true
+stretch_mode = 0
 script = ExtResource("8_luqhd")
 
 [connection signal="pressed" from="Click_to_zoom_here" to="Tower_layer" method="_on_click_to_zoom_here_pressed"]

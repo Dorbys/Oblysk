@@ -45,10 +45,3 @@ func _ready():
 		%Ability1.visible = false
 	else: 
 		%Ability1.texture = Unit_Ability_texture
-
-
-
-
-
-
-

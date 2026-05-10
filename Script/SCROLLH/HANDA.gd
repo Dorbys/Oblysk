@@ -35,6 +35,3 @@ func Resize_HANDA():
 
 
 #var handstart = mid - (handwidth/2)
-
-
-

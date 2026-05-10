@@ -23,10 +23,10 @@ extends Control
 
 
 func _ready():
-
+	
 	if Lobby.MULTIPLAYER == true:
 			await initiate_heroes(Base.HeroDeck,arena_rect1,towerB)
-			await get_tree().create_timer(0.1).timeout
+			#await get_tree().create_timer(0.1).timeout
 			await initiate_heroes(Base.OpponentHeroDeck,abarena_rect1,towerA)
 	else:
 		await initiate_heroes(Base.HeroDeck,arena_rect1,towerB)

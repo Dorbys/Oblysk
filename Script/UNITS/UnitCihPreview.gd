@@ -32,6 +32,8 @@ func _ready():
 	if loaded_script != null:
 		script_instance = loaded_script.new()
 		%Card_description.text = script_instance.description
+	elif loaded_script == null:
+		%Card_description.text = "I'm lowkey useless"
 	
 	if Unit_Armor != 0:
 		%AR.visible = true
@@ -49,10 +51,3 @@ func _ready():
 		%Ability1.visible = false
 	else: 
 		%Ability1.texture = Unit_Ability_texture
-
-
-
-
-
-
-

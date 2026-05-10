@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://dtog3glf6s2wx"]
 
-[ext_resource type="Script" path="res://Script/Building/Building1Preview.gd" id="1_4uy3s"]
+[ext_resource type="Script" uid="uid://boly8vwb6w1se" path="res://Script/Building/Building1Preview.gd" id="1_4uy3s"]
 [ext_resource type="Texture2D" uid="uid://byp5tyg4fcg1r" path="res://Assets/SPELL.png" id="2_3ycxu"]
 [ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="3_6achf"]
 [ext_resource type="LabelSettings" uid="uid://cacnbuvsrroxp" path="res://Setts/Labels/SpellCost.tres" id="4_4k7o5"]

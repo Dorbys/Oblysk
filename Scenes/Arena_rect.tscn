@@ -2,12 +2,12 @@
 
 [ext_resource type="Theme" uid="uid://k8fg2sxs4p6k" path="res://Themes/Empty H scrollbar.tres" id="1_rwa2n"]
 [ext_resource type="PackedScene" uid="uid://fa87ub5cj205" path="res://Scenes/Empty_shadow.tscn" id="2_ks0je"]
-[ext_resource type="Script" path="res://Script/SCROLLA/SCROLLA.gd" id="2_p58ki"]
-[ext_resource type="Script" path="res://Script/SCROLLA/Arena.gd" id="3_6kukc"]
-[ext_resource type="Script" path="res://Script/SCROLLA/ArenaRect.gd" id="4_sj4ya"]
+[ext_resource type="Script" uid="uid://dup08m517kru8" path="res://Script/SCROLLA/SCROLLA.gd" id="2_p58ki"]
+[ext_resource type="Script" uid="uid://dqxewhdxr8smd" path="res://Script/SCROLLA/Arena.gd" id="3_6kukc"]
+[ext_resource type="Script" uid="uid://drwfu8abhvtww" path="res://Script/SCROLLA/ArenaRect.gd" id="4_sj4ya"]
 [ext_resource type="PackedScene" uid="uid://bayidy5c8jqm4" path="res://Scenes/UNIT/Unit1.tscn" id="6_mayyw"]
 [ext_resource type="PackedScene" uid="uid://dmaqk1n41c6o5" path="res://Scenes/EFFECTS/SEffect.tscn" id="7_fwx8v"]
-[ext_resource type="Script" path="res://Script/SCROLLA/ArenaRoof.gd" id="8_kdq13"]
+[ext_resource type="Script" uid="uid://ctsrie36ectkm" path="res://Script/SCROLLA/ArenaRoof.gd" id="8_kdq13"]
 [ext_resource type="PackedScene" uid="uid://b8getkkagqaqq" path="res://Scenes/Empty_VOID.tscn" id="8_ste1a"]
 [ext_resource type="PackedScene" uid="uid://d3jknhi2o25m5" path="res://Scenes/EFFECTS/IEffect.tscn" id="8_w0v0q"]
 

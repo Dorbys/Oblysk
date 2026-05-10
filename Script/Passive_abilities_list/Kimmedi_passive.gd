@@ -4,8 +4,10 @@ extends Unit_passive_ability
 
 var DAMAGE
 var description 
+var projectile
 
 func _ready():
+	projectile = preload("res://Scenes/VFX/Projectile1.tscn")
 	DAMAGE = AbilitiesDB.MP5_DAMAGE
 	description = AbilitiesDB.MP5_description
 	if Lobby.MULTIPLAYER == true:
@@ -18,7 +20,7 @@ func _ready():
 		else:
 			if Lobby.host == true:
 				LvlupDB.railgun_join_owner = wielder.MY_UNIQUE_UNIT_KEY
-				push_error("assigning host owner the value of: " +str(wielder.MY_UNIQUE_UNIT_KEY))
+				#push_error("assigning host owner the value of: " +str(wielder.MY_UNIQUE_UNIT_KEY))
 			else:
 				LvlupDB.railgun_host_owner = wielder.MY_UNIQUE_UNIT_KEY 
 	else:
@@ -50,7 +52,7 @@ func remove_myself_from_old_array(old_tower_layer):
 	
 func monday_phase():
 	if Lobby.MULTIPLAYER == false or wielder.faction == "alpha":
-		MP5()
+		await MP5()
 		
 		
 var snipe_damage = 3
@@ -97,9 +99,14 @@ func MP5():
 #		#really gotta put this inside take_dmg function....
 #			#usure?
 #		target.take_damage(expected_damage)
-		AbilitiesDB.call(sister,target)
+		#projectile_animation(target)
+		
+		await AbilitiesDB.call(sister,target)
 		
 		if Lobby.MULTIPLAYER == true and wielder.faction == "alpha":
-			wielder.Card_layer.make_my_mirror_unit_receive_ability_call(target.MY_UNIQUE_UNIT_KEY, sister)
+			await wielder.card_layer.make_my_mirror_unit_receive_ability_call(target.MY_UNIQUE_UNIT_KEY, sister)
 		
-	
+#func projectile_animation(target):
+	#var another = projectile.instantiate()
+	#another.destination = target.get_global_position()
+	#get_parent().add_child(another)	

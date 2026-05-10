@@ -30,7 +30,7 @@ func card_has_been_played(card:Node):
 func mirror_played_card(card_type, card_ID):
 	if multiplayer.get_remote_sender_id() == 0:
 		#called locally
-		push_error("rpcing mirror_played_card")
+		#push_error("rpcing mirror_played_card")
 		rpc_id(Lobby.opponent_peer_id,"mirror_played_card",card_type, card_ID)
 	else:
 		push_error("rpc of mirror_played_card received")

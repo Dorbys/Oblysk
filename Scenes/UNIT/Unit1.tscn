@@ -1,11 +1,11 @@
-[gd_scene load_steps=28 format=3 uid="uid://bayidy5c8jqm4"]
+[gd_scene load_steps=29 format=3 uid="uid://bayidy5c8jqm4"]
 
-[ext_resource type="Script" path="res://Script/Unit1.gd" id="1_58f8m"]
+[ext_resource type="Script" uid="uid://qecb7manyl5v" path="res://Script/Unit1.gd" id="1_58f8m"]
 [ext_resource type="PackedScene" uid="uid://dmaqk1n41c6o5" path="res://Scenes/EFFECTS/SEffect.tscn" id="2_jshfr"]
 [ext_resource type="PackedScene" uid="uid://d3jknhi2o25m5" path="res://Scenes/EFFECTS/IEffect.tscn" id="3_thguv"]
 [ext_resource type="PackedScene" uid="uid://cn3mcrn6nii3q" path="res://Scenes/EFFECTS/ATEffect.tscn" id="4_y51pp"]
 [ext_resource type="PackedScene" uid="uid://b8hsptennfo6k" path="res://Scenes/EFFECTS/LVLUPEFFECT.tscn" id="5_h3hi2"]
-[ext_resource type="Script" path="res://Script/UNITS/Ability_1.gd" id="6_7tni5"]
+[ext_resource type="Script" uid="uid://u32dcy4ojf2j" path="res://Script/UNITS/Ability_1.gd" id="6_7tni5"]
 [ext_resource type="PackedScene" uid="uid://1qxt0o7ufabr" path="res://Scenes/UI/Covering.tscn" id="6_diytq"]
 [ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="6_xyfb1"]
 [ext_resource type="LabelSettings" uid="uid://c3htsyeddmmay" path="res://Setts/Labels/Stats.tres" id="7_mya13"]
@@ -15,16 +15,17 @@
 [ext_resource type="Texture2D" uid="uid://bsg0uej28g8jr" path="res://Assets/CardsPNGS/Heroes/Dorbys.png" id="9_unpde"]
 [ext_resource type="Texture2D" uid="uid://dpnulmevfgww4" path="res://Assets/CardsPNGS/CardUI/Inventory shield.png" id="10_otp25"]
 [ext_resource type="Texture2D" uid="uid://cebjpxdc1cwq7" path="res://Assets/CardsPNGS/CardUI/Ability_frame.png" id="10_q7bmo"]
-[ext_resource type="Script" path="res://Script/UNITS/Arrow_combat.gd" id="10_wsnbo"]
-[ext_resource type="Script" path="res://Script/UI_layer/Tooltip.gd" id="12_8wtn5"]
+[ext_resource type="Script" uid="uid://cnxv8fqsrnq2r" path="res://Script/UNITS/Arrow_combat.gd" id="10_wsnbo"]
+[ext_resource type="Script" uid="uid://ciq5nhqh1xjg1" path="res://Script/UI_layer/Tooltip.gd" id="12_8wtn5"]
 [ext_resource type="LabelSettings" uid="uid://ucthkrf481c6" path="res://Setts/Labels/Cooldown.tres" id="12_jtwlf"]
+[ext_resource type="PackedScene" uid="uid://1ii2eu8a2p22" path="res://Scenes/UI/No_action_warning.tscn" id="12_p2p02"]
 [ext_resource type="Texture2D" uid="uid://f6k8coqa3pyq" path="res://Assets/Boardstuff/arrow_target2.png" id="13_06qur"]
-[ext_resource type="Script" path="res://Script/UNITS/Unit_Lane_auras.gd" id="13_iuwco"]
+[ext_resource type="Script" uid="uid://siu3aeiuf2rp" path="res://Script/UNITS/Unit_Lane_auras.gd" id="13_iuwco"]
 [ext_resource type="PackedScene" uid="uid://blvlp7vt2ydtm" path="res://Scenes/UI/Tooltip_container.tscn" id="13_u8fq3"]
 [ext_resource type="FontFile" uid="uid://ctencmtygnfkv" path="res://Assets/Font source/RobotoMono-Italic.ttf" id="15_ceog3"]
 [ext_resource type="Texture2D" uid="uid://mx5vriwhyhxd" path="res://Assets/CardsUI/grim-reaper.png" id="16_rwel1"]
-[ext_resource type="Script" path="res://Script/UNITS/DraggingRect.gd" id="17_ef5kf"]
-[ext_resource type="Script" path="res://Script/UNITS/Item_slot.gd" id="21_nustg"]
+[ext_resource type="Script" uid="uid://doabennqlnlt6" path="res://Script/UNITS/DraggingRect.gd" id="17_ef5kf"]
+[ext_resource type="Script" uid="uid://c2s0hiwnd7rmq" path="res://Script/UNITS/Item_slot.gd" id="21_nustg"]
 [ext_resource type="PackedScene" uid="uid://cenvkv14icjac" path="res://Scenes/UNIT/UnitEmptyPreview.tscn" id="23_sgdew"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_owja7"]
@@ -123,6 +124,7 @@ mouse_default_cursor_shape = 2
 texture = ExtResource("8_xaqce")
 expand_mode = 1
 script = ExtResource("6_7tni5")
+no_action_warning = ExtResource("12_p2p02")
 
 [node name="Ability_field" type="TextureRect" parent="Slacksus/Ability1" node_paths=PackedStringArray("owner_node")]
 unique_name_in_owner = true

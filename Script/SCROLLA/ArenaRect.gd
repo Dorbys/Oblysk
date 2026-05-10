@@ -54,7 +54,7 @@ var OP_identity
 var OPTower
 var MYTower
 
-var TYPE:String = "arena_rect"
+var TYPE:String = "lane"
 #since this can be targeted, it also has to be able to TYPEChecked
 #reason of implementation : unit targeted in covering might be this lane
 	#when using blink_axe
@@ -109,37 +109,19 @@ func _ready():
 			tower_layer.my_lane = 3
 		_:
 			push_error("ArenaRect appeared on an unkown lane")
+			
 
 var Slot_calc_top = 0 - STARTSET # dont scale ----> - distance_to_arena
 var	Slot_calc_bot =	Card_and_offset
 	
 @rpc("any_peer", "call_remote", "reliable")
-func Adding_Units(_at_position, ID, forced_here = null):
+func Adding_Units(_at_position, ID):
 	#THIS function is for when units are dropped from card 
 	
 	#howto shadowindex lemao
 	
 	Carrying = 0
 		
-	if Lobby.MULTIPLAYER == true:
-		if multiplayer.get_remote_sender_id() != 0:
-			#if I was rpced
-			if forced_here == false:
-				push_error("Calling to spawn_unit " +str(ID))
-				if abarena:
-					#if abarena isn't null <=> I'm not abarena
-					abarena.Adding_Units(_at_position, ID, true)
-		#				push_error("telling abarena to spawn creep at " +str(rpced_slot))
-					return
-				elif arena_meine:
-					arena_meine.Adding_Units(_at_position, ID, true)
-		#				push_error("telling arena_meine to spawn creep at " +str(rpced_slot))
-					return
-			else: #if forced_here == true
-				pass
-		elif Lobby.host == true: #if I was called locally and am HOST
-			rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, Shadow_index, false)
-			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 
 
 	var replacing_replacer = 0
@@ -198,13 +180,13 @@ func Adding_Units(_at_position, ID, forced_here = null):
 				#ancient
 		move_child(another, Shadow_index)
 		collide_units()
-	if Lobby.MULTIPLAYER == true and Lobby.host == false:
-		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, Shadow_index,  false)
-		another.second_ready_without_curve_rng()
+	if Lobby.MULTIPLAYER == true:
+		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, 1, Shadow_index,  false)
+		#another.second_ready() #_without_curve_rng
 		#push_error("mult true and lobbyhost false")
-	else:
-		await get_tree().create_timer(Base.FAKE_OMEGA).timeout 
-		another.second_ready_without_curve_rng() #on adding no curving
+	#else:
+	await get_tree().create_timer(Base.FAKE_OMEGA).timeout 
+	another.second_ready() #on adding no curving #_without_curve_rng
 		#these two lines also work for SP
 			
 
@@ -245,87 +227,182 @@ func Cheating_Units(ID, has_ability):
 		
 	add_child(another)
 	
-@rpc("any_peer", "call_remote", "reliable")
-func spawn_unit(ID, rpced_slot = null, forced_here = false, readied = true):
-	#THIS function is for when units are spawned from effect 
-	var spawning_slot
-	if multiplayer.get_remote_sender_id()== 0:
-		spawning_slot = await new_random_slot()		
-	else:
-		if forced_here == false:
-			spawning_slot = rpced_slot
-			#new_radnom_slot GENERATES VOIDS !!! 
-			
+var spawning_units = 0
+#used to keep track of how many units are still being summoned
+	#mass_second_ready only triggers when spawning_units == 0
+	#so its a for of waiting condition
+@rpc("any_peer", "call_remote", "reliable") 
+func spawn_unit(ID, amount, rpced_slots = null, forced_here = false, readied = true):
+	#THIS function is for when units are spawned from effect
+	#spawning_units += 1
+	var spawning_slots = []
+	var slot_to_be_added = 0
+	#becomes array [int, bool] when keeping_voids
+				#[slot index, whether it added a new void]
+	var keep_voids = false
+	if amount > 1:
+		keep_voids = true
+	#we keep voids so that we can replace units in their place
+			#and simplifiy calculations of slots when spawning multiple units
+	var original_spawning_slots = []
+	#these are spawning slots in order we calc them before rpcing them,
+		#unmodified by 0th index void and less affected by boost
+		#receiver uses the same func to create spawning_slots
+		
+	if multiplayer.get_remote_sender_id()== 0 or forced_here == true:
+		var boost = 0
+		#for every unit spawned at the highest index, all other highest index units
+			#must have their index increased by 1
+		for i in amount:
+			if rpced_slots == null:	
+				slot_to_be_added = await new_random_slot(null, keep_voids)
+			else:
+				var target_slot
+				if rpced_slots is int or rpced_slots is float: #no idea how it becomes float
+					target_slot = rpced_slots
+					#used when one player plays unit from hand (Adding_units())
+						#and rpcs the unit to opponent, which is then spawned
+						#mb also sp?
+				elif rpced_slots is Array and (rpced_slots[i] is int or rpced_slots[i] is float):
+					target_slot = rpced_slots[i]
+					#used when a single unit is being spawned 
+					#three different ways to do one thing agane huh
+						#each of them is optimal for their use ig, else we'd need to fill with nulls
+				else:
+					target_slot = rpced_slots[i][0]
+				slot_to_be_added = await new_random_slot(target_slot, keep_voids)
+			if amount > 1 and slot_to_be_added[1] == true: 
+				push_error("comparison of slot_to_be_added and childcount: " +str(slot_to_be_added) + " / " +str(get_child_count()))			
+				if slot_to_be_added[0] == 0:
+					#when a new void at id 0 has been added
+					for j in spawning_slots.size():
+						spawning_slots[j][0] += 1
+						push_error("increasing spawning_slots[" +str(j) + "][0] by 1")
+					#this calc is simplified when keeping voids
+				slot_to_be_added[0] += boost
+				if slot_to_be_added[0] == get_child_count():
+					#when a new void at max id has been added
+					#has to be after the old boost has been applied
+					boost += 1
+						
+			spawning_slots.append(slot_to_be_added)
+			 	
+			if rpced_slots == null and Lobby.MULTIPLAYER == true:
+				#we must prepare original_spawning_slots to rpc them
+				var decreased_boost = boost -1
+				if decreased_boost < 0:
+					decreased_boost = 0
+				if amount > 1:
+					original_spawning_slots.append([slot_to_be_added[0] - decreased_boost, slot_to_be_added[1]])
+				else:
+					original_spawning_slots.append(slot_to_be_added)
+	
+	elif forced_here == false:
+			#spawning_slots = rpced_slots
+			##new_radnom_slot GENERATES VOIDS !!! 
+			#
 			if abarena:
 				#if abarena isn't null <=> I'm not abarena
-				abarena.spawn_unit(ID, rpced_slot, true)
-#				push_error("telling abarena to spawn creep at " +str(rpced_slot))
+				push_error("telling abarena to spawn creeps at " +str(rpced_slots))
+				await abarena.spawn_unit(ID, amount, rpced_slots, true, false)
+				#spawning_units -= 1
 				return
 			elif arena_meine:
-				arena_meine.spawn_unit(ID, rpced_slot, true)
-#				push_error("telling arena_meine to spawn creep at " +str(rpced_slot))
+				push_error("telling arena_meine to spawn creeps at " +str(rpced_slots))
+				await arena_meine.spawn_unit(ID, amount, rpced_slots, true, false)
+				#spawning_units -= 1
 				return
-		elif  forced_here == true:
-			spawning_slot = await new_random_slot(rpced_slot)
-			#voids need to be created after arena or abarena is decided
-	if Lobby.MULTIPLAYER == true and Lobby.host == true and rpced_slot == null:
-	#multiplayer check isn't necessary here, but I want to signify all parts
-		#of the code that are for MP purpose only
-		push_error("Host calling to spawn_unit " +str(ID))
-		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, spawning_slot, forced_here)
+		#elif  forced_here == true:
+			#for i in amount:
+				#slot_to_be_added = await new_random_slot(rpced_slots[i], keep_voids)
+				#spawning_slots.append(slot_to_be_added) 			#voids need to be created after arena or abarena is decided
+	#if Lobby.MULTIPLAYER == true and Lobby.host == true and rpced_slot == null:
+	##multiplayer check isn't necessary here, but I want to signify all parts
+		##of the code that are for MP purpose only
+		#push_error("Host calling to spawn_unit " +str(ID))
+		#rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, spawning_slot, forced_here)
 		#so that the unit is first created at joiner, since he can't mirrorcurve
 		
 #	var population = get_child_count()
-	var another = CARD.instantiate()
-	
-	another.VOIDING = 0
-#	another.Unit_Name = Base.UNITS_DB[ID][Base.NAMEPOSITION]
-	another.Card_pfp = Base.CREEP_TEXTURES[ID]
-	
-	another.Unit_Attack = CreepsDB.CREEPS_DB[ID][CreepsDB.ATTACKPOSITION]
-	another.Unit_Health = CreepsDB.CREEPS_DB[ID][CreepsDB.HEALTHPOSITION]
-	another.Unit_Armor = CreepsDB.CREEPS_DB[ID][CreepsDB.ARMORPOSITION]
-	
-	another.Identification = ID
-	another = handle_has_ability_for_creeps(another)
-	
-	another.HERO = false
-	
-	another.position.x= STARTSET + spawning_slot * (Card_and_offset)
-	if MY_identity == "B": 
-		another.position.y = BOFFSET
-	else: another.position.y = AOFFSET
+	#push_error("spawning slots prepared: " +str(spawning_slots))
+	var anothers = []
+	for i in amount:
+		var another = CARD.instantiate()
 		
-	another.my_lane = my_lane
-	#to track which lane a unit is in
-
-	
+		another.VOIDING = 0
+	#	another.Unit_Name = Base.UNITS_DB[ID][Base.NAMEPOSITION]
+		another.Card_pfp = Base.CREEP_TEXTURES[ID]
 		
-	
-	add_child(another)
-	##############
-	if Lobby.MULTIPLAYER == true and Lobby.host == false and rpced_slot == null:
-	#multiplayer check isn't necessary here, but I want to signify all parts
-		#of the code that are for MP purpose only
-			#wtf it is else it would trigger in SP
-		push_error("Joiner calling to spawn_unit " +str(ID))
-		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, spawning_slot, forced_here)
-		#so that the unit is created also at host, but after mine
+		another.Unit_Attack = CreepsDB.CREEPS_DB[ID][CreepsDB.ATTACKPOSITION]
+		another.Unit_Health = CreepsDB.CREEPS_DB[ID][CreepsDB.HEALTHPOSITION]
+		another.Unit_Armor = CreepsDB.CREEPS_DB[ID][CreepsDB.ARMORPOSITION]
+		
+		another.Identification = ID
+		another = handle_has_ability_for_creeps(another)
+		
+		another.HERO = false
+		if amount > 1:
+			another.position.x= STARTSET + spawning_slots[i][0] * (Card_and_offset)
+		else:
+			another.position.x= STARTSET + spawning_slots[i] * (Card_and_offset)
+		if MY_identity == "B": 
+			another.position.y = BOFFSET
+		else: another.position.y = AOFFSET
+			
+		another.my_lane = my_lane
+		#to track which lane a unit is in
 
+		
+			
+		
+		add_child(another)
+		if amount == 1:
+			move_child(another, spawning_slots[i])
+		anothers.append(another)
 	##############
-	move_child(another, spawning_slot)
+	if amount > 1:
+		for i in amount:
+			make_child_replace_void(anothers[i], spawning_slots[i][0])
+	##############		
+	if Lobby.MULTIPLAYER == true and rpced_slots == null: #  and Lobby.host == false 
+	##multiplayer check isn't necessary here, but I want to signify all parts
+		##of the code that are for MP purpose only
+			##wtf it is else it would trigger in SP
+		#var clean_spawning_slots = []
+		#if amount > 1:
+			#for i in amount:
+				#clean_spawning_slots.append(spawning_slots[i][0])
+			#push_error("clean spawning slots: " + str(clean_spawning_slots))
+		#else:
+			#clean_spawning_slots = spawning_slots
+		push_error("rpcing to spawn units at " + str(original_spawning_slots))
+		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, amount, original_spawning_slots, forced_here)
+		##so that the unit is created also at host, but after mine
+		
+		#we will only rpc the function via returning clean spawning slots
+	##############
+	
+			
 	collide_units()
 	UNITS_MOVED_YO()
 	
 	if readied == true:
+		for i in amount:
+			await get_tree().create_timer(Base.FAKE_DELTA).timeout
+			#if Lobby.MULTIPLAYER == true:
+				#another.second_ready()
+				#if Lobby.host == true:
+					#another.second_ready()
+				#else:
+					#another.second_ready_without_curve_rng()
+			#else: another.second_ready()		
+			anothers[i].second_ready()	
+	elif  readied == false:
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		if Lobby.MULTIPLAYER == true:
-			if Lobby.host == true:
-				another.second_ready()
-			else:
-				another.second_ready_without_curve_rng()
-		else: another.second_ready()		
-	
+		mass_second_ready()
+		
+
+
 	
 
 			
@@ -506,6 +583,8 @@ func Shadow_preview():
 func Shadow_follow():
 	while Carrying == 1 and Measuring == 1:
 		New_Slot = new_slot_for_shadow_follow()
+		#New_Slot = new_slot_for_shadow_preview()
+
 		
 		var population = get_child_count()
 		var NSvsSI = abs(New_Slot-Shadow_index)
@@ -543,7 +622,7 @@ func Shadow_follow():
 			Shadow_index = New_Slot		#pass
 #			print("population is: " +str(population))
 #this wasnt it
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		await get_tree().create_timer(Base.FAKE_GAMMA).timeout
 #		await get_tree().create_timer(1).timeout
 
 func new_slot_for_shadow_preview():
@@ -555,7 +634,7 @@ func new_slot_for_shadow_preview():
 	var Scroll_value = scroller.get_h_scroll_bar().get_value()
 	var Mouse_X = get_global_mouse_position().x - lane.position.x
 	
-	New_Slot = round(((((1/scroller.scale.x) * (Slot_calc_top + Mouse_X)) + Scroll_value - distance_to_arena)  / (Slot_calc_bot) ))
+	New_Slot = ((((1/scroller.scale.x) * (Slot_calc_top + Mouse_X)) + Scroll_value - distance_to_arena)  / (Slot_calc_bot) )
 	#REWORK THIS FROM PAPER IG
 	if len(empty_slots) != 0:
 		New_Slot = round_to_closest_empty(New_Slot, empty_slots)
@@ -577,45 +656,71 @@ func new_slot_for_shadow_follow():
 		New_Slot = round(New_Slot)
 	return New_Slot
 	
-func new_random_slot(forced = null):
-	#forced is used for multiplayer
-		#host? tells joiner where to land
+func new_random_slot(forced_slot = null, keep_voids = false):
+	#forced_slot is used for multiplayer
+	var population = get_child_count()
 	var Random_slot = 0
-	empty_slots = []
-	for i in self.get_child_count():
-		if self.get_child(i).SITT == 1:
-			empty_slots.append(i)
+	var empty_random_slots = []
+	#just to name it diff from the global before killing the global
+	for i in population:
+		var target = self.get_child(i)
+		if target.SITT == 1:
+			
+			#push_error("appending empty_random_slots by " +str(target.TYPE) + " at " +str(i))
+			empty_random_slots.append(i)
 
-	if len(empty_slots) != 0:
-		if forced == null:
+	if len(empty_random_slots) != 0:
+		if forced_slot == null:
 			randomize()  # Initialize the random number generator
-			var random_index = randi() % empty_slots.size()
-			Random_slot = empty_slots[random_index]
-			var replacing_void = get_child(empty_slots[random_index])
+			var random_index = randi() % empty_random_slots.size()
+			Random_slot = empty_random_slots[random_index]
+			var replacing_void = get_child(empty_random_slots[random_index])
 	#			var new_x = replacing_void.position.x
-			RIP_BOZO(replacing_void)
+			if keep_voids == false:
+				RIP_BOZO(replacing_void)
+			else:
+				replacing_void.SITT = 0
 	#		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		elif forced != null:
-			for i in len(empty_slots):
-				if empty_slots[i] == forced:
-					Random_slot = empty_slots[i]
-					var replacing_void = get_child(empty_slots[i])
-					RIP_BOZO(replacing_void)
-					
+		elif forced_slot != null:
+			if forced_slot >= population:
+				forced_slot = population
+				push_error("forced slot above population")
+				#happens when multispawning
+				
+			for i in len(empty_random_slots):
+				if empty_random_slots[i] == forced_slot:
+					Random_slot = empty_random_slots[i]
+					var replacing_void = get_child(empty_random_slots[i])
+					replacing_void.SITT = 0
+					if keep_voids == false:
+						RIP_BOZO(replacing_void)
+
+		if keep_voids == true:
+			Random_slot = [Random_slot, false]			
 	else:
-		if forced == null:
+		if forced_slot == null:
 			var random_index = randf()
 			if random_index <  0.5:
 				Random_slot = self.get_child_count()
 			OPrena_rect.insert_void(Random_slot, 1, 1)
-		elif forced == 0:
+			if keep_voids == true:
+				insert_void(Random_slot, 1, 0)
+				Random_slot = [Random_slot, true]
+		elif forced_slot == 0:
 			OPrena_rect.insert_void(Random_slot, 1, 1)
+			if keep_voids == true:
+				insert_void(Random_slot, 1, 0)
+				Random_slot = [Random_slot, true]
 			#random slot is already 0
-		elif forced > 0:
-			Random_slot = forced #self.get_child_count()
+		elif forced_slot > 0:
+			Random_slot = forced_slot #self.get_child_count()
 			OPrena_rect.insert_void(Random_slot, 1, 1)
+			if keep_voids == true:
+				insert_void(Random_slot, 1, 0)
+				Random_slot = [Random_slot, false]
 			#rightmost slot
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
+	#push_error("returning new random slot: " + str(Random_slot))
 	return Random_slot
 	
 
@@ -680,12 +785,15 @@ func maybe_clean_two_voids(index):
 func get_opposer(Index):
 	#I cant add an incorect argument check here because it wouldnt get to while loop
 	#which would ruin the primary purpose of this function
+	#push_error("OPP?")
 	var opposer = OPrena_rect.get_child(Index)
 #	var mb_opposer
 	while opposer == null or (opposer.TYPE == "unit" and opposer.alive == false):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 		opposer = OPrena_rect.get_child(Index)
-
+		if OPrena_rect.get_child_count() <= Index:
+			break
+	
 	return opposer		
 	
 func swap_children(index1, index2):
@@ -770,6 +878,7 @@ func create_hero(ID):
 	another.VOIDING = 0
 	#idk
 	another.has_ability = true
+	another.readied = true
 	
 	OPrena_rect.insert_void(0, 1, 1)
 	add_child(another)
@@ -805,6 +914,7 @@ func transfer_hero_to_spawner(target):
 func respawn_here(target, rpced_slot = null, faction = null):
 	#target starts as int of ID and becomes node of Hero
 	if faction != null:
+		#when rpced to us
 #		push_error(faction + " hero is respawning at " +str(rpced_slot))
 		if faction == "alpha":
 			target = Base.Player_heroes[target]
@@ -814,9 +924,10 @@ func respawn_here(target, rpced_slot = null, faction = null):
 		#if this was rpced to us, 'target' contains index where to look for the hero
 			#else its the node
 	target.straight_target = null
-	target.side_target = null
-	target.damage_used_up_1 = 0
-	target.damage_used_up_2 = 0
+
+	#target.side_target = null
+	#target.damage_used_up_1 = 0
+	#target.damage_used_up_2 = 0
 	#they might rember what they were targeting previously
 	##################################################################
 	#MUST BE HERE TO START THE GAME CUZ HEROES ARE MADE IN L1
@@ -860,19 +971,26 @@ func respawn_here(target, rpced_slot = null, faction = null):
 	#mb dividing the Unit1.gd _ready() into two parts will solve the problem
 	
 		
-func land_here(target):
+func land_here(lander, forced_slot):
 	#same as respawn_here but for when a unit enters this lane from elsewhere
 	#D12 is used
+	var landing_slot
+	if forced_slot != null:
+		landing_slot = await new_random_slot(forced_slot)
+	else:
+		landing_slot = await new_random_slot()
+	lander.reparent(self)
+	move_child(lander, landing_slot)
+	lander.land()
 	
-	var landing_slot = await new_random_slot()
-	target.reparent(self)
-	move_child(target, landing_slot)
-	target.land()
-	printerr("target landed")
+	
+	
 	
 	collide_units()
 	UNITS_MOVED_YO()
 	#sends signal yo
+	
+	return landing_slot
 
 @rpc("any_peer", "call_remote", "reliable")
 func spawn_lane_creep(rpced_slot = null, forced_here = false):
@@ -920,6 +1038,7 @@ func spawn_lane_creep(rpced_slot = null, forced_here = false):
 	another.my_lane = my_lane
 	#to track which lane a unit is in
 	#another.readied = true #ig HERE
+	another.readied = true
 	
 	add_child(another)
 	move_child(another, spawning_slot)
@@ -932,7 +1051,9 @@ func spawn_lane_creep(rpced_slot = null, forced_here = false):
 	#trying to do this by waves
 	#nvm
 #		push_error("sending joiner order to spawn a lane creep at " +str(spawning_slot))
-	
+	#if Lobby.MULTIPLAYER == true and rpced_slot != null:
+		#push_error("random creep spawned for joiner")
+		
 func reset_curving():
 	#BRATTY CURVING, NEEDS TO BE CORRECTED
 	var population = get_child_count()
@@ -959,7 +1080,7 @@ func is_there_a_hero_check():
 			if target.TYPE == "unit" and target.HERO == true:
 				return true
 		return false
-	print("there is always a caster")
+	
 	return true
 	
 func is_there_a_unit_check():
@@ -983,7 +1104,12 @@ func refresh_annulled_units():
 	for i in population:
 		target = get_child(i)
 		if target.TYPE == "unit" and target.my_damage_was_annuled == true:
-			target.refresh_me_from_being_annulled()
+			#target.refresh_me_from_being_annulled()
+			if target.straight_target == null:
+				target.curve_straight()
+			else:
+				push_error("attempted to refresh unit from anulment which had straight target")
+			
 		
 		
 		
@@ -991,22 +1117,35 @@ func RIP_BOZO(target):
 	#takes a void as target, reparents them to D12
 	target.reparent(D12)		
 	target.queue_free()
+	
+func make_child_replace_void(the_child, void_index):
+	var target_void = get_child(void_index)
+	RIP_BOZO(target_void)
+	move_child(the_child,void_index)
 		
 		
 func mass_second_ready():
+	while spawning_units != 0:
+		push_error("waiting to finish spawning before mass_second_readying")
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		
+	push_error("mass secondreadying")
 	var population = get_child_count()
 	var target
 	for i in range(population - 1, -1, -1): 
 		target = get_child(i)
 		if target.TYPE == "unit" and target.readied == false:
-			if Lobby.MULTIPLAYER == true:
-				if Lobby.host == true:
-					target.second_ready()
-				else:
-					target.second_ready_without_curve_rng()
-			else:
-				target.second_ready()
-		
+			target.second_ready()
+	
+func mass_reduce_cooldowns(how_much):
+	push_error("mass cooldownreducing")
+	var population = get_child_count()
+	var target
+	for i in range(population - 1, -1, -1): 
+		target = get_child(i)
+		if target.TYPE == "unit" and target.Passiveness == false:
+			for j in how_much:
+				target.Ability1.decrease_cooldown()	
 		
 		
 		

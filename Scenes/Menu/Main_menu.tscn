@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://3au5ircxans"]
 
-[ext_resource type="Script" path="res://Script/Menu/Main_menu.gd" id="1_5sqjf"]
+[ext_resource type="Script" uid="uid://c64ee8qbi6bel" path="res://Script/Menu/Main_menu.gd" id="1_5sqjf"]
 [ext_resource type="Texture2D" uid="uid://d2kj8w0ww347r" path="res://Assets/Pics/Menu 2019.jpg" id="2_hpnoo"]
 [ext_resource type="Texture2D" uid="uid://kf368eo4difl" path="res://Assets/CardsPNGS/Creeps/Sommelier.png" id="2_i1ydm"]
 [ext_resource type="Texture2D" uid="uid://ixnf1t3lo74x" path="res://Assets/Pics/Waiting.jpg" id="4_xg7it"]
@@ -73,6 +73,16 @@ offset_bottom = 205.0
 theme_override_font_sizes/font_size = 64
 placeholder_text = "Pick a username"
 
+[node name="Address" type="LineEdit" parent="."]
+layout_mode = 0
+offset_left = 1511.0
+offset_top = 998.0
+offset_right = 1891.0
+offset_bottom = 1056.0
+theme_override_font_sizes/font_size = 36
+text = "100.82.93.31"
+alignment = 1
+
 [node name="Waiting_screen" type="TextureRect" parent="."]
 unique_name_in_owner = true
 visible = false
@@ -105,4 +115,5 @@ text = "X"
 [connection signal="pressed" from="Join" to="." method="_on_join_pressed"]
 [connection signal="pressed" from="exit" to="." method="_on_exit_pressed"]
 [connection signal="text_changed" from="LineEdit" to="." method="_on_line_edit_text_changed"]
+[connection signal="text_changed" from="Address" to="." method="_on_address_text_changed"]
 [connection signal="pressed" from="Waiting_screen/Close_waiting_button" to="." method="_on_close_waiting_button_pressed"]

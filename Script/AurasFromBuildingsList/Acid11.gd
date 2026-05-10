@@ -17,10 +17,10 @@ var armor = -1
 func _ready():
 	wielder.increase_ArmorM(armor,1)
 
-	print("Acid11 afflicted: " +str(name) + str(aura_unique_id))
+	#push_error("Acid11 afflicted: " +str(name) + str(aura_unique_id))
 
 
 func get_removed():
 	wielder.increase_ArmorM(-armor,1)
-	print("Acid11 is leaving")
+	#push_error("Acid11 is leaving")
 	self.queue_free()

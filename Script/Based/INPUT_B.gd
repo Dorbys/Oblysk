@@ -60,7 +60,7 @@ func _input(event):
 				
 			scrollh.get_h_scroll_bar().value += HandScrollSpeed
 #		print(get_h_scroll_bar().value)
-	if Input.is_action_just_pressed("Terminate") and Base.PLAYTEST == false:
+	if Input.is_action_just_pressed("Terminate"):
 		get_tree().quit()
 		
 	elif Input.is_action_just_pressed("Camera_Lane_1"):
@@ -79,7 +79,7 @@ func _input(event):
 			the_button._on_pressed()
 		
 	elif Input.is_action_just_pressed("Show_or_hide_help"):
-		%Help_screen.show_or_hide()
+		%Help2.show_or_hide()
 		
 	elif Input.is_action_just_pressed("Show_or_hide_help_button"):
 		var target = %Help
@@ -112,9 +112,7 @@ func _input(event):
 			scrolla.get_h_scroll_bar().value -= ArenaScrollSpeed
 			scrollb.get_h_scroll_bar().value -= ArenaScrollSpeed
 			
-		if  (MOUSEY > scrollh.position.y and MOUSEX > scrollh.position.x 
+		if  (MOUSEY > scrollh.position.y+363 and MOUSEX > scrollh.position.x 
 			and MOUSEX < scrollh.position.x + scrollh.size.x):
 			scrollh.get_h_scroll_bar().value -= HandScrollSpeed
 #		print(get_h_scroll_bar().value)
-
-

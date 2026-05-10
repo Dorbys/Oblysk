@@ -34,7 +34,7 @@ extends TextureButton
 @onready var towerA2 = $"../../Mid_lane/Tower_layer/TowerA"
 @onready var tower_max_mana2 = $"../../Mid_lane/Tower_layer/TowerA/Mana_display/Max_mana"
 @onready var tower_current_mana2 = $"../../Mid_lane/Tower_layer/TowerA/Mana_display/Current_mana"
-@onready var tower_current_mana2B = $"../../First_lane/Tower_layer/TowerB/Mana_display/Current_mana"
+@onready var tower_current_mana2B = $"../../Mid_lane/Tower_layer/TowerB/Mana_display/Current_mana"
 @onready var card_layer2 = $"../../Mid_lane/Card_layer"
 @onready var scrolla2 = $"../../Mid_lane/Card_layer/SCROLLA"
 @onready var arena_rect2 = $"../../Mid_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
@@ -45,7 +45,7 @@ extends TextureButton
 @onready var towerA3 = $"../../Last_lane/Tower_layer/TowerA"
 @onready var tower_max_mana3 = $"../../Last_lane/Tower_layer/TowerA/Mana_display/Max_mana"
 @onready var tower_current_mana3 = $"../../Last_lane/Tower_layer/TowerA/Mana_display/Current_mana"
-@onready var tower_current_mana3B = $"../../First_lane/Tower_layer/TowerB/Mana_display/Current_mana"
+@onready var tower_current_mana3B = $"../../Last_lane/Tower_layer/TowerB/Mana_display/Current_mana"
 @onready var card_layer3 = $"../../Last_lane/Card_layer"
 @onready var scrolla3 = $"../../Last_lane/Card_layer/SCROLLA"
 @onready var arena_rect3 = $"../../Last_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
@@ -71,6 +71,9 @@ var towers
 var confirmed_my_deployment = false
 var opponent_confirmed_deployment = false
 
+var monday_received = false
+var opponent_monday_received = false
+	#to sync days since they're rpced over
 
 
 
@@ -88,7 +91,7 @@ func _ready():
 		#at game start
 	Base.game_started_yet_bruh = true
 	
-	set_process(false)
+	#set_process(false)
 	#multiplayer deployment coordination tool
 	#turned off even in SP cuz it's played by default
 	
@@ -145,14 +148,14 @@ func _on_pressed():
 		
 func handle_MP_thursday():
 	#only called in MP
-	if Lobby.host == true:
-		the_button_has_been_pressed_frfr()
-		await get_tree().create_timer(Base.FAKE_OMEGA).timeout
-		rpc_id(Lobby.opponent_peer_id, "the_button_has_been_pressed_frfr")
-	else:
-		rpc_id(Lobby.opponent_peer_id, "the_button_has_been_pressed_frfr")
-		await get_tree().create_timer(Base.FAKE_OMEGA).timeout
-		the_button_has_been_pressed_frfr()
+	#if Lobby.host == true:
+	the_button_has_been_pressed_frfr()
+	await get_tree().create_timer(Base.FAKE_OMEGA).timeout
+	rpc_id(Lobby.opponent_peer_id, "the_button_has_been_pressed_frfr")
+	#else:
+		#rpc_id(Lobby.opponent_peer_id, "the_button_has_been_pressed_frfr")
+		#await get_tree().create_timer(Base.FAKE_OMEGA).timeout
+		#the_button_has_been_pressed_frfr()
 		
 @rpc("any_peer", "call_remote", "reliable")
 func the_button_has_been_pressed_frfr():
@@ -161,19 +164,26 @@ func the_button_has_been_pressed_frfr():
 		target.disappear_when_THE_BUTTON_is_pushed()
 	#to get rid of tooltips
 	
-	print("unlocked? " + str(Base.CAN_CLICK_BUTTON_NOW))
+	#push_error("unlocked? " + str(Base.CAN_CLICK_BUTTON_NOW))
 	
 	if  Base.Combat_phase == 0 and Base.CAN_CLICK_BUTTON_NOW == 1:
-		Base.Main_phase = 0 #determines which curving to use, rng or anull #not anymore
-		# "when you can play cards"
+		Base.Main_phase = 0 
 		disabled = true
+		opponent_turn_indicator.inactive_texture_now()
 		if Base.current_lane == 4:
 			if Lobby.MULTIPLAYER == true:
 				if Lobby.host == true:
 					#If I'm the host
 					await spawn_rect.deploy_all()
+					
 				elif Lobby.host == false:
-					await spawn_rect.clear_creeps_and_undraggable_heroes()
+					await spawn_rect.clear_creeps()
+					#await spawn_rect.wait_for_host_to_rpc_me_deployment()
+						#this waiting is done in process()
+					
+
+			
+					
 			else: await spawn_rect.deploy_all()
 			
 			await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
@@ -187,7 +197,7 @@ func the_button_has_been_pressed_frfr():
 			await THE_COMBAT()
 			
 			
-			await get_tree().create_timer(card_layer.visible_death_anim_length).timeout
+			await get_tree().create_timer(Base.visible_death_anim_length).timeout
 			
 			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 			await card_layer.clear_up_both()
@@ -257,11 +267,18 @@ func move_to_next_lane():
 		
 		await get_tree().create_timer(0.25).timeout
 		#so that camera has time to get to new lane
-		disabled = false
+		if Lobby.MULTIPLAYER == false:
+			#mp takes care of it in Base
+			disabled = false
+			
 		
 		await card_layer.monday_phase()
+		if Lobby.MULTIPLAYER == true:
+			await waiting_for_MP_monday_to_finish()
 #		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 		await card_layer.tuesday_phase()
+		if Lobby.MULTIPLAYER == true:
+			monday_MP_passed()
 		#currently for duelyst
 #		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 		await card_layer.wednesday_phase()
@@ -288,10 +305,11 @@ func move_to_next_lane():
 		#wait until the units are collided
 #		push_error("Button is NOT waiting for collision of units in spawner to complete: " +str(spawn_rect.colliding_units) +str(camera_2d.moving))
 		spawner.visible = true
+		spawn_rect._on_child_order_changed()
 		
 	if Lobby.MULTIPLAYER == true:
 		if Base.current_lane == 4:
-			Base.receive_granted_action()	
+			spawn_rect.lane_4_start()
 		elif Base.current_lane != 4:		
 			if Base.initiative == 1:
 				Base.receive_granted_action()
@@ -300,7 +318,28 @@ func move_to_next_lane():
 				Base.refresh_pass_button()
 				show_opponent_turn_begins()
 
-
+func waiting_for_MP_monday_to_finish():
+	push_error("waiting for MP monday to finish")
+	while monday_received == false or opponent_monday_received == false:
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	push_error("waiting for MP monday completed")
+	#so that player doesnt go to tuesday before monday finishes and is rpced over
+	
+func monday_MP_passed():
+	monday_received = false
+	opponent_monday_received = false
+	
+@rpc("any_peer", "call_remote", "reliable")	
+func monday_completed():
+	if multiplayer.get_remote_sender_id() == 0:
+		push_error("My monday finished")
+		monday_received = true
+		rpc_id(Lobby.opponent_peer_id, "monday_completed")
+	else:
+		push_error("opponent monday finished")
+		opponent_monday_received = true
+	
+	
 func confirm_my_deployment():
 	#decides which hero's my_target_deployment_lane has to be send over to opponent
 	
@@ -317,7 +356,7 @@ func confirm_my_deployment():
 	
 		
 	rpc_id(Lobby.opponent_peer_id, "confirm_deployment_status")
-	start_waiting_on_opponent_to_finish_deploying() 
+	wait_on_opponent_to_confirm_deployment()
 	
 	
 	
@@ -331,17 +370,27 @@ func confirm_deployment_status():
 	#tells oppponent I'm done deploying
 	opponent_confirmed_deployment = true
 	
-func start_waiting_on_opponent_to_finish_deploying():
-	set_process(true)
+
 	
-func _process(delta = Base.FAKE_DELTA):
-	if opponent_confirmed_deployment == true:
-		the_button_has_been_pressed_frfr()
-		set_process(false)
-		opponent_confirmed_deployment = false
-		confirmed_my_deployment = false
-	else:
+	
+func wait_on_opponent_to_confirm_deployment():
+	while  opponent_confirmed_deployment == false:
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+
+	if Lobby.host == false:
+		#joiner waits
+		spawn_rect.clear_draggable_heroes()
+		#they have to be cleared before deployment is received
+		await spawn_rect.wait_for_host_to_rpc_me_deployment()
+	the_button_has_been_pressed_frfr()
+	#set_process(false)
+	
+	opponent_confirmed_deployment = false
+	confirmed_my_deployment = false
+	#if Lobby.host == true:
+		#spawn_rect.rpc_joiner_deployment_is_ready()
+	#else:
+		#await get_tree().create_timer(Base.FAKE_DELTA).timeout
 
 				
 
@@ -352,6 +401,7 @@ func _process(delta = Base.FAKE_DELTA):
 
 
 func global_prep_phase():
+	push_error("prepphase commence")
 	card_layer1.prep_phase()
 	card_layer2.prep_phase()
 	card_layer3.prep_phase()
@@ -438,8 +488,11 @@ func refresh_player_hp_dmg_to_be_taken():
 
 func round_end():
 	player_mana_display.increase_max_mana()
+	opponent_mana.increase_max_mana()
 	transfer_tower_mana_to_player_mana()
 	round_end_signal()
+	
+	#awaiting sobbingemoji
 	
 	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
 	
@@ -459,13 +512,15 @@ func transfer_tower_mana_to_player_mana():
 	var mana2 = tower_current_mana2.current_mana
 	var mana3 = tower_current_mana3.current_mana
 	var mana_to_be_added = (mana1 + mana2 + mana3)/3
+	push_error("increasing player mana by (" +str(mana1) + ", "  +str(mana2) + ", " +str(mana3) + ") /3 = " + str(mana_to_be_added))
 	player_mana_display.increase_mana(mana_to_be_added)
 	
 	var mana4 = tower_current_mana1B.current_mana
 	var mana5 = tower_current_mana2B.current_mana
 	var mana6 = tower_current_mana3B.current_mana
-	var _mana_to_be_added2 = (mana4 + mana5 + mana6)/3
-	opponent_mana.increase_mana(mana_to_be_added)
+	var mana_to_be_added2 = (mana4 + mana5 + mana6)/3
+	push_error("increasing opponent mana by (" +str(mana4) + ", "  +str(mana5) + ", " +str(mana6) + ") / 3 = " + str(mana_to_be_added2))
+	opponent_mana.increase_mana(mana_to_be_added2)
 	
 func show_opponent_turn_begins():
 	opponent_turn_indicator.active_texture_now()

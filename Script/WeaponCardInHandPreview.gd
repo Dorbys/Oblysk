@@ -21,6 +21,7 @@ func _ready():
 	%WEAPON_JPEG.texture = Card_pfp
 	
 	%STATS.text = ItemsDB[str(Item_Name)+"_description"]
+	
 
 	
 	

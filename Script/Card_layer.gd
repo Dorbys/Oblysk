@@ -14,6 +14,10 @@ extends Control
 @onready var lane_buildings_A = $"../Tower_layer/TowerA/Buildings"
 @onready var lane_buildings_B = $"../Tower_layer/TowerB/Buildings"
 
+@onready var spawn_rect = $"../../UI_layer/Spawner/SpawnRect"
+#just for rpcing during monday phase to joiner that deployment is done
+@onready var the_button = $"../../UI_layer/THE_BUTTON"
+	#also rpcing monday, once monday effects complete
 
 var my_lane 
 	#calced in ready() of arena_rect
@@ -283,8 +287,7 @@ func card_preview_targeting_non_single_exits_tree():
 				
 				
 				
-var visible_death_anim_length = 0.6
-var death_anim_length = 0.9
+
 	
 func dueling(Target_unit1, Target_unit2):
 	var attack1 = Target_unit1.AttackC - Target_unit2.Unit_Armor
@@ -332,16 +335,24 @@ func cleanup_phase():
 	
 	
 func prep_phase():
+	
 	await tower_layer.unit_order_changed_signal(my_lane)
 	await apply_phase("before_prep_phase")
 	await annul_tower_damage_to_be_done()
 	await apply_phase("prep_phase")
 	
 func monday_phase():
+	if Lobby.MULTIPLAYER == true and Lobby.host == true:
+		
+		spawn_rect.rpc_joiner_deployment_is_ready()
 	push_error("monday phase")
 	await tower_layer.monday_phase_signal()
+	await get_tree().create_timer(0.3).timeout 
+	the_button.monday_completed()
+	
 
 func tuesday_phase():
+	push_error("tuesday phase")
 	await tower_layer.tuesday_phase_signal()
 func wednesday_phase():
 	await tower_layer.wednesday_phase_signal()
@@ -372,11 +383,11 @@ func curve_rng_both():
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
 		if target.TYPE == "unit":
-			target.curve_rng()				
+			target.curve_straight #curve_rng()				
 	for i in abarena_rect.get_child_count():
 		var target = abarena_rect.get_child(i)
 		if target.TYPE == "unit":
-			target.curve_rng()	
+			target.curve_straight() #curve_rng()	
 
 
 
@@ -388,7 +399,7 @@ func refresh_lane_auras(target,faction,wielder):
 
 			
 func unit_being_sieged(faction, siege_dmg):
-	push_error("siege dmg is: " +str(siege_dmg))
+	#push_error("siege dmg is: " +str(siege_dmg))
 	match faction:
 		"alpha":
 			tower_a.increase_damage_to_be_taken(siege_dmg)
@@ -447,8 +458,30 @@ func lets_check_cooldown_penetrability():
 			target.check_cooldown_penetrability()	
 			
 			
+func get_lane(lane_identification:String):
+	#for lanes: MY_identity+my_lane
+	var identity = lane_identification.substr(0,1)
+	var lane_int = lane_identification.substr(1)
+	push_error("identity: " +str(identity) +" my_lane: " +str(lane_int))
+	var target_card_layer
+	var target_lane
+	match lane_int:
+		"1":
+			target_card_layer = $"../../First_lane/Card_layer"
+		"2":
+			target_card_layer = $"../../Mid_lane/Card_layer"	
+		"3":
+			target_card_layer = $"../../Last_lane/Card_layer"	
+		_:
+			push_error("incorrect my_lane value: " +str(lane_int))
+	if identity == "A":
+		target_lane = target_card_layer.arena_rect	
+	elif identity == "B":
+		target_lane = target_card_layer.abarena_rect
+	else:
+		push_error("unknown lane identity: " +identity)
 			
-			
+	return target_lane		
 			
 #================================================================
 #						SYNCING
@@ -457,17 +490,17 @@ func lets_check_cooldown_penetrability():
 		#to replicate the effect for opponent
 		#since different treepaths, units can't RPC
 	
-@rpc("any_peer", "call_remote", "reliable")
-func make_mirror_unit_curve(direction, unique_key:int):
-	#only from host to join, hmm
-	if multiplayer.get_remote_sender_id() == 0:
-		#if I was called localy
-		rpc_id(Lobby.opponent_peer_id, "make_mirror_unit_curve", direction, unique_key)
-	else:
-		#if I was RPCed
-#		push_error("get_remote_sender_id s mp funguje")
-		var fun_to_call = "curve_" + direction
-		Lobby.universal_global_unit_array[unique_key].call(fun_to_call)
+#@rpc("any_peer", "call_remote", "reliable")
+#func make_mirror_unit_curve(direction, unique_key:int):
+	##only from host to join, hmm
+	#if multiplayer.get_remote_sender_id() == 0:
+		##if I was called localy
+		#rpc_id(Lobby.opponent_peer_id, "make_mirror_unit_curve", direction, unique_key)
+	#else:
+		##if I was RPCed
+##		push_error("get_remote_sender_id s mp funguje")
+		#var fun_to_call = "curve_" + direction
+		#Lobby.universal_global_unit_array[unique_key].call(fun_to_call)
 			
 @rpc("any_peer", "call_remote", "reliable")
 func make_mirror_unit_receive_spell_call(spelltype:String,
@@ -484,28 +517,27 @@ func make_mirror_unit_receive_spell_call(spelltype:String,
 			DB_full = LvlupDB.LVLUPS_DB
 		var fun_to_call:String = DB_full[spell_id][0]
 		var unit_to_target = Lobby.universal_global_unit_array[unique_key]
-		DB.call(fun_to_call, unit_to_target, concurrent_player)
+		DB.call(fun_to_call, unit_to_target, concurrent_player, true)
 		push_error("calling function: " +fun_to_call +" " +"on unit " +str(unique_key))
-		tower_layer.unit_targeted_signal(Lobby.universal_global_unit_array[unique_key], DB_full[spell_id])
 
 @rpc("any_peer", "call_remote", "reliable")
-func make_two_mirror_units_receive_spell_call(spelltype:String,
- spell_id:int, first_unit_unique_key:int, second_unit_unique_key:int):
+func make_two_mirror_units_receive_spell_call(cardtype:String,
+ func_to_call:String, first_unit_unique_key:int, second_unit_unique_key:int, sync_data):
 	if multiplayer.get_remote_sender_id() == 0:
 		rpc_id(Lobby.opponent_peer_id, "make_two_mirror_units_receive_spell_call",
-		 spelltype,spell_id,first_unit_unique_key,second_unit_unique_key)
-		push_error("sending function: " +str(spell_id) +" to units " +str(first_unit_unique_key,second_unit_unique_key))
+		 cardtype,func_to_call,first_unit_unique_key,second_unit_unique_key, sync_data)
+		push_error("sending function: " +func_to_call +" to units " +str(first_unit_unique_key,second_unit_unique_key))
 	else:
 		var DB = SpellsDB
-		var DB_full = SpellsDB.SPELLS_DB
-		if spelltype == "lvlup_spell":
+		if cardtype == "lvlup_spell":
 			DB = LvlupDB
-			DB_full = LvlupDB.LVLUPS_DB
-		var fun_to_call:String = DB_full[spell_id][0]
+		elif cardtype == "item":
+			DB = ItemsDB
+
 		var target1 = Lobby.universal_global_unit_array[first_unit_unique_key]
 		var target2 = Lobby.universal_global_unit_array[second_unit_unique_key]
-		DB.call(fun_to_call, target1, target2)
-		push_error("calling function: " + fun_to_call +" " +"on units " +str(first_unit_unique_key,second_unit_unique_key))		
+		DB.call(func_to_call, target1, target2, sync_data)
+		push_error("calling function: " + func_to_call +" " +"on units " +str(first_unit_unique_key,second_unit_unique_key))		
 			
 		
 @rpc("any_peer", "call_remote", "reliable")		
@@ -568,8 +600,25 @@ func make_mirror_lane_receive_spell_call(spelltype:String,
 		var DB = SpellsDB
 		if spelltype == "lvlup_spell":
 			DB = LvlupDB
-		DB.call(fun_to_call, arena_rect, concurrent_player, true)
+		DB.call(fun_to_call, arena_rect, concurrent_player, true) 
 		push_error("calling function: " + fun_to_call +" on lane " + self.name)		
+
+@rpc("any_peer", "call_remote", "reliable")
+func make_mirror_unit_and_lane_receive_spell_call(card_type:String, func_to_call:String,
+		target1_MY_UNIQUE_UNIT_KEY:int, target2_lane_identification:String, sync_data):
+	#target2_lane_identification: MY_identity+my_lane
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "make_mirror_unit_and_lane_receive_spell_call",
+		 card_type,func_to_call,target1_MY_UNIQUE_UNIT_KEY,target2_lane_identification, sync_data)
+	else:
+		var DB = SpellsDB
+		if card_type == "lvlup_spell":
+			DB = LvlupDB
+		elif card_type == "item":
+			DB = ItemsDB
+		var target_lane = get_lane(target2_lane_identification)
+		DB.call(func_to_call,Lobby.universal_global_unit_array[target1_MY_UNIQUE_UNIT_KEY],
+			target_lane, sync_data, true)
 
 @rpc("any_peer", "call_remote", "reliable")
 func make_mirror_lane_building(building_id:int,):
@@ -580,3 +629,29 @@ func make_mirror_lane_building(building_id:int,):
 	else:
 		lane_buildings_B.make_building(building_id)
 		#currently only B
+		
+@rpc("any_peer", "call_remote", "reliable")
+func mirror_item_activate_cooldown(unit_unique_key:int, item_slot:String):
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "mirror_item_activate_cooldown",
+		 unit_unique_key, item_slot)
+		push_error("sending activate item cooldown to " + str(unit_unique_key))
+	else:
+		var target_slot = Lobby.universal_global_unit_array[unit_unique_key].get_node(item_slot)
+		target_slot.activate_cooldown(true)
+	
+@rpc("any_peer", "call_remote", "reliable")
+func mirror_ability_activate_cooldown(unit_unique_key:int):
+	#separate func cuz tree diff
+	if multiplayer.get_remote_sender_id() == 0:
+		rpc_id(Lobby.opponent_peer_id, "mirror_ability_activate_cooldown",
+		 unit_unique_key)
+		#push_error("sending activate ability cooldown to " + str(unit_unique_key))
+	else:
+		var target_hero = Lobby.universal_global_unit_array[unit_unique_key]
+		while target_hero == null:
+			#push_error("waiting for mirror ability cooldown to find target hero")
+			await get_tree().create_timer(Base.FAKE_DELTA).timeout
+			target_hero = Lobby.universal_global_unit_array[unit_unique_key]
+		var target_slot = target_hero.Ability1
+		target_slot.activate_cooldown(true)

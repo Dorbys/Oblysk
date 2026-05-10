@@ -18,14 +18,21 @@ var arena_rects
 @onready var opp_spawn_rect = $"../Opponent_spawn_rect_fake"
 	
 
-var scale_down = 0.8
-#how much do we scale down the units
+
 
 var starting_creep_count = 5
 
 var colliding_units = 0
 #to know whether I can make Spawner visible already
 #count of how many units still moving to hide their movement
+
+############################### MP ##############################
+var opponent_initial_heroes_deployed = false
+var waiting_for_host_to_rpc_me_deployment = true
+
+############################### MP ##############################
+
+
 
 func _ready():
 	arena_rects = [arena_rect1, arena_rect2,arena_rect3,
@@ -35,6 +42,7 @@ func _ready():
 #		opp_spawn_rect.connect("child_entered_tree",_on_child_entered_tree)
 
 func INITIATE_THE_GAME():
+	#Called from graveyard showcase after initiating heroes
 		
 	if Lobby.MULTIPLAYER == true:
 		player_HP.rpc_id(Lobby.opponent_peer_id, "set_opponent_name", Lobby.player_name)
@@ -43,15 +51,15 @@ func INITIATE_THE_GAME():
 		
 	deploy_my_heroes()
 	#better to keep this clientside since we gonna wait for it from both
-	
-#	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	while  Lobby.MULTIPLAYER == true and opponent_initial_heroes_deployed == false:
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 
 #	for i in starting_creep_count:
 #		spawn_a_creep_in_random_lane_for_both_sides(0)
 		
 	if Lobby.MULTIPLAYER == false:
 		for i in starting_creep_count:
-			spawn_a_creep_in_random_lane_for_both_sides(0)
+			spawn_a_creep_in_random_lane_for_both_sides(false)
 		
 		%BetaFirstLaneDeployRect.create_a_super_creep()
 		%BetaMidLaneDeployRect.create_a_super_creep()
@@ -64,16 +72,25 @@ func INITIATE_THE_GAME():
 	elif Lobby.MULTIPLAYER == true:
 		for i in starting_creep_count:
 			spawn_a_creep_in_random_lane()
-		await get_tree().create_timer(0.5).timeout
+		
 
 	else: push_error("incorrect 'Lobby.MULTIPLAYER' value")
 	
 	if Lobby.MULTIPLAYER == false or Lobby.host == true: 
 		#only host deploys
+		await get_tree().create_timer(0.5).timeout
 		await deploy_all()
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout #mb not needed
+		#rpc_joiner_deployment_is_ready()
+		#now send during monday phase
+		
+		#receive_deployment_complete_from_host()
 	else:
 		#joiner just cleans his deployrects
-		clear_creeps_and_undraggable_heroes()
+		
+		clear_draggable_heroes()
+		await wait_for_host_to_rpc_me_deployment()
+		clear_creeps()
 		
 	#await get_tree().create_timer(0.5).timeout
 	#we were starting before all the creeps spawned lol
@@ -89,6 +106,7 @@ func INITIATE_THE_GAME():
 	#or load the cl1
 	
 func deploy_my_heroes():
+	#this is just for initiating the game when 3 heroes are waiting for init deployment
 	var target
 	
 	#SpawnRect should already have 3 heroes prepared there
@@ -113,20 +131,62 @@ func deploy_opponent_heroes(which_lane):
 
 	target = opp_spawn_rect.get_child(opp_spawn_rect.get_child_count()-1) 
 	target.reparent(lanes_to_deploy[which_lane])
+	await get_tree().create_timer(0.1).timeout
+	opponent_initial_heroes_deployed = true
+
+#func collide_units(skip_target = -1):
+	##currently copied from SpawnRect, skip_target could be removed
+	#var collide_time = 0.2
+	#var target
+	#var destinationX
+	#var offset = (0.5 * Base.CARD_WIDTH) 
+	#var center = (size.x)/2
+	#
+#
+	#
+			#
+	#var population = get_child_count()
+	#var mid = ceil(population/2)
+	#
+	#for i in population:
+		#if i == skip_target:
+			#continue
+		#
+			#
+		#target = get_child(i)
+		#
+		#if skip_target != -1 and i> skip_target:
+			#i -= 1
+			##modifies the placement of following cards, but still targets the right
+			##child since the "skipped one" is still present
+			#
+		#if population%2 == 0:
+			#destinationX = center - offset + ((i+1-mid) * Base.CARD_WIDTH)
+#
+		#else:
+			#destinationX =  center + ((i-mid) * Base.CARD_WIDTH)
+#
+		#var tween = create_tween().set_parallel(true)
+		#tween.tween_property(target,"position",
+		 #Vector2(destinationX,0),
+		 #collide_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
+	#if colliding_units > 0 : 
+		#colliding_units -= 1
+	##because we don't care about when units are removed	
+
 
 func collide_units(skip_target = -1):
-	#currently copied from SpawnRect, skip_target could be removed
 	var collide_time = 0.2
-	var target
-	var destinationX
-	var offset = (0.5 * Base.CARD_WIDTH) 
+	var destination_X = 0
+	var population = get_child_count()
 	var center = (size.x)/2
-	
+	var gap = 6
+	var target 
+	var tween
 
 	
-			
-	var population = get_child_count()
-	var mid = ceil(population/2)
+	tween = get_tree().create_tween().set_parallel(true)
+	tween.pause()
 	
 	for i in population:
 		if i == skip_target:
@@ -140,40 +200,45 @@ func collide_units(skip_target = -1):
 			#modifies the placement of following cards, but still targets the right
 			#child since the "skipped one" is still present
 			
-		if population%2 == 0:
-			destinationX = center - offset + ((i+1-mid) * Base.CARD_WIDTH)
 
-		else:
-			destinationX =  center + ((i-mid) * Base.CARD_WIDTH)
+		destination_X = center + (i * Base.CARD_WIDTH * Base.pre_deploy_scale_down	)
+		if i > 0:
+			destination_X += gap*i
+		#push_error("destinationX = " +str(destination_X))
 
-		var tween = create_tween().set_parallel(true)
-		tween.tween_property(target,"position",
-		 Vector2(destinationX,0),
-		 collide_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
+		tween.tween_property(target,"position",Vector2(destination_X,0),collide_time)
+#			tween.tween_property(target,"scale",Vector2(scale_down,scale_down),movement_time)
+
+	tween.play()
 	if colliding_units > 0 : 
 		colliding_units -= 1
-	#because we don't care about when units are removed	
 
-func _on_child_entered_tree(node):
-	colliding_units += 1
-	node.enter_draggable_state()
-	node.pre_deploy_respawn()
-	collide_units()
+
+
+
 	
 
 
 func new_wave_of_creeps():
-	%FirstLaneDeployRect.create_a_creep()
-	%MidLaneDeployRect.create_a_creep()
-	%LastLaneDeployRect.create_a_creep()
-	%BetaFirstLaneDeployRect.create_a_creep()
-	%BetaMidLaneDeployRect.create_a_creep()
-	%BetaLastLaneDeployRect.create_a_creep()
+	#ccc
+	var how_many_random_creeps = 1
+	var how_many_creeps_for_each_lane = 1
+	#primarily for debugging
+	if how_many_creeps_for_each_lane > 1:
+		push_error("spawning more lane creeps")
+	for i in how_many_creeps_for_each_lane:
+		%FirstLaneDeployRect.create_a_creep()
+		%MidLaneDeployRect.create_a_creep()
+		%LastLaneDeployRect.create_a_creep()
+		%BetaFirstLaneDeployRect.create_a_creep()
+		%BetaMidLaneDeployRect.create_a_creep()
+		%BetaLastLaneDeployRect.create_a_creep()
 		
 	if Lobby.MULTIPLAYER == true:
-		spawn_a_creep_in_random_lane()
+		for i in how_many_creeps_for_each_lane:
+			spawn_a_creep_in_random_lane()
 	else:
-		spawn_a_creep_in_random_lane_for_both_sides(1)
+		spawn_a_creep_in_random_lane_for_both_sides(true)
 	
 func spawn_a_creep_in_random_lane():
 	#Can only be called if MULTIPLAYER
@@ -205,7 +270,7 @@ func opponent_spawned_random_creep_in_this_lane(which_lane:int):
 			push_error("incorrect 'client_spawned_random_creep_in_this_lane' input")
 	
 			
-func spawn_a_creep_in_random_lane_for_both_sides(include_supers = 1):
+func spawn_a_creep_in_random_lane_for_both_sides(include_supers = true):
 	var uno = randi()%3
 	match uno:
 		0:
@@ -224,7 +289,7 @@ func spawn_a_creep_in_random_lane_for_both_sides(include_supers = 1):
 		2:
 			%BetaLastLaneDeployRect.create_a_creep()
 			
-	if include_supers == 1:
+	if include_supers == true:
 		uno = randi()%3
 		match uno:
 			0:
@@ -314,17 +379,24 @@ func deploy_all():
 
 		#deploys the units switching between starting and second deployer
 		# skipping when its null
-func clear_creeps_and_undraggable_heroes():
+func clear_creeps():
 	#to clear creeps of joiner since he doesn't deploy
-	%FirstLaneDeployRect.clear_creeps_and_undraggable_heroes()
-	%MidLaneDeployRect.clear_creeps_and_undraggable_heroes()
-	%LastLaneDeployRect.clear_creeps_and_undraggable_heroes()
-	%BetaFirstLaneDeployRect.clear_creeps_and_undraggable_heroes()
-	%BetaMidLaneDeployRect.clear_creeps_and_undraggable_heroes()
-	%BetaLastLaneDeployRect.clear_creeps_and_undraggable_heroes()
+	%FirstLaneDeployRect.clear_creeps()
+	%MidLaneDeployRect.clear_creeps()
+	%LastLaneDeployRect.clear_creeps()
+	%BetaFirstLaneDeployRect.clear_creeps()
+	%BetaMidLaneDeployRect.clear_creeps()
+	%BetaLastLaneDeployRect.clear_creeps()
 	
-	
-	
+func clear_draggable_heroes():
+	#to clear creeps of joiner since he doesn't deploy
+	%FirstLaneDeployRect.clear_draggable_heroes()
+	%MidLaneDeployRect.clear_draggable_heroes()
+	%LastLaneDeployRect.clear_draggable_heroes()
+	%BetaFirstLaneDeployRect.clear_draggable_heroes()
+	%BetaMidLaneDeployRect.clear_draggable_heroes()
+	%BetaLastLaneDeployRect.clear_draggable_heroes()	
+	%Opponent_spawn_rect_fake.clear_draggable_heroes()
 					
 #	for i in len(arena_rects):
 #		arena_rects[i].reset_curving()
@@ -352,16 +424,30 @@ func clear_creeps_and_undraggable_heroes():
 #			deploy_target = alpha_squadron[k]
 #			if deploy_target != null:
 #				await alpha_deployer.deploy_unit(deploy_target)
-
+func _on_child_entered_tree(node):
+	#push_error("child entering tree")
+	colliding_units += 1
+	node.enter_draggable_state()
+	node.pre_deploy_respawn()
+	collide_units()
 					
 func _on_child_order_changed():
+	push_error("child order changed")
 	if get_child_count() > 0:
 		Base.lock_pass_button()
 	else:
 		Base.unlock_pass_button(true)
 		#have to set forced as true because 'if' triggers more times than 'else'
 
-
+func lane_4_start():
+	#called from THE BUTTON
+	if get_child_count() == 0:
+		Base.receive_granted_action()
+	else:
+		Base.receive_granted_action_for_lane4()
+	#if get_child_count() == 0:
+		#Base.receive_granted_action()
+	#to pass if we have n
 
 func assign_starting_buildings():
 	var beta_towers = [BUTTON.towerB1.buildings, BUTTON.towerB2.buildings, BUTTON.towerB3.buildings]
@@ -372,10 +458,36 @@ func assign_starting_buildings():
 		house.Build_Pfp = Base.BUILDINGS_SMALLS_TEXTURES[i]
 		house.is_aura = BuildDB.BUILD_DB[i][BuildDB.ISAURAPOSITION]
 		house.affects = BuildDB.BUILD_DB[i][BuildDB.AFFPOSITION]
-		house.position.x = 50+ beta_towers[i-1].get_child_count() * 110
+		#house.position.x = 50+ beta_towers[i-1].get_child_count() * 110
 		#For now placement
 		beta_towers[i-1].add_child(house)
+		beta_towers[i-1].collide_buildings()
 		
 		
 func more_enemies():
 	pass
+	
+	
+func rpc_joiner_deployment_is_ready():
+	#is now send when host reaches monday phase 
+	#delayed since deployment is relative to deploy of host, but phases start moving
+	#immediatelly after this is called -> phases for joiner before deployment done
+	#push_error("sending joiner deployment is readdy")
+	rpc_id(Lobby.opponent_peer_id, "receive_deployment_complete_from_host")
+
+@rpc("any_peer", "call_remote", "reliable")
+func receive_deployment_complete_from_host():
+	push_error("deployment complete from host received")
+	waiting_for_host_to_rpc_me_deployment = false
+	
+	await get_tree().create_timer(Base.FAKE_OMEGA).timeout
+	waiting_for_host_to_rpc_me_deployment = true
+	#for the next time we need to wait
+
+func wait_for_host_to_rpc_me_deployment():
+	push_error("waiting for host to rpc me deployment")
+	#just that it's complete
+	if waiting_for_host_to_rpc_me_deployment == false:
+		push_error("instant end of waiting for rpced deployment")
+	while waiting_for_host_to_rpc_me_deployment == true:
+		await get_tree().create_timer(Base.FAKE_GAMMA).timeout

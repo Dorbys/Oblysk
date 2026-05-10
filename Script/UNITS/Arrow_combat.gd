@@ -24,15 +24,15 @@ func curve_straight():
 	tween.tween_property(self, "rotation_degrees", 0, curving_time)
 	tween.tween_property(self, "position:x", basex, curving_time)
 	
-func curve_left():
-	var tween = create_tween().set_parallel(true)
-	tween.tween_property(self, "rotation_degrees", -c_angle, curving_time)
-	tween.tween_property(self, "position:x", basex-c_distance, curving_time)
-		
-func curve_right():
-	var tween = create_tween().set_parallel(true)
-	tween.tween_property(self, "rotation_degrees", c_angle, curving_time)
-	tween.tween_property(self, "position:x", basex+c_distance, curving_time)
+#func curve_left():
+	#var tween = create_tween().set_parallel(true)
+	#tween.tween_property(self, "rotation_degrees", -c_angle, curving_time)
+	#tween.tween_property(self, "position:x", basex-c_distance, curving_time)
+		#
+#func curve_right():
+	#var tween = create_tween().set_parallel(true)
+	#tween.tween_property(self, "rotation_degrees", c_angle, curving_time)
+	#tween.tween_property(self, "position:x", basex+c_distance, curving_time)
 	
 	
 	

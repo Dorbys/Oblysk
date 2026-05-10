@@ -7,7 +7,7 @@ extends Control
 
 
 @onready var which_lane  = $"../../../../../.."
-@onready var Card_layer = $"../../../../.."
+@onready var card_layer = $"../../../../.."
 @onready var tower_layer = $"../../../../../../Tower_layer"
 @onready var tower_mana = $"../../../../../../Tower_layer/TowerA/Mana_display/Current_mana"
 @onready var MYrena_rect = $".."
@@ -76,18 +76,14 @@ var LEVEL = 0
 
 var Siege = false
 #whether this unit can siege
-#var besieged_damage = 0
-##how much damage is being sent to my tower because Im being sieged
+var besieged_damage = 0
+#how much damage is being sent to my tower because Im being sieged
 var overkill_damage = 0
 # damage tbtb - healthC
 #how much more dmg I'm goind to take than I can absorb
 #only used with siege if opposer does have Siege
 
-#GONNA REPLACE BESIEGED DAMAGE WITH BESIEGING DAMAGE
-#CUZ IF THERE'S CURVING, real besieged damage from an enemy would 
-	#have to be calced including the curver
 
-var besieging_damage = 0
 
 
 
@@ -116,18 +112,18 @@ var item_equipped = [placeholder, weapon_equipped,special_equipped,armour_equipp
 var item_script_folders = ["Placeholder/", "Weapons/", "Specials/", "Armours/"]
 #for loading item scripts
 
-var targeting = "straight"
+#var targeting = "straight"
 #for curving
 var OPrena
 #the opposite arena
 var damage_to_be_taken = 0
 #how much damage I will be dealt next combat phase
-var damage_used_up_1 = 0
-var damage_used_up_2 = 0
+#var damage_used_up_1 = 0
+#var damage_used_up_2 = 0
 #how much of my damage is being directed to units (NOT TOWERS)
 #1 For the opposing target, 2 for side target
 # = if 0+0 all dmg goes to tower
-var side_target = null
+#var side_target = null
 #enemy I'm curving into on left or right
 var straight_target = null
 #the tower or the opposing enemy
@@ -306,6 +302,9 @@ func _ready():
 	
 	if HERO == true:
 		Lvlup_xp = HeroesDB.HEROES_DB[Identification][HeroesDB.XPPOSITION]
+		
+		if faction == "beta":
+			XP_panel = $"../../../../../../../UI_layer/Opponent_info/Opponent_XP_panel"
 	#Isnt shown on text so its okay to load here
 	
 	
@@ -330,9 +329,9 @@ func _ready():
 	
 	
 	
-	if Base.Main_phase == 1:
-		await get_tree().create_timer(0.2).timeout 
-		check_if_I_put_space_between_curving()
+	#if Base.Main_phase == 1:
+		#await get_tree().create_timer(0.2).timeout 
+		#check_if_I_put_space_between_curving()
 		
 #	curve_rng()
 	#fuck it lets call this from the spawning source
@@ -348,35 +347,40 @@ func second_ready():
 	#needs to be called together with _ready() for a proper initiation
 		#of a unit, but the delay between the two can be modified
 	if readied == false:
+		
 		await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
-		curve_rng()
+		curve_straight() #curve_rng()
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		increase_damage_to_be_taken(0)
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		lane_aura_check()	
 		
 		readied = true
+	#else:
+		#push_error("secondready called, but unit was already readied")
 	
-func second_ready_without_curve_rng():
-	#Used in multiplayer since curving is done only for at host
-	if readied == false:
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		increase_damage_to_be_taken(0)
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		lane_aura_check()	
-		
-		refresh_my_combat_damage()
-		
-		readied = true
+#func second_ready_without_curve_rng():
+	##Used in multiplayer since curving is done only for at host
+		#since no curving, this was the same as second_ready()
+	#if readied == false:
+		#await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		#increase_damage_to_be_taken(0)
+		#await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		#lane_aura_check()	
+		#
+		#refresh_my_combat_damage()
+		#
+		#readied = true
 	
 	
 func respawn(silent = 0):
 #	sent_over_to_opponent = false
 	#because my slot has to be synced again
 	
-	appear_alive()
+	#appear_alive()
+	leave_draggable_state()
 	scale = Vector2(1,1)
-	new_lane()
+	await new_lane()
 	lane_aura_check()
 	HealthC = HealthM
 	AttackC = AttackM
@@ -389,70 +393,77 @@ func respawn(silent = 0):
 
 	
 	
-	updateS(0) #HERE
+	updateS(false) 
 	# silent value is USED FOR DEPLOYMENT #wtf
 	
 	my_damage_was_annuled = false
 	
-	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
+	#await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
 
-	check_if_I_put_space_between_curving()
+	#check_if_I_put_space_between_curving()
 	
 
 func land():
 	#blink ig
 	new_lane()
+	curve_straight()
 	
 	
-	var opposer = await get_opposer()
-	if opposer.TYPE == "unit":
-		straight_target = opposer
-	else:
-		straight_target = MYrena_rect.OPTower
+	#var opposer = await get_opposer()
+	#if opposer.TYPE == "unit":
+		#straight_target = opposer
+	#else:
+		#straight_target = MYrena_rect.OPTower
 	
 		
-	curve_rng()
-	if opposer.TYPE == "unit":
-		opposer.curve_rng()
-
-func check_if_I_put_space_between_curving():
-	if Base.Main_phase == 1:
-		var opposer = await get_opposer()
-		if opposer.TYPE == "void":
-			#only if I brought a void here I couldve messed up
-			var id = get_index()
-			if id > 0:
-				var target1 = MYrena_rect.get_child(id-1)
-				if target1.TYPE == "unit" and target1.targeting == "right":
-					target1.curve_straight()
-#					print("made him curve straight from right")
-			if id < MYrena_rect.get_child_count() -1 :
-				var target1 = MYrena_rect.get_child(id+1)
-				if target1.TYPE == "unit" and target1.targeting == "left":
-					target1.curve_straight()
-#					print("made him curve straight from left")
-#			print("ID is: " +str(id))
-		else:
-			pass
-#			print("opposer aint void")
-	else:
-		pass
-#		print("main phase aint 1")
+	#CURVEREMOVED
 	
+	#curve_rng()
+	#if opposer.TYPE == "unit":
+		#opposer.curve_rng()
+
+#func check_if_I_put_space_between_curving():
+	#if Base.Main_phase == 1:
+		#var opposer = await get_opposer()
+		#if opposer.TYPE == "void":
+			##only if I brought a void here I couldve messed up
+			#var id = get_index()
+			#if id > 0:
+				#var target1 = MYrena_rect.get_child(id-1)
+				#if target1.TYPE == "unit" and target1.targeting == "right":
+					#target1.curve_straight()
+##					print("made him curve straight from right")
+			#if id < MYrena_rect.get_child_count() -1 :
+				#var target1 = MYrena_rect.get_child(id+1)
+				#if target1.TYPE == "unit" and target1.targeting == "left":
+					#target1.curve_straight()
+##					print("made him curve straight from left")
+##			print("ID is: " +str(id))
+		#else:
+			#pass
+##			print("opposer aint void")
+	#else:
+		#pass
+##		print("main phase aint 1")
+	
+
 func pre_deploy_respawn():
-		scale = Vector2(1,1)
+		scale = Vector2(Base.pre_deploy_scale_down,Base.pre_deploy_scale_down)
 		HealthC = HealthM
 		AttackC = AttackM
 		hide_incoming_death()
 		damage_to_be_taken = 0
-		updateS(1)
+		overkill_damage = 0 
+		besieged_damage = 0
+		alive = true
+		updateS(true)
 
 	
 	
 	
 	
 #	var tween = create_tween()
-#	tween.tween_property(self, "modulate:a", 1, Card_layer.visible_death_anim_length)
+#	tween.tween_property(self, "modulate:a", 1, card_layer.visible_death_anim_length)
 	
 
 
@@ -474,6 +485,7 @@ func pre_deploy_respawn():
 
 
 func increase_AttackM(how_much, loudness):
+	annul_my_damage()
 	AttackM += how_much
 	AttackC += how_much
 	if loudness == 1:
@@ -513,7 +525,7 @@ func increase_ArmorM(how_much,loudness = 1):
 		
 		updateS()
 
-func updateS(silent = 0):
+func updateS(silent = false):
 	%ATK.text = str(AttackC)
 	%HP.text = str(HealthC)
 	%AR.text = str(ArmorC)
@@ -551,7 +563,7 @@ func updateS(silent = 0):
 		
 	check_damage_to_be_taken()
 		
-	if silent == 0:
+	if silent == false:
 		refresh_my_combat_damage()
 
 	
@@ -559,9 +571,11 @@ func take_damage(Damage):
 	HealthC -= Damage
 	if HealthC <= 0:
 		Death_sudden(Damage)
+		return true
 	else:
 		updateS()
 		increase_damage_to_be_taken(0)
+		return false
 	
 func Death_sudden(DMG):
 	appear_dead()
@@ -576,17 +590,20 @@ func Death_sudden(DMG):
 		
 	if Base.Combat_phase == 0:
 		push_error("nolongering")
-		if targeting == "straight":
-			push_error("nolongering straight")
-			if straight_target != null:
-				straight_target.Im_no_longer_attacked_only_by(self,Siege)
-#				print(str(Unit_Name) +"is no longer attacking str target")
+		#if targeting == "straight":
+			#push_error("nolongering straight")
+			#if straight_target != null:
+		if straight_target != null:
+			straight_target.Im_no_longer_attacked_only_by(self,Siege)
 		else:
-			push_error("nolongering to a side")
-			if side_target != null:
-				side_target.Im_no_longer_side_attacked_by(self)
-			if straight_target != null:
-				straight_target.Im_no_longer_straight_attacked_by(self)
+			push_error("attempted to call funtion Im_no_longer_attacked_only_by() on a null target")
+#				print(str(Unit_Name) +"is no longer attacking str target")
+		#else:
+			#push_error("nolongering to a side")
+			#if side_target != null:
+				#side_target.Im_no_longer_side_attacked_by(self)
+			#if straight_target != null:
+				#straight_target.Im_no_longer_straight_attacked_by(self)
 						
 		
 		
@@ -595,20 +612,20 @@ func Death_sudden(DMG):
 
 	
 	
-#	self.reparent(Card_layer)
+#	self.reparent(card_layer)
 	
-	await get_tree().create_timer(Card_layer.visible_death_anim_length).timeout
+	await get_tree().create_timer(Base.visible_death_anim_length).timeout
 	if HERO == false:
-		Card_layer.Death_care(self, id, par)
+		card_layer.Death_care(self, id, par)
 	else :
 		clean_myself_from_effects()
 		cleanse_me_from_position_auras()
-		Card_layer.Hero_death_care(self, id, par)
+		card_layer.Hero_death_care(self, id, par)
 	
 	if (has_position_aura == true):
 		Ability1.get_child(2).remove_aura_on_death()
 	
-#var VDAL = Card_layer.visible_Card_layer.death_anim_length
+#var VDAL = card_layer.visible_card_layer.death_anim_length
 var mid_damage = 11.0
 var DM = 1 #Direction modifier
 func death_animation(DMG):
@@ -618,43 +635,45 @@ func death_animation(DMG):
 	var push_modifier = 0.6 + DMG/mid_damage
 	var tween = create_tween().set_parallel(true)
 	tween.tween_property(self, "position",Vector2(0,300*push_modifier*DM),
-	 Card_layer.death_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
-	tween.tween_property(self, "modulate:a", 0, Card_layer.visible_death_anim_length)
+	 Base.death_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
+	tween.tween_property(self, "modulate:a", 0, Base.visible_death_anim_length)
 	tween.tween_property(self,
-	"rotation_degrees", -15, Card_layer.death_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
+	"rotation_degrees", -15, Base.death_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
 
 func take_combat_damage():
 	take_damage(damage_to_be_taken)
 
 
 func refresh_neighbours_from_my_death(id, _parent, opposer):
-#	if Base.Combat_phase == 0:
-#already checked in parent function
-
-	if opposer.TYPE == "unit":
+	#push_error(str(Unit_Name) + " is refreshing ngh from its death at " +str(get_index()))
+##	if Base.Combat_phase == 0:
+##already checked in parent function
+	#push_error("type: " +str(opposer.TYPE) + " alive: " +str(opposer.alive))
+	if opposer.TYPE == "unit" and opposer.alive == true:
 		opposer.ignore_opposer()
-		if opposer.Siege == true and opposer.targeting == "straight":
-			Card_layer.unit_no_longer_being_sieged(faction, opposer.besieging_damage)
-			opposer.besieging_damage = 0
-			overkill_damage = 0
-			#not nullified for when curving ig
-			printerr("refreshing neighbours and bro had siege")
-			
+		##if opposer.Siege == true: # and opposer.targeting == "straight"
+			##card_layer.unit_no_longer_being_sieged(faction, besieged_damage)
+			##nolonger doesnt work when ignoring opposer since 26
+		#besieged_damage = 0
+		#overkill_damage = 0
+			##not nullified for when curving ig
+			#
+			#
 #	await get_tree().create_timer(Base.MICRO_TIME).timeout
 
-	var comp = id-1
-	if comp> -1:
-		var left_opponent = OPrena.get_child(comp)
-		if left_opponent.TYPE == "unit" and left_opponent.targeting == "right":
-			left_opponent.curve_straight()
+	#var comp = id-1
+	#if comp> -1:
+		#var left_opponent = OPrena.get_child(comp)
+		#if left_opponent.TYPE == "unit" and left_opponent.targeting == "right":
+			#left_opponent.curve_straight()
 			
 #	await get_tree().create_timer(Base.MICRO_TIME).timeout
 		
-	comp = id+1
-	if comp < OPrena.get_child_count():
-		var right_opponent = OPrena.get_child(comp)
-		if right_opponent.TYPE == "unit" and right_opponent.targeting == "left":
-			right_opponent.curve_straight()
+	#comp = id+1
+	#if comp < OPrena.get_child_count():
+		#var right_opponent = OPrena.get_child(comp)
+		#if right_opponent.TYPE == "unit" and right_opponent.targeting == "left":
+			#right_opponent.curve_straight()
 
 
 	
@@ -709,23 +728,27 @@ func cleanup_phase():
 #that I wrote for the second time LULE
 
 func before_prep_phase():
+	#if HERO == true:
+		#push_error("before prep for unit" + Unit_Name + "index: " +str(get_index()))
 	#increase_damage_to_be_taken(-damage_to_be_taken)
 	damage_to_be_taken = 0
-	check_damage_to_be_taken() #HERE
+	besieged_damage = 0
+	await check_damage_to_be_taken() 
 	straight_target = null
-	side_target = null
-	damage_used_up_1 = 0
-	damage_used_up_2 = 0
-	besieging_damage = 0
+
 	
 func prep_phase():
-	if Lobby.MULTIPLAYER == true:
-		if Lobby.host == true:
-			curve_rng()
-		else:
-			refresh_my_combat_damage()
-	elif Lobby.MULTIPLAYER == false:
-		curve_rng()
+	#if HERO == true:
+		#push_error("prep for unit" + Unit_Name + "index: " +str(get_index()))
+
+	#if Lobby.MULTIPLAYER == true:
+		##if Lobby.host == true:
+			###curve_rng()
+		##else:
+		#refresh_my_combat_damage()
+	#elif Lobby.MULTIPLAYER == false:
+		#refresh_my_combat_damage()
+	curve_straight(false)
 ################################################################
 
 
@@ -830,11 +853,6 @@ func _drop_data(_at_position, DropData):
 			#If the card is from lvlup, we need to change the DB 
 			
 		if DropData[5] == Enums.Targeting.none:
-			await tower_layer.unit_targeted_signal(self,DBList[DropData[1]])
-			#FOR PASSIVES
-#			tower_mana.spend_mana(DBList[DropData[1]][DB.COSTPOSITION])
-			#Spends mana
-			
 			var which_function:String = str(DBList[DropData[1]][DB.NAMEPOSITION])
 			if Lobby.MULTIPLAYER == true:
 				drop_data_multiplayer_funcall(DropData[0],DropData[1],which_function, DropData[7])
@@ -848,6 +866,9 @@ func _drop_data(_at_position, DropData):
 			#cleaning to prevent bs
 			await get_tree().create_timer(Base.FAKE_DELTA).timeout
 			hand_rect.collide_cards()
+			await tower_layer.unit_targeted_signal(self,DBList[DropData[1]])
+			#FOR PASSIVES
+			
 		elif DropData[5] != Enums.Targeting.none:
 			#
 			#TEMPORARY SOLUTION I BELIEVE
@@ -884,14 +905,14 @@ func _drop_data(_at_position, DropData):
 		hand_rect.collide_cards()
 	
 func item_equipping_multiplayer(ID):
-	if Lobby.host == true:
-		Card_layer.make_my_mirror_unit_equip_item(ID, MY_UNIQUE_UNIT_KEY)
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	#if Lobby.host == true:
+		#card_layer.make_my_mirror_unit_equip_item(ID, MY_UNIQUE_UNIT_KEY)
+		#await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		#equip_item(ID)
+	#else:
 		equip_item(ID)
-	else:
-		equip_item(ID)
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		Card_layer.make_my_mirror_unit_equip_item(ID, MY_UNIQUE_UNIT_KEY)
+		card_layer.make_my_mirror_unit_equip_item(ID, MY_UNIQUE_UNIT_KEY)
 		
 func equip_item(ID):
 	var Item_type = ItemsDB.ITEMS_DB[ID][ItemsDB.ITEMMPOSITION]
@@ -918,14 +939,14 @@ func drop_data_multiplayer_funcall(spelltype:String, spell_id:int, function_to_b
 	if spelltype == "lvlup_spell":
 		DB = LvlupDB
 			
-	if Lobby.host == true:
-		Card_layer.make_mirror_unit_receive_spell_call(spelltype, spell_id, MY_UNIQUE_UNIT_KEY, current_player)
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		DB.call(function_to_be_called,self,current_player)
-	else:
-		DB.call(function_to_be_called,self,current_player)
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		Card_layer.make_mirror_unit_receive_spell_call(spelltype, spell_id, MY_UNIQUE_UNIT_KEY, current_player)
+	#if Lobby.host == true:
+		#card_layer.make_mirror_unit_receive_spell_call(spelltype, spell_id, MY_UNIQUE_UNIT_KEY, current_player)
+		#await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		#DB.call(function_to_be_called,self,current_player)
+	#else:
+	DB.call(function_to_be_called,self,current_player)
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	card_layer.make_mirror_unit_receive_spell_call(spelltype, spell_id, MY_UNIQUE_UNIT_KEY, current_player)
 
 	
 	
@@ -1048,7 +1069,7 @@ func LVLUP():
 	increase_AttackM(1,1)
 	increase_HealthM(1,1)
 	await hand_rect.draw_a_lvlup_card(Identification, LVLUP_type)
-	Card_layer.make_my_mirror_unit_lvlup(MY_UNIQUE_UNIT_KEY)
+	card_layer.make_my_mirror_unit_lvlup(MY_UNIQUE_UNIT_KEY)
 
 func pretend_LVLUP():
 	#for opponent heroes
@@ -1094,91 +1115,104 @@ func _on_ColorRect_input(event):
 
 
 
-func curve_rng():
-	var my_slot = get_index()
-	var population = OPrena.get_child_count()
-	var opposer = await get_opposer()
-	
-	
-		
-	if opposer.TYPE == "unit":
-		curve_straight()
-		if Lobby.MULTIPLAYER == true and Lobby.host == true:
-			make_my_mirror_self_curve("straight")
-		
-	#there might be a bug if this setting is turned off 
-	#which might happen when naturally placing or spawning units
-	#bug includes being curved but the arrow not showing it
+#func curve_rng():
+	#var my_slot = get_index()
+	#var population = OPrena.get_child_count()
+	#var opposer = await get_opposer()
+	#
+	#
+		#
+	#if opposer.TYPE == "unit":
+		#curve_straight()
+		#if Lobby.MULTIPLAYER == true and Lobby.host == true:
+			#make_my_mirror_self_curve("straight")
+		#
+	##there might be a bug if this setting is turned off 
+	##which might happen when naturally placing or spawning units
+	##bug includes being curved but the arrow not showing it
+#
+	#else:
+		#if Lobby.MULTIPLAYER == false or Lobby.host == true:
+			##only the host will calculate curving
+			#var random_value = randf()  # Generates a random float between 0 and 1
+			#if random_value < 0.4 and my_slot != 0:
+			## 42% chance 
+				##That looks like 40 bro
+				#if OPrena.get_child(my_slot-1) != null and OPrena.get_child(my_slot-1).TYPE == "unit":
+					#curve_left()
+					#make_my_mirror_self_curve("left")
+				#else:
+					#curve_straight()
+					#make_my_mirror_self_curve("straight")
+			#elif random_value >= 0.4 and random_value < 0.8 and my_slot != (population-1):
+			## Another 42% chance (totaling 84%)
+				#if OPrena.get_child(my_slot+1) != null and OPrena.get_child(my_slot+1).TYPE == "unit":
+					#curve_right()
+					#make_my_mirror_self_curve("right")
+				#else:
+					#curve_straight()
+					#make_my_mirror_self_curve("straight")
+			#else:
+			## Remaining 16% chance
+				#curve_straight()
+				#make_my_mirror_self_curve("straight")
+		#elif Lobby.host == false:
+			#start_waiting_for_curve_data()
 
-	else:
-		if Lobby.MULTIPLAYER == false or Lobby.host == true:
-			#only the host will calculate curving
-			var random_value = randf()  # Generates a random float between 0 and 1
-			if random_value < 0.4 and my_slot != 0:
-			# 42% chance 
-				#That looks like 40 bro
-				if OPrena.get_child(my_slot-1) != null and OPrena.get_child(my_slot-1).TYPE == "unit":
-					curve_left()
-					make_my_mirror_self_curve("left")
-				else:
-					curve_straight()
-					make_my_mirror_self_curve("straight")
-			elif random_value >= 0.4 and random_value < 0.8 and my_slot != (population-1):
-			# Another 42% chance (totaling 84%)
-				if OPrena.get_child(my_slot+1) != null and OPrena.get_child(my_slot+1).TYPE == "unit":
-					curve_right()
-					make_my_mirror_self_curve("right")
-				else:
-					curve_straight()
-					make_my_mirror_self_curve("straight")
-			else:
-			# Remaining 16% chance
-				curve_straight()
-				make_my_mirror_self_curve("straight")
-		elif Lobby.host == false:
-			start_waiting_for_curve_data()
 
-
-func make_my_mirror_self_curve(direction):
-#	push_error("trying to make_my_mirror_self_curve " +direction)
-	#can be "straight" "left" or "right"
-	Card_layer.make_mirror_unit_curve(direction, MY_UNIQUE_UNIT_KEY)
-	
-func start_waiting_for_curve_data():
-	push_error("Waiting for curve data")
+#func make_my_mirror_self_curve(direction):
+##	push_error("trying to make_my_mirror_self_curve " +direction)
+	##can be "straight" "left" or "right"
+	#card_layer.make_mirror_unit_curve(direction, MY_UNIQUE_UNIT_KEY)
+	#
+#func start_waiting_for_curve_data():
+	#push_error("Waiting for curve data")
 		
 #RNG_curve should probably have its own shit, then we make the annul stuff		
 		
 #@rpc("any_peer", "call_remote", "reliable")
-func curve_left():
-	targeting = "left"
-	#push_error(str(Unit_Name) +" is curving left")
-	%Arrow_combat.curve_left()
-	if OPrena.get_child(get_index()-1).TYPE == "unit":
-		redirect_damage(OPrena.get_child(get_index()-1))
-	else:
-		curve_straight()	
-
-#@rpc("any_peer", "call_remote", "reliable")
-func curve_right():
-	targeting = "right"
-	#push_error(str(Unit_Name +" is curving right"))
-	%Arrow_combat.curve_right()	
-	if OPrena.get_child(get_index()+1).TYPE == "unit":
-		redirect_damage(OPrena.get_child(get_index()+1))
-	else:
-		curve_straight()
+#func curve_left():
+	#targeting = "left"
+	##push_error(str(Unit_Name) +" is curving left")
+	#%Arrow_combat.curve_left()
+	#if OPrena.get_child(get_index()-1).TYPE == "unit":
+		#redirect_damage(OPrena.get_child(get_index()-1))
+	#else:
+		#curve_straight()	
+#
+##@rpc("any_peer", "call_remote", "reliable")
+#func curve_right():
+	#targeting = "right"
+	##push_error(str(Unit_Name +" is curving right"))
+	#%Arrow_combat.curve_right()	
+	#if OPrena.get_child(get_index()+1).TYPE == "unit":
+		#redirect_damage(OPrena.get_child(get_index()+1))
+	#else:
+		#curve_straight()
 		
 #@rpc("any_peer", "call_remote", "reliable")
-func curve_straight():
-	targeting = "straight"	
-#	push_error(str(Unit_Name +" is curving straight"))
-	%Arrow_combat.curve_straight()
+func curve_straight(call_for_opposer = true):
+		#to prevent loop
+	
+		#to prevent double secondreadying
+	
+	#targeting = "straight"	
+	#%Arrow_combat.curve_straight()
 	var opposer = await get_opposer()
+	#push_error("opposer type: " + opposer.TYPE)
+	#push_error(str(Unit_Name +" is curving straight" + " faction: " +faction + " index: " +str(get_index()) + "opposertype: " + opposer.TYPE))
+
 	if opposer.TYPE == "unit":
-		redirect_damage(OPrena.get_child(get_index()))
+		#redirect_damage(OPrena.get_child(get_index()))
+		redirect_damage(opposer)
+		
+		if call_for_opposer == true:
+			opposer.curve_straight(false)
 	else:	
-		redirect_damage(MYrena_rect.OPTower)		
+		redirect_damage(MYrena_rect.OPTower)
+	
+	my_damage_was_annuled = false
+			
 		
 		
 		
@@ -1318,23 +1352,26 @@ func curve_straight():
 #		MYrena_rect.OPTower.Im_no_longer_straight_attacked_by(self, false, 0)
 		
 func refresh_my_combat_damage():
+	annul_my_damage()
 	if Base.Main_phase == 0 and alive == true:
-		match targeting:
-			"left": 
-					curve_left()
-			"straight":
-					curve_straight()
-			"right":
-					curve_right()
+		#match targeting:
+			#"left": 
+					#curve_left()
+			#"straight":
+		curve_straight(false)
+			#"right":
+					#curve_right()
+		#push_error("#CURVEREMOVED")
 	elif Base.Main_phase == 1: 
 	#this was the annul try ig
-		match targeting:
-			"left": 
-					curve_left()
-			"straight":
-					curve_straight()
-			"right":
-					curve_right()
+		#match targeting:
+			#"left": 
+					#curve_left()
+			#"straight":
+		curve_straight(false)
+			#"right":
+					#curve_right()
+		#push_error("#CURVEREMOVED2")
 	elif Base.Main_phase == 0 and alive == false:
 		pass
 		#this happens during game start and causes no problems
@@ -1345,245 +1382,278 @@ func refresh_my_combat_damage():
 func refresh_combat_damage_on_me():
 	increase_damage_to_be_taken(0)
 				
-func annul_damage_directed_to_me(loudness = false):
+func annul_damage_directed_to_me():
 	#for calcing armor and so on 
-	var id = get_index()
-	var comp = id-1
-	var expected_damage = 0
-	#FROM THE UNIT TO LEFT
-	if comp> -1:
-		var left_opponent = OPrena.get_child(comp)
-		if left_opponent.TYPE == "unit" and left_opponent.targeting == "right" and left_opponent.damage_used_up_2 > 0 and left_opponent.side_target == self:
-			left_opponent.my_damage_was_annuled = true
-			#helps keeping track when undoing so cuz I might not be afterwards
-			expected_damage = left_opponent.damage_used_up_2 - ArmorC
-			if ArmorC > 0 and expected_damage < 0:
-				expected_damage = 0
-				### this check elsewhere
-			increase_damage_to_be_taken(-expected_damage, false)
-			#its minus armor because + - goes before -= bruhhhh
-			
-	#FROM OPPOSER
-	comp = id
-	var opposer = await get_opposer(comp)
-	if opposer.TYPE == "unit" and opposer.straight_target == self: # and opposer.damage_used_up_1 > 0
-		opposer.my_damage_was_annuled = true
-		expected_damage = opposer.damage_used_up_1 - ArmorC
-		if ArmorC > 0 and expected_damage < 0:
-			expected_damage = 0
-			### this check elsewhere
-		if opposer.besieging_damage > 0:
-			#this means that the opposer is sieging over me
-			expected_damage -= opposer.besieging_damage
-			#so we can't reduce the whole expected dmg
-		increase_damage_to_be_taken(-expected_damage, false)
+	#var expected_damage = 0
+	#var opposer = await get_opposer()
+	#if opposer.TYPE == "unit" and opposer.straight_target == self: # and opposer.damage_used_up_1 > 0
+		#if opposer.my_damage_was_annuled == false:
+		#opposer.my_damage_was_annuled = true
+		push_error("annulling dmgtbt by -" + str(damage_to_be_taken))
+		damage_to_be_taken = 0
+		check_damage_to_be_taken()
+		if besieged_damage > 0:
+			card_layer.unit_no_longer_being_sieged(faction, besieged_damage)
+			besieged_damage = 0
+
+		
+		#expected_damage = opposer.AttackC - ArmorC #opposer.damage_used_up_1
+		#if ArmorC > 0 and expected_damage < 0:
+			#expected_damage = 0
+			#### this check elsewhere
+		#if besieged_damage > 0:
+			##this means that the opposer is sieging over me
+			#expected_damage -= besieged_damage
+			##so we can't reduce the whole expected dmg
+			#if opposer.AttackC -1 == besieged_damage:
+				#expected_damage += ArmorC
+		
+		#increase_damage_to_be_taken(-expected_damage, false)
 		#we are taking care of besieged in increase_damage_to_be_taken() now
 		
-	
-	#FROM UNIT TO RIGHT 
-	comp = id+1
-	if comp< OPrena.get_child_count():
-		var right_opponent = OPrena.get_child(comp)
-		if right_opponent.TYPE == "unit" and right_opponent.targeting == "left" and right_opponent.damage_used_up_2 > 0 and right_opponent.side_target == self:
-			right_opponent.my_damage_was_annuled = true
-			expected_damage = right_opponent.damage_used_up_2 - ArmorC
-			if ArmorC > 0 and expected_damage < 0:
-				expected_damage = 0
-				### this check elsewhere
-			increase_damage_to_be_taken(-expected_damage,false) 
 	
 	
 	#DONT FORGET TO REDIRECT DAMAGE TO ME AGAIN
 	#pls
 	
-	if loudness == true:
-		increase_damage_to_be_taken(0)
+	#if loudness == true:
+		#increase_damage_to_be_taken(0)
 	
 func redirect_damage_to_me_again():
 	#for calcing armor updates and so on 
-	var id = get_index()
-	var comp = id-1
-	if comp> -1:
-		var left_opponent = await get_opposer(comp)
-		# this crashes push_error("redirect check: " +str(left_opponent.TYPE == "unit") + str (left_opponent.targeting == "right") + str(left_opponent.side_target == self))
-		if left_opponent.TYPE == "unit" and left_opponent.targeting == "right": # and left_opponent.side_target == self
-			left_opponent.my_damage_was_annuled = false
-			left_opponent.side_target = self
-			#because I might've landed here and there was someone else b4
-			increase_damage_to_be_taken(left_opponent.damage_used_up_2 - ArmorC,false)
-	#FROM THE UNIT TO LEFT
+	#var id = get_index()
+	#var comp = id #-1
+	#if comp> -1:
+		#var left_opponent = await get_opposer(comp)
+		## this crashes push_error("redirect check: " +str(left_opponent.TYPE == "unit") + str (left_opponent.targeting == "right") + str(left_opponent.side_target == self))
+		#if left_opponent.TYPE == "unit" and left_opponent.targeting == "right": # and left_opponent.side_target == self
+			#left_opponent.my_damage_was_annuled = false
+			#left_opponent.side_target = self
+			##because I might've landed here and there was someone else b4
+			#increase_damage_to_be_taken(left_opponent.damage_used_up_2 - ArmorC,false)
+	##FROM THE UNIT TO LEFT
 	
 	
-	comp = id+1
-	if comp< MYrena_rect.get_child_count():
-		var right_opponent = await get_opposer(comp)
-		if right_opponent.TYPE == "unit" and right_opponent.targeting == "left": # and right_opponent.side_target == self
-			right_opponent.my_damage_was_annuled = false
-			right_opponent.side_target = self
-			#because I might've landed here and there was someone else b4
-			increase_damage_to_be_taken(right_opponent.damage_used_up_2 - ArmorC, false)
-	#FROM UNIT TO RIGHT
+	#comp = id+1
+	#if comp< MYrena_rect.get_child_count():
+		#var right_opponent = await get_opposer(comp)
+		#if right_opponent.TYPE == "unit" and right_opponent.targeting == "left": # and right_opponent.side_target == self
+			#right_opponent.my_damage_was_annuled = false
+			#right_opponent.side_target = self
+			##because I might've landed here and there was someone else b4
+			#increase_damage_to_be_taken(right_opponent.damage_used_up_2 - ArmorC, false)
+	##FROM UNIT TO RIGHT
 	
-	comp = id
-	var opposer = await get_opposer(comp)
-	if opposer.TYPE == "unit" and opposer.damage_used_up_1 > 0: #and opposer.straight_target == self:
-		opposer.my_damage_was_annuled = false
-		opposer.straight_target = self
-		#because I might've landed here and there was someone else b4
-			#which would ruin the point of me checking whether opposers straight target is self hmm
-		var expected_damage = opposer.damage_used_up_1 - ArmorC
-		if opposer.Siege == true and opposer.targeting == "straight":
-			#this means I was being sieged before I was annuled
-			#we have take that into account and recalc besieged dmg and
-				#towers dmg to be taken
-			var excess_damage = damage_to_be_taken + expected_damage - HealthC
-			if excess_damage != opposer.besieging_damage:
-				#if the damage Im supposed to send to tower has changed
-				Card_layer.unit_no_longer_being_sieged(faction, opposer.besieging_damage)
-				if excess_damage > 0:
-					expected_damage -= excess_damage
-					opposer.besieging_damage = excess_damage
-					Card_layer.unit_being_sieged(faction, opposer.besieging_damage)
-		#we are taking care of besieged in increase_damage_to_be_taken() now
-		increase_damage_to_be_taken(expected_damage, false)
+	#comp = id
+	var opposer = await get_opposer()
+	if opposer.TYPE == "unit" and opposer.AttackC > 0: # damage_used_up_1and opposer.straight_target == self: 
+		opposer.redirect_damage(self)
+	check_damage_to_be_taken()
+		#opposer.my_damage_was_annuled = false
+		#opposer.straight_target = self
+		##because I might've landed here and there was someone else b4
+			##which would ruin the point of me checking whether opposers straight target is self hmm
+		#var expected_damage = opposer.AttackC - ArmorC #damage_used_up_1
+		#push_error("expected damage: " + str(expected_damage) + " opp dmg: " +str(opposer.AttackC) + " arm: " + str(ArmorC)) #damage_used_up_1
+		#if opposer.Siege == true:  #and opposer.targeting == "straight"
+			##this means I was being sieged before I was annuled
+			##we have take that into account and recalc besieged dmg and
+				##towers dmg to be taken
+			#var excess_damage = damage_to_be_taken + expected_damage - HealthC
+			#push_error("excess damage: " + str(excess_damage) + " damage_to_be_taken: " +str(damage_to_be_taken) + " HealthC: " + str(HealthC))
+			##if excess_damage != besieged_damage:
+			##this if has to be skipped due to sieging damage being capped at opposer.AttackC -1
+				##if the damage Im supposed to send to tower has changed
+			#card_layer.unit_no_longer_being_sieged(faction, besieged_damage)
+			#if excess_damage > 0:
+				#expected_damage -= excess_damage
+				#if opposer.AttackC <= excess_damage:
+					#besieged_damage = opposer.AttackC -1
+				#else:
+					#besieged_damage = excess_damage
+				#card_layer.unit_being_sieged(faction, besieged_damage)
+		##we are taking care of besieged in increase_damage_to_be_taken() now
+		#increase_damage_to_be_taken(expected_damage, false)
 			
 	#FROM OPPOSER
 	
 	#THIS IS USED IN COMBINATION WITH ANNUL DAMAGE DIRECTED TO ME
 
-func annul_my_damage():
+func annul_my_damage(remove_targets_straight_target = false):
 	#annuls damage that I'm declaring on other units or tower
-	if straight_target != null:
-		if side_target	!= null:
-			side_target.Im_no_longer_side_attacked_by(self)
-			straight_target.Im_no_longer_straight_attacked_by(self)
-		else:
+	
+	#remove_targets_straight_target now expands the usage to anull the opposer
+		#for anulling presence, since we dont get_opposer in anul_damage_directed_to_me()
+		#
+	#if my_damage_was_annuled == false:
+		if straight_target != null:
+			#my_damage_was_annuled = true
+			#if side_target	!= null:
+				#side_target.Im_no_longer_side_attacked_by(self)
+				#straight_target.Im_no_longer_straight_attacked_by(self)
+			#else:
+			#push_error("annuling damage of " +Unit_Name + " dmg: " +str(AttackC))
 			straight_target.Im_no_longer_attacked_only_by(self,Siege)
-	else:
-		push_error("straight target was null during annuling my damage")
+			if straight_target.TYPE == "unit" and remove_targets_straight_target == true:
+				straight_target.straight_target = null
+				straight_target.my_damage_was_annuled = true
+			straight_target = null
+			
+
+		else:
+			#push_error("straight target was null during annuling my damage")
+			pass
 				
 	
 func redirect_damage(target):
 	var opposer = await get_opposer()
-#	print("REDIRECTING")
-#	if HERO == true:
-#		push_error(Unit_Name + " is redirecting dmg")
+	#if HERO == true:
+		#push_error(Unit_Name + " id: " + str(get_index()) + " is redirecting dmg to " + target.Unit_Name)
 	
-	if straight_target == null:
-		damage_used_up_1 = 0
-	if side_target == null:
-		damage_used_up_2 = 0
+	#if straight_target == null:
+		#damage_used_up_1 = 0
+	#if side_target == null:
+		#damage_used_up_2 = 0
 	#I guess it works?
 	#makes sure that when creep is gone we don't try to detract damage from them
-	
-	if straight_target == null and damage_used_up_1+damage_used_up_2 == 0:
+	#push_error("opposer.TYPE = " + opposer.TYPE)
+	#if straight_target != null:
+		#push_error("straight_target_type = " + straight_target.TYPE)
+	if straight_target == null: # and damage_used_up_1 == 0+damage_used_up_2 
+		#first redirection after appearing
 		if opposer.TYPE == "unit":
+			#%Arrow_combat.curve_straight()
+			#hoply fixes the correct mathly but not graphical curving  
 			straight_target = opposer
 			straight_target.Im_attacked_only_by(self, Siege)
-			straight_target.curve_straight()
+			#straight_target.curve_straight()
 		
 		else:
 			straight_target = MYrena_rect.OPTower
 			straight_target.Im_attacked_only_by(self, Siege)
+			
+	elif straight_target.TYPE == "tower" and target == opposer:
+		#redirecting from tower to a unit
+			straight_target.Im_no_longer_attacked_only_by(self, Siege)
+			straight_target = opposer
+			straight_target.Im_attacked_only_by(self, Siege)
+	elif straight_target == opposer:
+		#when redirecting to opposer again (after annullment)
+		straight_target.Im_attacked_only_by(self, Siege)
+	elif straight_target.TYPE == "tower":
+		#when redirecting to tower again (after annullment)
+		straight_target.Im_attacked_only_by(self, Siege)
+	elif straight_target.TYPE == "unit" and opposer.TYPE == "unit":
+		#straight_target.Im_no_longer_attacked_only_by(self, Siege)
+		straight_target = opposer
+		straight_target.Im_attacked_only_by(self, Siege)
+	
+			
+	else:	#when ignoring opposer
+		push_error("ignoring opposer id: " + str(get_index()))
+		straight_target = MYrena_rect.OPTower
+		straight_target.Im_attacked_only_by(self, Siege)
+			
+			
 	#in case the unit just appeared
 	
-	if damage_used_up_2 == 0:
-		#curving from attacking tower or the unit straight across only
-		if target == straight_target:
-#			print("curving from attacking tower or the unit straight across only")
-			straight_target.Im_no_longer_attacked_only_by(self,Siege)
-			straight_target.Im_attacked_only_by(self, Siege)
-			
-			#if we are curved into same target again, refresh damage
-			
-		elif target.TYPE == "tower":
-			#We assume that the opposer was the previous target and is dead 
-			#and redirect damage was triggered outside of prephase
-			#for example during cleanup phase
-			
-			#well now that we have creeps we have to take them into account:
-			if straight_target != null:
-#				push_error("well now that we have creeps we have to take them into account:")
-				#I have no idea what this does, but it works
-				straight_target.Im_no_longer_attacked_only_by(self,Siege)
-			
-			damage_used_up_1 = 0
-			#may not be able to call the Im no longer attackedx the prev target
-			#so just set it to 0, since we werent curved before this
-			
-			straight_target = target
-			straight_target.Im_attacked_only_by(self, Siege)
-			
-			
-		else:
-			straight_target.Im_no_longer_attacked_only_by(self,Siege)
-			#removes the pointing damage
-#			print("removes the pointing damage")
-			if target == opposer:
-				#We were attacking tower previously
-				straight_target = target
-				straight_target.Im_attacked_only_by(self, Siege)
-			else:
-			#if target isnt opposer then we curved
-			#or its tower, dummy (already fixed)
-				straight_target.Im_straight_attacked_by(self)
-				#the target should modify my damage used up 
-				#adds half the damage to tower
-				
-				side_target = target
-				side_target.Im_side_attacked_by(self)
-				
-			#there will be different function along the lines of "update direction of dmg" for when a unit appears in front of me
-		
-		
-	elif damage_used_up_2 != 0:
-		#curving from already being curved to a side unit
-		if target == side_target:
-			# if we are still curved into the same target, refresh dmg
-			side_target.Im_no_longer_side_attacked_by(self)
-			side_target.Im_side_attacked_by(self)
-#			print("it was side")
-			
-			#straight_target_also has be refreshed, 
-			#because we may have just equipped an item
-			straight_target.Im_no_longer_straight_attacked_by(self)
-			straight_target.Im_straight_attacked_by(self)
-			
-			
-			
-		elif straight_target.TYPE == "unit" and target == opposer:
-#			print("it was opposer")
-			#if we are curved to attack straight
-			side_target.Im_no_longer_side_attacked_by(self)
-			straight_target.Im_no_longer_straight_attacked_by(self)
-			#remove the damage 
-			side_target = null
-			straight_target.Im_attacked_only_by(self, Siege)
-			
-		elif straight_target.TYPE == "tower" and (target == opposer or target == straight_target):
-			#we were curved to side and there was empty slot across us, 
-			#a unit appeared there and we target it now or the tower
-			side_target.Im_no_longer_side_attacked_by(self)
-			side_target = null
-			straight_target.Im_no_longer_straight_attacked_by(self)
-			straight_target = target 
-			straight_target.Im_attacked_only_by(self, Siege)
-
-			
-		else: #if we are curved into the other side unit
-#			print("it was else")
-			side_target.Im_no_longer_side_attacked_by(self)
-			side_target = target
-			side_target.Im_side_attacked_by(self)
+	#if damage_used_up_2 == 0:
+		##curving from attacking tower or the unit straight across only
+		#if target == straight_target:
+##			print("curving from attacking tower or the unit straight across only")
+			#straight_target.Im_no_longer_attacked_only_by(self,Siege)
+			#straight_target.Im_attacked_only_by(self, Siege)
+			#
+			##if we are curved into same target again, refresh damage
+			#
+		#elif target.TYPE == "tower":
+			##We assume that the opposer was the previous target and is dead 
+			##and redirect damage was triggered outside of prephase
+			##for example during cleanup phase
+			#
+			##well now that we have creeps we have to take them into account:
+			#if straight_target != null:
+##				push_error("well now that we have creeps we have to take them into account:")
+				##I have no idea what this does, but it works
+				#straight_target.Im_no_longer_attacked_only_by(self,Siege)
+			#
+			#damage_used_up_1 = 0
+			##may not be able to call the Im no longer attackedx the prev target
+			##so just set it to 0, since we werent curved before this
+			#
+			#straight_target = target
+			#straight_target.Im_attacked_only_by(self, Siege)
+			#
+			#
+		#else:
+			#straight_target.Im_no_longer_attacked_only_by(self,Siege)
+			##removes the pointing damage
+##			print("removes the pointing damage")
+			#if target == opposer:
+				##We were attacking tower previously
+				#straight_target = target
+				#straight_target.Im_attacked_only_by(self, Siege)
+			#else:
+			##if target isnt opposer then we curved
+			##or its tower, dummy (already fixed)
+				#straight_target.Im_straight_attacked_by(self)
+				##the target should modify my damage used up 
+				##adds half the damage to tower
+				#
+				##side_target = target
+				##side_target.Im_side_attacked_by(self)
+				#
+			##there will be different function along the lines of "update direction of dmg" for when a unit appears in front of me
+		#
+		#
+	#elif damage_used_up_2 != 0:
+		##curving from already being curved to a side unit
+		#if target == side_target:
+			## if we are still curved into the same target, refresh dmg
+			#side_target.Im_no_longer_side_attacked_by(self)
+			#side_target.Im_side_attacked_by(self)
+##			print("it was side")
+			#
+			##straight_target_also has be refreshed, 
+			##because we may have just equipped an item
+			#straight_target.Im_no_longer_straight_attacked_by(self)
+			#straight_target.Im_straight_attacked_by(self)
+			#
+			#
+			#
+		#elif straight_target.TYPE == "unit" and target == opposer:
+##			print("it was opposer")
+			##if we are curved to attack straight
+			#side_target.Im_no_longer_side_attacked_by(self)
+			#straight_target.Im_no_longer_straight_attacked_by(self)
+			##remove the damage 
+			#side_target = null
+			#straight_target.Im_attacked_only_by(self, Siege)
+			#
+		#elif straight_target.TYPE == "tower" and (target == opposer or target == straight_target):
+			##we were curved to side and there was empty slot across us, 
+			##a unit appeared there and we target it now or the tower
+			#side_target.Im_no_longer_side_attacked_by(self)
+			#side_target = null
+			#straight_target.Im_no_longer_straight_attacked_by(self)
+			#straight_target = target 
+			#straight_target.Im_attacked_only_by(self, Siege)
+#
+			#
+		#else: #if we are curved into the other side unit
+##			print("it was else")
+			#side_target.Im_no_longer_side_attacked_by(self)
+			#side_target = target
+			#side_target.Im_side_attacked_by(self)
 			
 func Im_attacked_only_by(attacker, _attackers_siege):
 	var dmg = attacker.AttackC
-	attacker.damage_used_up_1 = dmg
+	#attacker.damage_used_up_1 = dmg
 	var expected_damage = dmg - ArmorC
 #	if attackers_siege == true:
 #		var overkill_damage = damage_to_be_taken + expected_damage - HealthC
 #		if overkill_damage > 0:
-#			Card_layer.unit_being_sieged(faction, overkill_damage)
+#			card_layer.unit_being_sieged(faction, overkill_damage)
 #			expected_damage -= overkill_damage
 #			besieged_damage = overkill_damage
 	#we are taking care of besieged in increase_damage_to_be_taken() now
@@ -1592,97 +1662,83 @@ func Im_attacked_only_by(attacker, _attackers_siege):
 	if dmg<=0 and expected_damage > 0:
 		expected_damage = 0
 	#armor shenanigans
+	#if HERO == true or attacker.HERO == true:
+		#push_error(Unit_Name + " id: " + str(get_index()) + " is attacked only by " + attacker.Unit_Name)
+
 	increase_damage_to_be_taken(expected_damage)
 	
 	
-func Im_side_attacked_by(attacker):		
-#	var opposer = await get_opposer()
-#	if opposer.Siege == true and opposer.targeting == "straight":
-#		var damage_to_be_subtracted = opposer.damage_used_up_1 - (besieged_damage + ArmorC)
-#		damage_to_be_taken -= damage_to_be_subtracted
-#		besieged_damage = 0
-#		opposer.damage_used_up_1 = 0
-	#Siege only handled in increase dmg to be taken
-#	else:
-	var dmg = floor(attacker.AttackC / 2.0)
-	attacker.damage_used_up_2 = dmg
-	var expected_damage = dmg - ArmorC
-	if dmg >= 0 and expected_damage < 0:
-		expected_damage = 0
-	if dmg<0 and expected_damage > 0:
-		expected_damage = 0
-	#armor shenanigans
-	increase_damage_to_be_taken(expected_damage) 
-	
-#	if opposer.Siege == true and opposer.targeting == "straight":
-#		opposer.curve_straight()
-		
-func Im_straight_attacked_by(attacker):		
-	var dmg = ceil(attacker.AttackC / 2.0)
-	attacker.damage_used_up_1 = dmg
-	var expected_damage = dmg - ArmorC
-	if dmg > 0 and expected_damage < 0:
-		expected_damage = 0
-	if dmg<0 and expected_damage > 0:
-		expected_damage = 0
-	#armor shenanigans
-	increase_damage_to_be_taken(expected_damage)  
 		
 func Im_no_longer_attacked_only_by(attacker, _attackers_siege):
-	var dmg = attacker.damage_used_up_1
+	#push_error("unit " +Unit_Name +" id: " +str(get_index()) + " is nolongerattkedonlyby " + attacker.Unit_Name)
+	#var dmg = attacker.damage_used_up_1
+	var dmg = attacker.AttackC
+
 	if dmg > 0:
-		attacker.damage_used_up_1 = 0
-		var expected_damage = (-dmg + ArmorC)
+		#attacker.damage_used_up_1 = 0
+		var expected_damage = dmg - ArmorC
 		
-		if dmg >= 0 and expected_damage > 0:
+		if dmg >= 0 and expected_damage < 0:
 			expected_damage = 0
 
 		#armor shenanigans
+		if _attackers_siege == true:
+			expected_damage -= besieged_damage
+			card_layer.unit_no_longer_being_sieged(faction,besieged_damage)
+			if attacker.AttackC -1 <= besieged_damage:
+				expected_damage += ArmorC
+				#negative armor shenanihanz
+			besieged_damage = 0
 		
-		increase_damage_to_be_taken(expected_damage) 
+		increase_damage_to_be_taken(-expected_damage) 
 	
 	
-func Im_no_longer_side_attacked_by(attacker):
-	var dmg = attacker.damage_used_up_2
-	if dmg > 0:
-		attacker.damage_used_up_2 = 0
-		var expected_damage = -dmg + ArmorC
-		
-		if dmg > 0 and expected_damage > 0:
-			expected_damage = 0
-		increase_damage_to_be_taken(expected_damage) 
-		
-func Im_no_longer_straight_attacked_by(attacker):
-	var dmg = attacker.damage_used_up_1
-	attacker.damage_used_up_1 = 0
-	var expected_damage = -dmg + ArmorC
-	
-	if dmg > 0 and expected_damage > 0:
-		expected_damage = 0
-	increase_damage_to_be_taken(expected_damage) 
-	
+#func Im_no_longer_side_attacked_by(attacker):
+	#var dmg = attacker.damage_used_up_2
+	#if dmg > 0:
+		#attacker.damage_used_up_2 = 0
+		#var expected_damage = -dmg + ArmorC
+		#
+		#if dmg > 0 and expected_damage > 0:
+			#expected_damage = 0
+		#increase_damage_to_be_taken(expected_damage) 
+		#
+#func Im_no_longer_straight_attacked_by(attacker):
+	#var dmg = attacker.damage_used_up_1
+	#attacker.damage_used_up_1 = 0
+	#var expected_damage = -dmg + ArmorC
+	#
+	#if dmg > 0 and expected_damage > 0:
+		#expected_damage = 0
+	#increase_damage_to_be_taken(expected_damage) 
+	#
 	
 	
 func ignore_opposer():
+	#push_error(str(Unit_Name) + " is ignoring opposer at " +str(get_index()))
 	#used when a unit dies in front of me
 	#this is called before the unit dies so that I can target the tower
 	#because I don't know how to call it after it's death
 		#actually just don't wanna do it now
-	if targeting == "straight":
+	#if targeting == "straight":
 #		print("it was curved straight")
-		damage_used_up_1 = 0
-		var target = MYrena_rect.OPTower
-		straight_target = target
+	#damage_used_up_1 = 0
+	if Siege == true and straight_target != null and straight_target.TYPE == "unit":
+		card_layer.unit_no_longer_being_sieged(straight_target.faction, straight_target.besieged_damage)
+
+	
+	var target = MYrena_rect.OPTower
+	straight_target = target
+	
+	redirect_damage(target)
 		
-		redirect_damage(target)
-		
-	else: 
+	#else: 
 #		print("it was curved to the side")
-		damage_used_up_1 = 0
-		var target = MYrena_rect.OPTower
-		straight_target = target
-		
-		redirect_damage(target)
+		#damage_used_up_1 = 0
+		#var target = MYrena_rect.OPTower
+		#straight_target = target
+		#
+		#redirect_damage(target)
 	
 		
 
@@ -1697,9 +1753,7 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 	#wtf is preopposer
 	
 	if problem == true:
-		#no idea how this becomes true	
-			#Manually when a problem comes up roflmao
-		push_error(" increasing dmg tbt by: " +str(amount) +" " + str( damage_to_be_taken) +" " + str( opposer.besieging_damage) + " " +str(get_index()) + " " +str(faction))
+		push_error(" increasing dmg tbt by: " +str(amount) +" " + str( damage_to_be_taken) +" " + str( besieged_damage) + " " +str(get_index()) + " " +str(faction) )
 	#Oh nyo, welcome back again master 
 	
 	
@@ -1707,8 +1761,7 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 		#only set to false when this is called from the anull guys
 		
 
-		damage_to_be_taken += opposer.besieging_damage 
-		#voids have besieging damage 0, which is unit default
+		damage_to_be_taken += besieged_damage 
 		if alive == true and damage_to_be_taken >= 0:
 			overkill_damage =  damage_to_be_taken - HealthC 
 			#otherwise dying unit recalcs overkill damage
@@ -1718,44 +1771,51 @@ func increase_damage_to_be_taken(amount, check_for_siege = true):
 			damage_to_be_taken += overkill_damage 
 			#this can only happen when subtracting dmgtbtkn 
 				#gotta divide this function into adding and subtracting
-			Card_layer.unit_no_longer_being_sieged(faction, overkill_damage)
+			card_layer.unit_no_longer_being_sieged(faction, overkill_damage)
 			overkill_damage = 0
 			
 		var being_sieged = false 
-		if problem == true:
-			push_error("overkill dmg: " +str(overkill_damage))
+		#if problem == true:
+			#push_error("overkill dmg: " +str(overkill_damage))
 		if overkill_damage > 0:
 			
-			if opposer.TYPE == "unit" and opposer.Siege == true and opposer.targeting == "straight":
+			if opposer.TYPE == "unit" and opposer.Siege == true : #and opposer.targeting == "straight"
 			#check whether tower is gonna take siege damage
 				being_sieged = true
-				if opposer.besieging_damage > 0:
-					Card_layer.unit_no_longer_being_sieged(faction, opposer.besieging_damage)
+				if besieged_damage > 0:
+					card_layer.unit_no_longer_being_sieged(faction, besieged_damage)
 				#if I was already besieged, retract that number
-				opposer.besieging_damage = overkill_damage
-				Card_layer.unit_being_sieged(faction, opposer.besieging_damage)
-				#update besieged damage and send it over
-				damage_to_be_taken-= overkill_damage
+				if opposer.AttackC <= overkill_damage:
+					#happens when armor goes bellow 0
+					#at least 1 dmg has to be consumed to kill the opposer
+					besieged_damage = opposer.AttackC -1
+					damage_to_be_taken = HealthC
+				else:
+					besieged_damage = overkill_damage
+					damage_to_be_taken-= overkill_damage
 				#to visually se only how much Im absorbing
-				#If on, armor and siege works
-				#If off, IncreaseDmg and siege works
+				#push_error("besieged damage: " +str(besieged_damage) + " overkill_damage: " + str(overkill_damage))
+				card_layer.unit_being_sieged(faction, besieged_damage)
+				#update besieged damage and send it over
+				
 			else:
 				overkill_damage = 0
 				#so that it doesnt mess up next calc
 
-		if opposer.besieging_damage> 0 and being_sieged == false:
+		if besieged_damage> 0 and being_sieged == false:
 			#this only happens if overkill is 0, so that's kept
 			#could cause problems if opposer qufreed early
 				#quefreeing early solved with: 'if alive == true and damage_to_be_taken < 0:'
-			Card_layer.unit_no_longer_being_sieged(faction, opposer.besieging_damage)
-			opposer.besieging_damage = 0
+			card_layer.unit_no_longer_being_sieged(faction, besieged_damage)
+			besieged_damage = 0
 			#I might've been sieged previously, retract that if no longer
-		
+	else:
+		push_error("not checking for siege")	
 	%DMG_TBT.text = str(damage_to_be_taken)
 	check_damage_to_be_taken()		
 	#modifies deathmarker
-	if problem == true:
-		push_error(" final increased dmg tbt by: " +str(amount) +" " + str( damage_to_be_taken) +" " + str( opposer.besieging_damage) + " " +str(faction))
+	#if problem == true:
+		#push_error(" final increased dmg tbt by: " +str(amount) +" " + str( damage_to_be_taken) +" " + str( besieged_damage) + " " +str(faction))
 
 
 func check_damage_to_be_taken():
@@ -1790,7 +1850,8 @@ func hide_incoming_death():
 func lane_aura_check():
 	#push_error("lane_aura_check_at_me")
 	%Lane_auras.reupdate(faction)
-	push_error("lane_aura_checking")
+	#push_error("lane_aura_checking")
+	
 
 
 
@@ -1824,7 +1885,7 @@ func new_lane():
 		if Passiveness == true and has_ability == true:
 			Ability1.get_child(2).remove_myself_from_old_array(tower_layer)
 		
-		Card_layer = $"../../../../.."
+		card_layer = $"../../../../.."
 		tower_layer = $"../../../../../../Tower_layer"
 		tower_mana = $"../../../../../../Tower_layer/TowerA/Mana_display/Current_mana"
 		MYrena_rect = $".."
@@ -1837,7 +1898,7 @@ func new_lane():
 			Ability1.get_child(2).new_lane(tower_layer)
 		#this connects the unit to the correct signal hub
 			#child 2 of ability is the one that is created during ready
-	
+	#push_error("newlane completed for " + Unit_Name + str(my_lane))
 	
 	
 	
@@ -1871,12 +1932,13 @@ func get_opposer(Index = get_index()):
 	#which would ruin the primary purpose of this function
 	var opposer = OPrena.get_child(Index)
 #	var mb_opposer
-	while opposer == null or (opposer.TYPE == "unit" and opposer.alive == false):
+	while opposer == null or (Base.Main_phase == 0 and opposer.TYPE == "unit" and opposer.alive == false):
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		if MYrena_rect.get_child_count() == OPrena.get_child_count():
 			#testing this to solve problem where last slot A 
 			#becomes second to last due to bonus void in B (spawning)
 			opposer = OPrena.get_child(Index)
+		push_error("still waiting for opposer at: " + str(Index))
 
 	return opposer
 		
@@ -1892,9 +1954,8 @@ func I_have_position_aura():
 	
 	
 func annul_my_presence():
-	annul_damage_directed_to_me(true) 
-	#we set loudness to true because unit might be moved when....... idk
-	await annul_my_damage()
+	await annul_damage_directed_to_me() 	
+	await annul_my_damage(true)
 	
 func cleanse_me_from_position_auras():
 	for i in %Position_auras.get_child_count():
@@ -1908,6 +1969,7 @@ func pull_me_out_of_this_lane():
 	#the damage2 doesn't seem to be annulled soon enough
 	
 	self.reparent(D12)
+	
 	MYrena_rect.insert_void(my_index)
 	
 	tower_layer.unit_order_changed_signal(my_lane)
@@ -1917,36 +1979,36 @@ func pull_me_out_of_this_lane():
 		#if it had opposer void, I should now curve straight
 		#which I'm checking by whether there is a unit as my left-target
 
-func refresh_me_from_being_annulled():
-	if my_damage_was_annuled == false:
-		printerr("unit forced to be refreshed_from_being_annulled despite not being annulled")
-	else:
-#		var opposer = await get_opposer()
-		var my_index = get_index()
-		var target
-		if targeting == "straight": #and opposer.TYPE == "void: #notsure if needed
-			straight_target = null
-			
-		#CLEARING TWO VOIDS WASNT CALLED YET
-		elif targeting == "left":
-			if my_index > 0:
-				target = await get_opposer(my_index-1)
-				if target.TYPE == "void":
-					side_target = null
-			else:
-				push_error("I was curved to left despite being id0 ")
-		elif targeting == "right":
-			if my_index > 0:
-				target = await get_opposer(my_index+1)
-				if target.TYPE == "void":
-					side_target = null
-			else:
-				push_error("I was curved to left despite being id0 ")
-		else: push_error("unknown targeting found in refresh_me_from_being_annulled: " +str(targeting))
-		
-		refresh_my_combat_damage()	
-			
-	
+#func refresh_me_from_being_annulled():
+	#if my_damage_was_annuled == false:
+		#push_error("unit forced to be refreshed_from_being_annulled despite not being annulled")
+	#else:
+##		var opposer = await get_opposer()
+		##var my_index = get_index()
+		###var target
+		###if targeting == "straight": #and opposer.TYPE == "void: #notsure if needed
+		##straight_target = null
+			#
+		##CLEARING TWO VOIDS WASNT CALLED YET
+		##elif targeting == "left":
+			##if my_index > 0:
+				##target = await get_opposer(my_index-1)
+				##if target.TYPE == "void":
+					##side_target = null
+			##else:
+				##push_error("I was curved to left despite being id0 ")
+		##elif targeting == "right":
+			##if my_index > 0:
+				##target = await get_opposer(my_index+1)
+				##if target.TYPE == "void":
+					##side_target = null
+			##else:
+				##push_error("I was curved to left despite being id0 ")
+		##else: push_error("unknown targeting found in refresh_me_from_being_annulled: " +str(targeting))
+		#
+		##refresh_my_combat_damage()	
+		#curve_straight()	
+	#
 	
 func hide_ability_and_items_mb():
 	#sets mouse filter to ignore, used when targeting units
@@ -2005,6 +2067,28 @@ func force_remove_myself_from_trigger_array():
 
 
 
+#######################################################################
+### 						ANIMATIONS 								###
+#######################################################################
+
+func SMASH():
+	var prep_time = 0.25
+	var charge_time = 0.1
+	var back_time = 0.4
+	var x = self.position.x
+	var y = self.position.y
+	var prep_distance = 210
+	var charge_distance = 240
+	if faction == "beta":
+		prep_distance = -prep_distance
+		charge_distance = -charge_distance
+	
+	var tween = get_tree().create_tween()
+	#we tween property 	of what 	which one 	to what 			how much time
+	tween.tween_property(self, "position", Vector2(x,y+prep_distance), prep_time)
+	tween.tween_property(self, 
+	"position", Vector2(x,y+prep_distance-charge_distance), charge_time)
+	tween.tween_property(self, "position", Vector2(x,y), back_time)
 
 
 
@@ -2019,9 +2103,9 @@ func minus_hp(mirror = true):
 	#mirror set to false only when receiving rpc to not loop
 	increase_HealthM(-1,1)
 	if mirror == true:
-		Card_layer.make_my_mirror_minus_hp(MY_UNIQUE_UNIT_KEY)
+		card_layer.make_my_mirror_minus_hp(MY_UNIQUE_UNIT_KEY)
 		
 func plus_hp(mirror = true):
 	increase_HealthM(-1,1)
 	if mirror == true:
-		Card_layer.make_my_mirror_plus_hp(MY_UNIQUE_UNIT_KEY)
+		card_layer.make_my_mirror_plus_hp(MY_UNIQUE_UNIT_KEY)

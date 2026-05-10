@@ -71,4 +71,3 @@ func _on_tree_exited():
 	abarena.move_roof_back()
 	Base.unlock_pass_button()
 	#because we locked it once we started dragging the preview
-

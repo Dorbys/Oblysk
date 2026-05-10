@@ -25,7 +25,6 @@ var aura_unique_id
 var text_for_tooltip = "tooltip didn't load properly"
 
 func _ready():
-#	print("My tower is: " + str(my_tower.name))
 	texture = Build_Pfp
 	
 	
@@ -76,9 +75,6 @@ func _ready():
 	#connect what's my and the opposite lane
 	
 	
-	
-	
-	
 	if is_aura == true:
 		#Following part affects all desired units by the aura because it was played
 		var population = my_lane.get_child_count()
@@ -113,7 +109,7 @@ func _ready():
 					affect_unit(target,wielder)
 
 func affect_unit(target, wielder):
-	push_error("AFFECTING")
+	push_error("AFFECTING " +wielder.Unit_Name + " lane: " + str(wielder.my_lane))
 	if %Affection.do_I_affect_this(wielder) == true:
 		var node_name = str(Build_name) + "_" + str(aura_unique_id)
 		if target.has_node(node_name):
@@ -136,7 +132,7 @@ func  do_I_affect_faction(faction):
 		return affects_faction_beta
 		
 	else: 
-		print("An aura is affecting both factions")
+		push_error("An aura is affecting both factions")
 		return true
 		
 	#NEED A SOLUTION FOR "BOTH"

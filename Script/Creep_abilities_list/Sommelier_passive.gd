@@ -75,7 +75,7 @@ func aura_affect_primary_targets():
 	
 func affect_unit(target):
 	#target is the auraslot already
-#	print("AFFECTING")
+#	push_error("AFFECTING")
 	if target.has_node(aura_name+str(aura_unique_id)) == false:
 		var aura_effect = Control.new()
 		aura_effect.name = aura_name+str(aura_unique_id)
@@ -97,7 +97,7 @@ func refresh_my_aura():
 			#but should no longer be have to get their auraeffect removed
 				affect_unit(target.position_auras)
 			else:
-				printerr("checking for: " + aura_name +str(aura_unique_id))
+				#printerr("checking for: " + aura_name +str(aura_unique_id))
 				if target.position_auras.has_node(aura_name+str(aura_unique_id)):
 					target.position_auras.get_node(aura_name+str(aura_unique_id)).get_removed()
 	

@@ -102,7 +102,7 @@ func create_lvlup_spell_preview():
 
 func assign_lvlup_spell_stats(preview, ID):
 	preview.Card_name = LvlupDB.LVLUPS_DB[ID][LvlupDB.NAMEPOSITION]
-	preview.Card_pfp = Base.LVLUP_CARDS_TEXTURES[ID]
+	preview.Card_pfp = Base.LVLUP_SPELLS_TEXTURES[ID]
 	preview.Card_Cost = LvlupDB.LVLUPS_DB[ID][LvlupDB.COSTPOSITION]
 	preview.Card_XP = 0
 	preview.Targets = LvlupDB.LVLUPS_DB[ID][LvlupDB.TARGPOSITION]
@@ -120,7 +120,7 @@ func create_building_preview():
 
 func assign_building_stats(preview, ID):
 	preview.Card_name = BuildDB.BUILD_DB[ID][BuildDB.NAMEPOSITION]
-	preview.Build_Pfp = Base.BUILDING_TEXTURES[ID]
+	preview.Card_pfp = Base.BUILDING_TEXTURES[ID]
 	preview.Card_Cost = BuildDB.BUILD_DB[ID][BuildDB.COSTPOSITION]
 	preview.Card_XP = BuildDB.BUILD_DB[ID][BuildDB.XPPOSITION]
 
@@ -133,9 +133,8 @@ func create_upgrade_preview():
 func assign_upgrade_stats(preview, ID):
 	preview.Item_Name = ItemsDB.ITEMS_DB[ID][ItemsDB.NAMEPOSITION]
 	preview.ITEMM = ItemsDB.ITEMS_DB[ID][ItemsDB.ITEMMPOSITION]
-	preview.Item_Pfp = Base.ITEM_TEXTURES[ID]
+	preview.Card_pfp = Base.UPGRADE_TEXTURES[ID]
 #	preview.Item_Stat = ItemsDB.ITEMS_DB[ID][ItemsDB.STATPOSITION]
 	preview.Card_Cost = ItemsDB.ITEMS_DB[ID][ItemsDB.COSTPOSITION]
 	preview.Item_cooldown = ItemsDB.ITEMS_DB[ID][ItemsDB.COOLDOWNPOSITION]
 	preview.Identification = ID
-

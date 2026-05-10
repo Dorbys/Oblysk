@@ -13,9 +13,11 @@ func r_update():
 		r_time -= 1
 	
 		if r_time == 0:
+			self.get_child(0).cleanup_phase()
 			await graveyard_showcase.respawn(self, self.get_child(0))
 			self.texture = null
 		elif r_time == 1:
+			self.get_child(0).cleanup_phase()
 			self.modulate = green
 		elif r_time == 2:
 			self.modulate = red

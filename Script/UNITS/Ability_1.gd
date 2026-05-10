@@ -1,4 +1,8 @@
 extends TextureRect
+
+@export var no_action_warning: PackedScene
+
+
 @onready var UI_layer = $"../../../../../../../../../UI_layer"
 
 @onready var Card_layer = $"../../../../../../../"
@@ -49,7 +53,7 @@ func Im_passive_and_ready():
 	
 	
 	
-func activate_cooldown():
+func activate_cooldown(_rpced = false):
 	CooldownC = CooldownM
 	%Cooldown.text = str(CooldownC)
 	make_cooldown_shaded()
@@ -63,15 +67,24 @@ func activate_cooldown():
 	await get_tree().create_timer(Base.FAKE_GAMMA).timeout
 	reshow_myself()
 	#for tooltip visibility
+	
+	if Lobby.MULTIPLAYER == true and _rpced == false and wielder.readied == true:
+		#readied check to prevent startup problems
+		wielder.card_layer.mirror_ability_activate_cooldown(wielder.MY_UNIQUE_UNIT_KEY)
+		
 
 
 func decrease_cooldown():
-	CooldownC -= 1
-	
-	if CooldownC == 0:
-		make_cooldown_off()
-		reshow_myself()
-	%Cooldown.text = str(CooldownC)
+	if CooldownC != null:
+		CooldownC -= 1
+		if CooldownC < 0:
+			CooldownC = 0
+		if CooldownC == 0:
+			make_cooldown_off()
+			reshow_myself()
+		%Cooldown.text = str(CooldownC)
+	else:
+		push_error("Attempted to decrease null cooldown")
 
 func make_cooldown_shaded():
 #	material.set_shader_parameter("Is_cooldown_ready", COOLDOWN_SHADED)
@@ -95,31 +108,37 @@ func make_cooldown_off():
 func _on_ability_field_gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 			if event.is_pressed():
-				print("ABILITY 1 CLICKED")
-#				%Ability_field.MOUSE_FILTER_STOP
-				#So that card doesnt automatically select itself as TList[0]
-					#No longer needed, no fucking idea why, but it works
-				var AID = wielder.Identification
-				if AbilitiesDB.HERO_ABILITIES_DB[AID][AbilitiesDB.TARGPOSITION] != Enums.Targeting.myself:
-				#we only need covering if there is something to be targeted
-					var another = wielder.COVERING.instantiate()
+				var action_check = does_player_have_action()
+				if action_check == true:
+					#print("ABILITY 1 CLICKED")
+	#				%Ability_field.MOUSE_FILTER_STOP
+					#So that card doesnt automatically select itself as TList[0]
+						#No longer needed, no fucking idea why, but it works
+					var AID = wielder.Identification
+					if AbilitiesDB.HERO_ABILITIES_DB[AID][AbilitiesDB.TARGPOSITION] != Enums.Targeting.myself:
+					#we only need covering if there is something to be targeted
+						var another = wielder.COVERING.instantiate()
 
-					if AbilitiesDB.HERO_ABILITIES_DB[AID][AbilitiesDB.TARGPOSITION] == Enums.Targeting.one_unit:
-						another.I_want_targets = 1
-					else: push_error("I_Want_targets for this targeting wasnt automated yet")
+						if AbilitiesDB.HERO_ABILITIES_DB[AID][AbilitiesDB.TARGPOSITION] == Enums.Targeting.one_unit:
+							another.I_want_targets = 1
+						else: push_error("I_Want_targets for this targeting wasnt automated yet")
+						
+						another.origin_ability = self
+						another.Ability_ID = AID
+						UI_layer.add_child(another)
+						Im_looking_for_targets_visual()
+						await get_tree().create_timer(Base.FAKE_GAMMA).timeout
+						hide_myself() #needed with the delay else selftargetting
+					else:
+						AbilitiesDB.call(str(AbilitiesDB.HERO_ABILITIES_DB[AID][AbilitiesDB.NAMEPOSITION]),wielder)
+						activate_cooldown()
+						#if we don't have covering we take care of CD manually
+						if Lobby.MULTIPLAYER == true:
+							Base.pass_the_initiative()
 					
-					another.origin_ability = self
-					another.Ability_ID = AID
-					UI_layer.add_child(another)
-					Im_looking_for_targets_visual()
-					await get_tree().create_timer(Base.FAKE_GAMMA).timeout
-					hide_myself() #needed with the delay else selftargetting
+					%Ability_field._mouse_exited()
 				else:
-					AbilitiesDB.call(str(AbilitiesDB.HERO_ABILITIES_DB[AID][AbilitiesDB.NAMEPOSITION]),wielder)
-					activate_cooldown()
-					#if we don't have covering we take care of CD manually
-				
-				%Ability_field._mouse_exited()
+					you_dont_have_action()
 				
 func disconnect_myself():
 	if ConnectionT == 1:
@@ -168,5 +187,14 @@ func check_cooldown_penetrability():
 			reconnect_myself()
 		else:
 			disconnect_myself()
-
-
+			
+func does_player_have_action():
+	if Base.granted_action == 1:
+		return true
+	else:
+		push_error("not your action :<")
+		return false
+		
+func you_dont_have_action():
+	var action_jumpscare = no_action_warning.instantiate()
+	UI_layer.add_child(action_jumpscare)

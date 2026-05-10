@@ -57,12 +57,14 @@ func prepare_cooldown():
 	CooldownC = 0
 	reconnect_myself()
 
-func activate_cooldown():
+func activate_cooldown(_rpced = false):
 	hide_myself()
 	CooldownC = CooldownM
 	cooldown_node.text = str(CooldownC)
 	cooldown_node.visible = true
 	disconnect_myself()
+	if Lobby.MULTIPLAYER == true and _rpced == false:
+		wielder.card_layer.mirror_item_activate_cooldown(wielder.MY_UNIQUE_UNIT_KEY,name)
 
 func decrease_cooldown():
 	if has_active_item == true:

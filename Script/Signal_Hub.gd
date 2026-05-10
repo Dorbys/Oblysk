@@ -54,9 +54,28 @@ func card_played_signal(card:Node):
 				#the problem is int multiple appendations
 				await target.card_has_been_played(card)
 		else: card_played_list.remove_at(i)
-		
+
+#selects what signal to send based on target type
+func something_targeted_signal(target, targeting_entity):
+	match target.TYPE:
+		"unit":
+			unit_targeted_signal(target, targeting_entity)
+		"lane":
+			push_error("signal not implemented yet")
+		"tower":
+			push_error("signal not implemented yet")
+		_:
+			push_error("signal not implemented yet")
+	
+	
+	
+	
+@rpc("any_peer", "call_remote", "reliable")			
 func unit_targeted_signal(unit, targeting_entity):
 	#targeting_entity is the function that targeted it
+	if unit is int:
+		unit = Lobby.universal_global_unit_array[unit]
+	#if it was rpced to us, we convert it from int to control	
 	if unit.TYPE == "unit":
 		for i in range(unit_targeted_list.size() - 1, -1, -1):
 			var target = unit_targeted_list[i]
@@ -64,6 +83,9 @@ func unit_targeted_signal(unit, targeting_entity):
 				if basic_requirements(target): 
 					await target.unit_has_been_targeted(unit, targeting_entity)
 			else: unit_targeted_list.remove_at(i)
+	if Lobby.MULTIPLAYER == true and multiplayer.get_remote_sender_id() == 0:
+		var unique_unit_key = unit.MY_UNIQUE_UNIT_KEY
+		rpc_id(Lobby.opponent_peer_id,"unit_targeted_signal", unique_unit_key, targeting_entity)
 		
 func cleanup_phase_signal():
 	for i in range(cleanup_phase_list.size() - 1, -1, -1):

@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3 uid="uid://cauryrpdbrtky"]
 
-[ext_resource type="Script" path="res://Script/UNITS/UnCIHERR.gd" id="1_uqjfn"]
+[ext_resource type="Script" uid="uid://jjmso125q3n1" path="res://Script/UNITS/UnCIHERR.gd" id="1_uqjfn"]
 [ext_resource type="PackedScene" uid="uid://ev4s6r8o0qsf" path="res://Scenes/UNIT/UnitPreview.tscn" id="3_uju4r"]
 [ext_resource type="PackedScene" uid="uid://dlw1m0ncyr2sg" path="res://Scenes/UNIT/UnitCihPreview.tscn" id="4_b3voe"]
 [ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="4_bp3rg"]

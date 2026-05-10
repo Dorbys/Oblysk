@@ -1,8 +1,8 @@
 [gd_scene load_steps=9 format=3 uid="uid://bj3bixoxwqodu"]
 
-[ext_resource type="Script" path="res://Script/SCROLLH/SCROLLH.gd" id="1_5wwpp"]
-[ext_resource type="Script" path="res://Script/SCROLLH/HANDA.gd" id="2_l65n7"]
-[ext_resource type="Script" path="res://Script/SCROLLH/Hand.gd" id="3_2ocrk"]
+[ext_resource type="Script" uid="uid://djygqkm5ffwar" path="res://Script/SCROLLH/SCROLLH.gd" id="1_5wwpp"]
+[ext_resource type="Script" uid="uid://dwptkwphiphvs" path="res://Script/SCROLLH/HANDA.gd" id="2_l65n7"]
+[ext_resource type="Script" uid="uid://bl5mvskugw7sb" path="res://Script/SCROLLH/Hand.gd" id="3_2ocrk"]
 [ext_resource type="PackedScene" uid="uid://cauryrpdbrtky" path="res://Scenes/UNIT/UnitCIH.tscn" id="4_yxy3t"]
 [ext_resource type="PackedScene" uid="uid://bab3q2vggpesl" path="res://Scenes/Spell/Spell1.tscn" id="5_i3k8w"]
 [ext_resource type="PackedScene" uid="uid://dseoec0oq6vju" path="res://Scenes/Weapon1.tscn" id="6_hreuf"]

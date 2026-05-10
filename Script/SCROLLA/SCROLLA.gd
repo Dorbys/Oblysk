@@ -20,5 +20,3 @@ func SMASH():
 	"position", Vector2(x,y+prep_distance-charge_distance), charge_time)
 	tween.tween_property(self, "position", Vector2(x,y), back_time)
 	
-
-

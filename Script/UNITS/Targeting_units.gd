@@ -122,7 +122,6 @@ func _ready():
 	
 
 	%targeting_what.text = base_text + cancel_text
-	printerr("Covering is locking") 
 	Base.lock_pass_button()
 	
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
@@ -181,7 +180,7 @@ func _process(_delta):
 		
 func handle_one_target():
 	if Card_ID != null:
-		await tower_layer.unit_targeted_signal(TList[0],DBList[Card_ID])
+		await tower_layer.something_targeted_signal(TList[0],DBList[Card_ID])
 		#FOR PASSIVES
 		var card_function = str(DBList[Card_ID][0])
 		if Lobby.MULTIPLAYER == true:
@@ -195,7 +194,7 @@ func handle_one_target():
 		return
 	elif Ability_ID != null:
 		origin_ability.activate_cooldown()
-		await tower_layer.unit_targeted_signal(TList[0],AbilitiesDB.HERO_ABILITIES_DB[Ability_ID])
+		await tower_layer.something_targeted_signal(TList[0],AbilitiesDB.HERO_ABILITIES_DB[Ability_ID])
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 
 		#FOR PASSIVES
@@ -205,18 +204,19 @@ func handle_one_target():
 		
 func handle_two_targets():
 	if Card_ID != null:
-		
+		var func_to_call = DBList[Card_ID][0]
+		var sync_data = await DB.call(func_to_call,TList[0],TList[1],Lobby.current_player)
 		if Lobby.MULTIPLAYER == true:
 			var cardtype = "spell"
 			if from_lvlup_card == true:
 				cardtype = "lvlup_spell"
-			await two_target_handling_multiplayer(cardtype, Card_ID, DBList[Card_ID][0],
-			 TList[0].MY_UNIQUE_UNIT_KEY,TList[1].MY_UNIQUE_UNIT_KEY)
-		else:
-			await DB.call(DBList[Card_ID][0],TList[0],TList[1],Lobby.current_player)
+			await two_target_handling_multiplayer(cardtype, Card_ID, func_to_call,
+			 TList[0],TList[1], sync_data)
+
+			
 		
-		await tower_layer.unit_targeted_signal(TList[0],DBList[Card_ID])
-		await tower_layer.unit_targeted_signal(TList[1],DBList[Card_ID])	
+		await tower_layer.something_targeted_signal(TList[0],DBList[Card_ID])
+		await tower_layer.something_targeted_signal(TList[1],DBList[Card_ID])	
 		#FOR PASSIVES
 		
 		delete_myself(true)
@@ -224,8 +224,8 @@ func handle_two_targets():
 	elif Ability_ID != null:
 		origin_ability.activate_cooldown()
 		
-		await tower_layer.unit_targeted_signal(TList[0],AbilitiesDB.ABILITIES_DB[Ability_ID])
-		await tower_layer.unit_targeted_signal(TList[1],AbilitiesDB.ABILITIES_DB[Ability_ID])
+		await tower_layer.something_targeted_signal(TList[0],AbilitiesDB.ABILITIES_DB[Ability_ID])
+		await tower_layer.something_targeted_signal(TList[1],AbilitiesDB.ABILITIES_DB[Ability_ID])
 		#FOR PASSIVES
 		
 		#not sure why abilites done via DB and DBList		
@@ -236,11 +236,16 @@ func handle_two_targets():
 	elif Item_ID != null:
 		origin_item.activate_cooldown()
 		
-		await tower_layer.unit_targeted_signal(TList[0],DBList[Item_ID])
-		await tower_layer.unit_targeted_signal(TList[1],DBList[Item_ID])	
+		await tower_layer.something_targeted_signal(TList[0],DBList[Item_ID])
+		await tower_layer.something_targeted_signal(TList[1],DBList[Item_ID])	
 		#FOR PASSIVES mbhere
-		
-		await DB.call(str(DBList[Item_ID][0]),TList[0],TList[1])
+		var func_to_call = str(DBList[Item_ID][DB.NAMEPOSITION])
+		var sync_data = await DB.call(func_to_call,TList[0],TList[1], null)
+		if Lobby.MULTIPLAYER == true:
+			var cardtype = "item"
+			await two_target_handling_multiplayer(cardtype, Item_ID, func_to_call,
+			 TList[0],TList[1], sync_data)
+			Base.pass_the_initiative()
 		#Use 'await' at the end of DB-functions
 		
 		delete_myself(true)
@@ -249,7 +254,6 @@ func handle_two_targets():
 	else: push_error("covering has 2 targets but nothing to call")
 
 func delete_myself(used):
-	printerr("covering is being deleted")
 	the_button.global_lets_stop_targeting()
 	the_button.global_lets_reshow_abilities_and_items()
 
@@ -305,26 +309,48 @@ func one_target_handling_multiplayer(spelltype:String, function_to_be_called:Str
 	#think I can't even test this except for ability, which I'm no longer using lol
 	#check here when one such is reimplemented
 	#why orderedd?
-	if Lobby.host == true:
-		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, unit_unique_key)
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key])
-	else:
-		DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key])
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, unit_unique_key)
+	#if Lobby.host == true:
+	Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, unit_unique_key)
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key])
+	#else:
+		#DB.call(function_to_be_called,Lobby.universal_global_unit_array[unit_unique_key])
+		#await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		#Card_layer.make_mirror_unit_receive_spell_call(spelltype, function_to_be_called, unit_unique_key)
 		
-func two_target_handling_multiplayer(spelltype:String, spell_id:int, 
- function_to_be_called:String, unit_unique_key:int, second_unit_unique_key:int):
-	var target1 = Lobby.universal_global_unit_array[unit_unique_key]
-	var target2 = Lobby.universal_global_unit_array[second_unit_unique_key]
-	if Lobby.host == true:
-		await Card_layer.make_two_mirror_units_receive_spell_call(spelltype, spell_id,
-		  unit_unique_key, second_unit_unique_key)
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		await DB.call(function_to_be_called,target1,target2)
+func two_target_handling_multiplayer(cardtype:String, spell_id:int, 
+ func_to_call:String, target1:Node, target2:Node, sync_data):
+	var target1_identification
+	var target2_identification
+	#for units: MY_UNIQUE_UNIT_KEY
+	#for lanes: MY_identity+my_lane
+	
+	if target1.TYPE == "unit":
+		target1_identification = target1.MY_UNIQUE_UNIT_KEY
+	elif  target1.TYPE == "lane":
+		target1_identification = str(target1.MY_identity + str(target1.my_lane))
+	#nah
+	if target2.TYPE == "unit":
+		target2_identification = target2.MY_UNIQUE_UNIT_KEY
+	elif  target2.TYPE == "lane":
+		target2_identification = str(target2.MY_identity + str(target2.my_lane))
+		
+	#var target1 = Lobby.universal_global_unit_array[target1_identification]
+	#var target2 = Lobby.universal_global_unit_array[target2_identification]
+	#if Lobby.host == true:
+	#push_error("comparing types: " +target1.TYPE + " and " +target2.TYPE)
+	if target1.TYPE == target2.TYPE:
+		if target1.TYPE == "unit":
+			await Card_layer.make_two_mirror_units_receive_spell_call(cardtype, func_to_call,
+			  target1_identification, target2_identification, sync_data)
 	else:
-		await DB.call(function_to_be_called,target1,target2)
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		await Card_layer.make_two_mirror_units_receive_spell_call(spelltype, spell_id,
-		 unit_unique_key, second_unit_unique_key)		
+		if target1.TYPE == "unit" and target2.TYPE == "lane":
+			await Card_layer.make_mirror_unit_and_lane_receive_spell_call(cardtype, func_to_call,
+			  target1_identification, target2_identification, sync_data)
+	#await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	#await DB.call(function_to_be_called,target1,target2)
+	#else:
+		#await DB.call(function_to_be_called,target1,target2)
+		#await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		#await Card_layer.make_two_mirror_units_receive_spell_call(spelltype, spell_id,
+		 #unit_unique_key, second_unit_unique_key)		

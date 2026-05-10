@@ -2,7 +2,7 @@ extends Unit_passive_ability
 
 
 
-var ATTACK = 2
+var ATTACK = 4
 var HEALTH = 1
 
 var description = "Friday: +" +str(ATTACK) + "/" +str(HEALTH)
@@ -21,6 +21,7 @@ func friday_phase():
 	Warmarch()
 		
 func Warmarch():
-	wielder.increase_AttackM(2, 1)
-	wielder.increase_HealthM(1, 1)
+
+	wielder.increase_AttackM(ATTACK, 1)
+	wielder.increase_HealthM(HEALTH, 1)
 	

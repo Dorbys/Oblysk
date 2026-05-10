@@ -35,7 +35,8 @@ func unit_has_been_targeted(unit, trigger):
 		else:
 			push_error("neither spell nor lvlupspell")
 	else:
-		push_error("Acamarpassive's target is not the wielder")
+		#push_error("Acamarpassive's target is not the wielder")
+		pass
 		
 		
 func Chill_up():

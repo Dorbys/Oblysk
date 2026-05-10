@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://cegtjh03emal6" path="res://Assets/PREUI/Pass_texture_edge.jpg" id="1_dw0bk"]
 [ext_resource type="Texture2D" uid="uid://0r4y8x7j6row" path="res://Assets/PREUI/PASS_texture_elsewhere.jpg" id="2_t6aig"]
-[ext_resource type="Script" path="res://Script/UI_layer/The_button.gd" id="2_yiu82"]
+[ext_resource type="Script" uid="uid://chwpy11tqbksw" path="res://Script/UI_layer/The_button.gd" id="2_yiu82"]
 [ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="4_10inj"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_etpj8"]

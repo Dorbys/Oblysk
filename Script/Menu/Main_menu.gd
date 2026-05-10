@@ -2,10 +2,11 @@ extends Control
 
 @onready var waiting_screen = %Waiting_screen
 
-var multiplayer_peer = ENetMultiplayerPeer.new()
+var multiplayer_peer 
 
-const PORT = 9999
-const ADDRESS = "127.0.0.1"
+const PORT = 9996
+#const address = "127.0.0.1"
+var address = "192.168.0.85"
 
 #var opponent_peer_id
 ##int 1 if joiner, random if hoster
@@ -28,6 +29,7 @@ func _on_sp_pressed():
 
 
 func _on_host_pressed():
+	multiplayer_peer = ENetMultiplayerPeer.new()
 	waiting_screen.visible = true
 	multiplayer_peer.create_server(PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer
@@ -36,11 +38,12 @@ func _on_host_pressed():
 	#server's id is always 1
 	if Lobby.player_name == "":
 		Lobby.player_name = "host"
-	
+
 	multiplayer_peer.peer_connected.connect(someone_joined)
 
 func _on_join_pressed():
-	multiplayer_peer.create_client(ADDRESS, PORT)
+	multiplayer_peer = ENetMultiplayerPeer.new()
+	multiplayer_peer.create_client(address, PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer
 	#telling game that we are the client
 	my_peer_id = multiplayer.get_unique_id()
@@ -135,3 +138,8 @@ func _on_line_edit_text_changed(new_text):
 
 func _on_exit_pressed():
 	get_tree().quit()
+
+
+func _on_address_text_changed(new_text: String) -> void:
+	address = new_text
+	push_error("new address: " + new_text)

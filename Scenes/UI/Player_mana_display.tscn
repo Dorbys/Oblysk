@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bhaer715oasq3"]
 
 [ext_resource type="Texture2D" uid="uid://hesws5dpv16t" path="res://Assets/PREUI/PlayerMana.png" id="1_ccyf7"]
-[ext_resource type="Script" path="res://Script/UI_layer/Player_mana_display.gd" id="1_nmo1j"]
+[ext_resource type="Script" uid="uid://vr2d7i2s3kbd" path="res://Script/UI_layer/Player_mana_display.gd" id="1_nmo1j"]
 [ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="2_khkhs"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_e1rxr"]

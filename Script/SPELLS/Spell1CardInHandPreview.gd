@@ -25,4 +25,3 @@ func _ready():
 		%XP.text = str(Card_XP)
 	%SPELL_JPEG.texture = Card_pfp
 	%Card_description.text = SpellsDB[str(Card_name)+"_description"]
-

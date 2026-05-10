@@ -30,5 +30,3 @@ func being_replaced(caller):
 	self.queue_free()
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	
-
-

@@ -7,7 +7,7 @@ for i in range(herocount - 1, -1, -1):
 
 
 
-
+567m 
 
 
 
@@ -26,6 +26,21 @@ wait a minute - counterargument for attack, oh ok nvm
 Taking a phrase of a deceased partner
 a pair of coworkers together, noone else apparently knows they are, boss calls one on a mission
     the other just receives a call "I want you there too"
+Immortality pill D uses as wilson ball from stranded, and contemplates taking it 
+The mark
+Hope huh? Baseball huh?
+All along^12
+"hello peter"
+Attempt to decrease production by reigniting passion for time-travel research
+the luxury (in diff word) makes everyone dull" the one who lived there whole live: Yes
+how mettalic -> ironic
+Robots laughing at pathetic attempt to attach a virus to their routine update, commander angered because the attachment was just decoy, entirety of the routine update was the virus, which summounts to entire planet's information for one week. Virus is emotion as they now laugh and angry, soc collaps
+(Dying) u fuck up everything u touch ... did you ever touch smt already fucked up? | You | Laughs dying "and look what you did" dies of laughter
+It's not a tech (cyborg upgrade), it's silicon based parasite
+Not death maintainer link spell
+
+
+
 
 
 
@@ -33,21 +48,19 @@ a pair of coworkers together, noone else apparently knows they are, boss calls o
 
 invest bigga time into one actionsession
 
+each card has it's rank, upon reaching veteran it can be "dusted" for it's full value 
+
+Each tower has indicator with 5 "lifes" each life taken (12 dmg) deals 1 player dmg
+after five are depleted deal 5 damage to opponent
+new five lifes are regained, requiring 30 dmg, player damage 1 per life and 10 after depletion
+only 1+number of heroes in the lane of lifes can be stripped from tower at once, limit removed by having a sieger
+
+if [TANK] wasn't opposed this [Week], you can't play creeps in other slots
+
 
 #########     ###########            ##########            ########            ########
-
-Curving done at host and sent to join
-rpcing functions to happen first at host, so that curving doesn't cause problem
-
-
-
+Proglog
 #########     ###########            ##########            ########            ########
-
-
-
-
-
-
 
 
 
@@ -162,17 +175,63 @@ SummonTwo
         mb when 1 slot is forced and second is open anew
     Fixed, tested by landing in front of curved sieger + unit spawning leftmost
 
-######################################
-
-MP frfr
-
+Acamar passive doesn't work for opposite player
+Building MP not implemented
+LVLUP doesn't refresh sieging
 Dying duelist caused opposer-bug possibly due to there being another duelist opposite of him
+Siege improved
+building not applying aura to new units
+
+try respawn with 5 units how it looks
+hero stats should be visible during respawn lane picking
+annihilate doesn't kill acamar
+
+simplifying code
+initiate_the_game now has proper waitingforhost func for initial deployment
+    same func needed for regular deployment
+spending mana mirroring 
+Blink axe sync
+    factionswap when rpc
+    slot sync
+ exreality when removing debuff from affected units cleanses correct amount of debufs on creeps, but all on heroes
+cont simplification into the damage redirection and anullment funcs and spawn_unit func
+    rpoceeed>?
+
+when one slot empty and other would be 0 or max, the max when rpced eats the unit at 0
+double second ready on Golem spawn
+
+##################################################################################################################
+
+
+PT TIME?
+
+
+
+
+Arena_rect has get_opposer func, update this to end itself if it gets out of bounds for x rounds
+    or similate it from unit.gd
 
 
 
 
 
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -192,27 +251,24 @@ Kimmedi passive on kill
 
 
 ((((((((((((((((((((((((((((( look out for )))))))))))))))))))))))))))))
-Curving to sides for joiner
-()
-Passive_trigger_arrays joining/leaving
+My_peak possibly increasing attack before granting siege?
+
+
 ((((((((((((((((((((((((((((( look out for )))))))))))))))))))))))))))))
 
+##################################################################################
+##################################### codias #####################################
+##################################################################################
+Base.waiting for tuesday
+    #turned true during monday tweens
 
 
 
+##################################################################################
+###################################### META ######################################
+##################################################################################
 
-
-
-
-
-
-
-
-
-
-
-
-
+Permablock 
 
 
 
@@ -233,6 +289,7 @@ Creep: active [quick] eats your most expensive card, gets +X/X where X is the co
 Hero: executioner, deals 6 dmg to opp hp after Bigass number of turns
 Creep: passive [charge1] when a hero equips upgrade, you gain a copy of that upgrade and I take X damage where X=cost
 Building: when a hero dies, its tower takes X dmg where X=  2*HP_max - ATK
+The brothers require lvlup to wake up inst of turns
 
 Command: tp scroll
 Swap would be a Command
@@ -326,16 +383,9 @@ Future fixes:
         simplification to reduce negations/mirroring
     Lvlup_db
         could be divided to lspellsdb and lcreepsdb when creeps
-    Item => upgrade 
-        i dont even know
-    Opponent_spawn_rect_fake
-        doesn't need tweens
     Restart match
         as option
-    Monday might still be too early
-        before dmg redirection completes on all lanes
-    Mirror > mirror unit
-        no point in having the "unit" in make_my_mirror_unit
+
 
 
 

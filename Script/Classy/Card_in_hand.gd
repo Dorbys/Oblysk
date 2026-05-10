@@ -123,6 +123,33 @@ func go_up(target):
 
 
 
+func action_and_caster_and_mana_available():
+	
+		
+		
+			
+	var action_check
+	if Lobby.MULTIPLAYER == true:
+		action_check = does_player_have_action()
+	else:
+		action_check = true
+	if action_check == true:
+		
+		var herocheck = arena_rect.is_there_a_hero_check()
+		if herocheck == true:
+			
+			var manacheck = does_player_have_enough_mana(self)
+			if manacheck == true:
+			
+				return true
+				
+			else: not_enough_mana(self)
+		else: no_hero_to_cast_this(self)
+	else: you_dont_have_action(self)
+			
+		
+		
+	
 
 
 func does_player_have_enough_mana(caller):
@@ -135,6 +162,7 @@ func does_player_have_action():
 	if Base.granted_action == 1:
 		return true
 	else:
+		push_error("not your action :<")
 		return false
 		
 func you_dont_have_action(caller):

@@ -53,8 +53,11 @@ func _ready():
 	
 
 func update_xp_labels():
+	#called for both players to make calls from DBs to both xp displays easier
 	for i in 5:
 		hero_xp_labels_in_deck_order[i].text = str(Base.Player_heroes[i].Lvlup_xp)
+	if Lobby.MULTIPLAYER == true:
+		opponent_xp_panel.update_xp_labels()
 
 func update_pfps():
 		for i in 5:
@@ -82,6 +85,3 @@ func lvlupping():
 		#starts the lvlup selection	
 	
 	
-
-
-

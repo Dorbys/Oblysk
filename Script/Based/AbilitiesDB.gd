@@ -43,13 +43,13 @@ func PASSIVE(_Target):
 	push_error("there was an attempt to trigger PASSIVE manually")
 	
 func Advance(Caster):
-	await Caster.MYrena_rect.spawn_unit(2)
+	await Caster.MYrena_rect.spawn_unit(2,1)
 
 
 
-func Warmarch(Target):
-	Target.increase_AttackM(-2, 1)	
-	await Target.take_damage(2)
+#func Warmarch(Target):
+	#Target.increase_AttackM(-2, 1)	
+	#await Target.take_damage(2)
 
 
 
@@ -65,14 +65,16 @@ func Warmarch(Target):
 	#the target is calced at the passive source
 	
 	
-var MP5_DAMAGE = 3
+var MP5_DAMAGE = 4
 var MP5_description = "Monday: I deal " + str(MP5_DAMAGE) + " physical damage to a random enemy"	
 func MP5(target):
 	var expected_damage = MP5_DAMAGE - target.ArmorC
 	if expected_damage < 0:
 		expected_damage = 0
 	#really gotta put this inside take_dmg function.... rly mb
-	target.take_damage(expected_damage)
+	var died = target.take_damage(expected_damage)
+	if died:
+		await get_tree().create_timer(Base.visible_death_anim_length).timeout
 
 
 
@@ -99,6 +101,3 @@ var CREEP_ABILITIES_DB = [
 ["PASSIVE", 0, Enums.Targeting.one_unit,Enums.PassiveTriggers.none],
 ["Warmarch", 0, Enums.Targeting.myself, Enums.PassiveTriggers.being_targeted],
 ["PASSIVE", 0, Enums.Targeting.one_unit,Enums.PassiveTriggers.none]]
-
-
-

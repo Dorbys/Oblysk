@@ -1,8 +1,8 @@
 [gd_scene load_steps=35 format=3 uid="uid://cak63fd13ipg1"]
 
-[ext_resource type="Script" path="res://Script/Based/INPUT_B.gd" id="1_kus8j"]
+[ext_resource type="Script" uid="uid://2l3t0uhs7xwh" path="res://Script/Based/INPUT_B.gd" id="1_kus8j"]
 [ext_resource type="PackedScene" uid="uid://b1u0py0ci1rgi" path="res://Scenes/Base.tscn" id="1_v73vy"]
-[ext_resource type="Script" path="res://Script/D12.gd" id="2_4ybwm"]
+[ext_resource type="Script" uid="uid://rbqvh83t2xuc" path="res://Script/D12.gd" id="2_4ybwm"]
 [ext_resource type="Texture2D" uid="uid://cpt5npvrxwctp" path="res://Assets/Maps/TABLE2.png" id="2_7e40q"]
 [ext_resource type="PackedScene" uid="uid://bj3bixoxwqodu" path="res://Scenes/UI/Hand.tscn" id="2_olllb"]
 [ext_resource type="PackedScene" uid="uid://dh7fu0rygacyt" path="res://Scenes/UI/Graveyard_showcase.tscn" id="3_cxe43"]
@@ -10,29 +10,29 @@
 [ext_resource type="PackedScene" uid="uid://bx1fm7gym1b2x" path="res://Scenes/UI/The_button.tscn" id="5_51a31"]
 [ext_resource type="PackedScene" uid="uid://biouc223p35ra" path="res://Scenes/UI/Game_over.tscn" id="5_hdcg8"]
 [ext_resource type="PackedScene" uid="uid://bpbmblkyxomck" path="res://Scenes/UI/Adding_button.tscn" id="6_xyuig"]
-[ext_resource type="Script" path="res://Script/UI_layer/DropdownButton.gd" id="7_inl2i"]
+[ext_resource type="Script" uid="uid://cln4s4n4n7p71" path="res://Script/UI_layer/DropdownButton.gd" id="7_inl2i"]
 [ext_resource type="Texture2D" uid="uid://c7sucoinxwaqc" path="res://Assets/PREUI/S_Button.jpg" id="9_3slyr"]
 [ext_resource type="PackedScene" uid="uid://dwwrxkxhppb77" path="res://Scenes/UI/spawner.tscn" id="10_86lln"]
-[ext_resource type="Script" path="res://Script/UI_layer/Camera2D.gd" id="10_b5mq6"]
+[ext_resource type="Script" uid="uid://c57b2tcf2ud03" path="res://Script/UI_layer/Camera2D.gd" id="10_b5mq6"]
 [ext_resource type="PackedScene" uid="uid://boul2xtayhroi" path="res://Scenes/Debug/Covering_-1HP.tscn" id="11_gedrm"]
 [ext_resource type="PackedScene" uid="uid://r785avsyfdxf" path="res://Scenes/UI/Player_HP.tscn" id="11_p1uyo"]
 [ext_resource type="Texture2D" uid="uid://bay0dxynxa87i" path="res://Assets/Textures/Inactive_orange.jpg" id="12_n6u6b"]
 [ext_resource type="PackedScene" uid="uid://cjqmj0pro1jag" path="res://Scenes/UI/Opponent/Opponent_XP_panel.tscn" id="13_iuwkg"]
 [ext_resource type="Texture2D" uid="uid://jeg0mn16qh8b" path="res://Assets/PREUI/Debug_status_indicator.jpg" id="13_oqncl"]
-[ext_resource type="Script" path="res://Script/UI_layer/Opponent_info/Turn_indicator.gd" id="13_rf5i7"]
+[ext_resource type="Script" uid="uid://npqt0iqfq1m4" path="res://Script/UI_layer/Opponent_info/Turn_indicator.gd" id="13_rf5i7"]
 [ext_resource type="AudioStream" uid="uid://df011xt5nto82" path="res://Assets/Sounds/Rxm リム - LOOK AT ME! _ Phonk _ NCS - Copyright Free Music (320kbps).mp3" id="13_virw5"]
 [ext_resource type="Texture2D" uid="uid://dk807clcgvok8" path="res://Assets/Textures/FFA200.jpg" id="14_i0xot"]
 [ext_resource type="PackedScene" uid="uid://bhaer715oasq3" path="res://Scenes/UI/Player_mana_display.tscn" id="15_ywx2j"]
 [ext_resource type="PackedScene" uid="uid://c3lbr0mtr2ums" path="res://Scenes/UI/Opponent/OpponentHand.tscn" id="16_e8r2r"]
 [ext_resource type="FontFile" uid="uid://c01uqsojl0t5d" path="res://Assets/Font source/RobotoMono-Bold.ttf" id="17_iqa2t"]
 [ext_resource type="Texture2D" uid="uid://kfymxxsg8nw3" path="res://Assets/Effects/LVLUPEFFECT.png" id="17_p02hj"]
-[ext_resource type="Script" path="res://Script/AudioStreamPlayer.gd" id="18_s0iln"]
-[ext_resource type="PackedScene" uid="uid://bxschfq4uae78" path="res://Scenes/UI/Help_screen.tscn" id="18_y5en8"]
+[ext_resource type="Script" uid="uid://crw0sj3x11nva" path="res://Script/AudioStreamPlayer.gd" id="18_s0iln"]
 [ext_resource type="AudioStream" uid="uid://dsgvtftwjma2y" path="res://Assets/Sounds/Skibidi Bop cut Yes Yes Yes x Bloody Mary _ Wednesday Dance (320kbps).mp3" id="19_18oe3"]
 [ext_resource type="AudioStream" uid="uid://jdretbttic7c" path="res://Assets/Sounds/kyOresu - DORIME__ (loli cover) (320kbps).mp3" id="20_36a0s"]
 [ext_resource type="AudioStream" uid="uid://ym44ll3g45pw" path="res://Assets/Sounds/Vine thud.mp3" id="24_8jte2"]
 [ext_resource type="PackedScene" uid="uid://3au5ircxans" path="res://Scenes/Menu/Main_menu.tscn" id="25_ersvt"]
 [ext_resource type="PackedScene" uid="uid://bebg654ub0p52" path="res://Scenes/UI/History/History.tscn" id="28_musle"]
+[ext_resource type="PackedScene" uid="uid://chwge1hn36jor" path="res://Scenes/UI/Help2.tscn" id="30_amnc5"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_qwlda"]
 font = ExtResource("17_iqa2t")
@@ -92,18 +92,10 @@ script = ExtResource("10_b5mq6")
 
 [node name="SCROLLH" parent="UI_layer" instance=ExtResource("2_olllb")]
 unique_name_in_owner = true
-offset_left = 421.0
+offset_left = 360.0
 offset_top = 591.0
-offset_right = 1621.0
+offset_right = 1560.0
 offset_bottom = 1311.0
-
-[node name="THE_BUTTON" parent="UI_layer" instance=ExtResource("5_51a31")]
-unique_name_in_owner = true
-offset_left = 1752.0
-offset_top = 565.0
-offset_right = 2006.0
-offset_bottom = 1015.0
-scale = Vector2(0.66, 0.66)
 
 [node name="Graveyard_showcase" parent="UI_layer" instance=ExtResource("3_cxe43")]
 unique_name_in_owner = true
@@ -144,10 +136,10 @@ offset_right = 1720.0
 offset_bottom = 184.0
 toggle_mode = false
 alignment = 1
-item_count = 7
 selected = 2
 fit_to_longest_item = false
 allow_reselect = true
+item_count = 8
 popup/item_0/text = "Cheat units"
 popup/item_0/id = 0
 popup/item_1/text = "Remove units"
@@ -162,6 +154,8 @@ popup/item_5/text = "Monday phase"
 popup/item_5/id = 5
 popup/item_6/text = "-1HP target unit"
 popup/item_6/id = 6
+popup/item_7/text = "Reduce cooldowns"
+popup/item_7/id = 7
 script = ExtResource("7_inl2i")
 
 [node name="Passing_status_indicator" type="TextureRect" parent="UI_layer/DevTools"]
@@ -172,6 +166,14 @@ offset_right = 55.0
 offset_bottom = 148.0
 texture = ExtResource("13_oqncl")
 expand_mode = 1
+
+[node name="Spawner" parent="UI_layer" instance=ExtResource("10_86lln")]
+unique_name_in_owner = true
+visible = false
+offset_left = 954.0
+offset_top = 901.0
+offset_right = 954.0
+offset_bottom = 901.0
 
 [node name="Opponent_info" type="Control" parent="UI_layer"]
 layout_mode = 3
@@ -214,13 +216,13 @@ offset_top = 48.0
 offset_right = 708.0
 offset_bottom = 48.0
 
-[node name="Spawner" parent="UI_layer" instance=ExtResource("10_86lln")]
+[node name="THE_BUTTON" parent="UI_layer" instance=ExtResource("5_51a31")]
 unique_name_in_owner = true
-visible = false
-offset_left = 992.0
-offset_top = 944.0
-offset_right = 992.0
-offset_bottom = 944.0
+offset_left = 1752.0
+offset_top = 565.0
+offset_right = 2006.0
+offset_bottom = 1015.0
+scale = Vector2(0.66, 0.66)
 
 [node name="Player_HP" parent="UI_layer" instance=ExtResource("11_p1uyo")]
 unique_name_in_owner = true
@@ -284,11 +286,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Help_screen" parent="UI_layer" instance=ExtResource("18_y5en8")]
-unique_name_in_owner = true
-visible = false
-z_index = 13
-
 [node name="Game_over" parent="UI_layer" instance=ExtResource("5_hdcg8")]
 unique_name_in_owner = true
 z_index = 11
@@ -311,6 +308,10 @@ offset_top = 180.0
 offset_right = -200.0
 offset_bottom = 180.0
 
+[node name="Help2" parent="UI_layer" instance=ExtResource("30_amnc5")]
+unique_name_in_owner = true
+visible = false
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("13_virw5")
 volume_db = -30.905
@@ -323,4 +324,4 @@ max_polyphony = 24
 
 [connection signal="pressed" from="UI_layer/DevTools/DRAW1" to="UI_layer/SCROLLH" method="_on_draw_1_pressed"]
 [connection signal="pressed" from="UI_layer/Active_lane" to="Camera2D" method="_on_active_lane_pressed"]
-[connection signal="pressed" from="UI_layer/Help" to="UI_layer/Help_screen" method="_on_help_pressed"]
+[connection signal="pressed" from="UI_layer/Help" to="UI_layer/Help2" method="_on_help_pressed"]

@@ -35,6 +35,3 @@ var abarena_rect
 var arena 
 var abarena 
 var card_layer
-
-
-

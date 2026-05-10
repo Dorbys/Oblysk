@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dh7fu0rygacyt"]
 
-[ext_resource type="Script" path="res://Script/UI_layer/Graveyard_showcase.gd" id="1_nciih"]
-[ext_resource type="Script" path="res://Script/UI_layer/Grave.gd" id="2_ppjy0"]
+[ext_resource type="Script" uid="uid://b5rp1jcfejsyt" path="res://Script/UI_layer/Graveyard_showcase.gd" id="1_nciih"]
+[ext_resource type="Script" uid="uid://bg23edyhpflqd" path="res://Script/UI_layer/Grave.gd" id="2_ppjy0"]
 
 [node name="Graveyard_showcase" type="Control"]
 visible = false

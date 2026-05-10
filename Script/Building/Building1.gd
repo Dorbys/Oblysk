@@ -71,37 +71,25 @@ func new_lane():
 
 		
 func _get_drag_data(_at_position):
-	var manacheck = does_player_have_enough_mana(self)
-	if manacheck == true:
-		var herocheck = arena_rect.is_there_a_hero_check()
-		if herocheck == true:
-			var action_check
-			if Lobby.MULTIPLAYER == true:
-				action_check = does_player_have_action()
-			else:
-				action_check = true
-			if action_check == true:			
-				Base.lock_pass_button()
-				#until preview is gone
-				arena.move_roof_to_front()
-				abarena.move_roof_to_front()
-				the_button.global_lets_hide_abilities_and_items()
+	if action_and_caster_and_mana_available():
+		Base.lock_pass_button()
+		#until preview is gone
+		arena.move_roof_to_front()
+		abarena.move_roof_to_front()
+		the_button.global_lets_hide_abilities_and_items()
 
 
-					
-				var drag_preview = create_preview(Identification)
-		#		UI_layer.add_child(drag_preview)
-				set_drag_preview(drag_preview)
-				drag_preview.modulate.a = .5
-					
-			#	arena.move_arena_to_front()
-			#	abarena.move_arena_to_front()
-					
-				
-				return [TYPE,Identification, self.get_index()]
-			else: you_dont_have_action(self)
-		else: no_hero_to_cast_this(self)	
-	else: not_enough_mana(self)
+			
+		var drag_preview = create_preview(Identification)
+#		UI_layer.add_child(drag_preview)
+		set_drag_preview(drag_preview)
+		drag_preview.modulate.a = .5
+			
+	#	arena.move_arena_to_front()
+	#	abarena.move_arena_to_front()
+			
+		
+		return [TYPE,Identification, self.get_index()]
 	
 func create_preview(ID):
 	var preview = Scene.instantiate()

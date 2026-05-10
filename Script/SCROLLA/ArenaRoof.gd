@@ -46,7 +46,7 @@ func _drop_data(at_position, DropData):
 	if DropData[0] == "unit":
 		MYrena_rect.Carrying = 0
 		#creates the unit
-		MYrena_rect.Adding_Units(at_position, DropData[1], DropData[3])
+		MYrena_rect.Adding_Units(at_position, DropData[1])
 		#spends mana
 #		tower_mana.spend_mana(CreepsDB.CREEPS_DB[DropData[1]][CreepsDB.COSTPOSITION])
 		#removes the card
@@ -99,18 +99,6 @@ func drop_data_multiplayer_funcall(spelltype:String, function_to_be_called:Strin
 	if spelltype == "lvlup_spell":
 		DB = LvlupDB
 
-	if Lobby.host == true:
-		card_layer.make_mirror_lane_receive_spell_call(spelltype, function_to_be_called, current_player)
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		DB.call(function_to_be_called,MYrena_rect,current_player)
-	else:
-		DB.call(function_to_be_called,MYrena_rect,current_player)
-		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		card_layer.make_mirror_lane_receive_spell_call(spelltype, function_to_be_called, current_player)
-
-
-
-
-
-
-
+	DB.call(function_to_be_called,MYrena_rect,current_player)
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	card_layer.make_mirror_lane_receive_spell_call(spelltype, function_to_be_called, current_player)

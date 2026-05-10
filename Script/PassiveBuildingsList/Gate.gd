@@ -19,4 +19,4 @@ func friday_phase():
 	Gating()
 		
 func Gating():
-	my_lane.spawn_unit(6)
+	my_lane.spawn_unit(6, 1)

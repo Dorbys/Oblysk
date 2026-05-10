@@ -65,4 +65,6 @@ func _on_pressed():
 		var another = hp_minus_covering.instantiate()
 		another.hp_modifier = "+"
 		ui_layer.add_child(another)	
-
+	elif option_button.text == "Reduce cooldowns":
+		arena_rect.mass_reduce_cooldowns(12)
+		abarena_rect.mass_reduce_cooldowns(12)

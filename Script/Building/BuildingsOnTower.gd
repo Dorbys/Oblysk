@@ -22,13 +22,16 @@ func _on_child_exiting_tree(_node):
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	collide_buildings()
 	
+var building_tower_distance = 75
+var building_spacing = 110
 func collide_buildings():
 	var collide_time = 0.4
 	var population = get_child_count()
 	var tween = create_tween().set_parallel(true)
+	#push_error("colliding")
 	for i in range(population-1 , -1, -1):
 #		get_child(i).position.x = 50 + (i * 110)
-		tween.tween_property(get_child(i),"position:x",50 + (i * 110), collide_time)
+		tween.tween_property(get_child(i),"position:x",building_tower_distance + (i * building_spacing), collide_time)
 
 	
 func make_building(ID):
@@ -40,9 +43,12 @@ func make_building(ID):
 	house.is_aura = BuildDB.BUILD_DB[ID][BuildDB.ISAURAPOSITION]
 	house.affects = BuildDB.BUILD_DB[ID][BuildDB.AFFPOSITION]
 #		house.Identification = ID
-	house.position.x = 50+ get_child_count() * 110
+	house.position.x = building_tower_distance + (get_child_count() * building_spacing)
+	
 	#For now placement
 	add_child(house)
+	#push_error("house added, child count: " + str(get_child_count()))
+	collide_buildings()
 	
 	
 	

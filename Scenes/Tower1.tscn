@@ -1,14 +1,18 @@
-[gd_scene load_steps=11 format=3 uid="uid://bd5cypnf78qdj"]
+[gd_scene load_steps=15 format=3 uid="uid://bd5cypnf78qdj"]
 
-[ext_resource type="Script" path="res://Script/TOWER_HP_DISPLAY.gd" id="2_k0ois"]
+[ext_resource type="Script" uid="uid://c6p5bu653dolh" path="res://Script/TOWER_HP_DISPLAY.gd" id="2_k0ois"]
 [ext_resource type="Texture2D" uid="uid://u6qf2spmmadb" path="res://Assets/Boardstuff/Towerr - kopie.jpg" id="2_pbq7b"]
 [ext_resource type="LabelSettings" uid="uid://5a0inadmx84s" path="res://Setts/Labels/TowerHP.tres" id="2_tff1w"]
 [ext_resource type="LabelSettings" uid="uid://h0cv0gkneiti" path="res://Setts/Labels/TowerMana.tres" id="4_i2uh8"]
-[ext_resource type="Script" path="res://Script/Max_mana.gd" id="5_bh4el"]
-[ext_resource type="Script" path="res://Script/Current_mana.gd" id="6_m1brs"]
+[ext_resource type="Script" uid="uid://6lj721lbpba2" path="res://Script/Max_mana.gd" id="5_bh4el"]
+[ext_resource type="Script" uid="uid://cdh8fqfjfv82p" path="res://Script/Current_mana.gd" id="6_m1brs"]
 [ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="7_iy82y"]
-[ext_resource type="Script" path="res://Script/Building/BuildingsOnTower.gd" id="8_cbyqh"]
+[ext_resource type="Script" uid="uid://7y1p52gy0cng" path="res://Script/Building/BuildingsOnTower.gd" id="8_cbyqh"]
 [ext_resource type="PackedScene" uid="uid://c4np20856wsq8" path="res://Scenes/Building/BuildingMain.tscn" id="9_apk20"]
+[ext_resource type="Texture2D" uid="uid://bqu4cjk6d2j34" path="res://Assets/Tables/Tower_plating.png" id="10_dopm3"]
+[ext_resource type="Texture2D" uid="uid://bu3k5c38wabyq" path="res://Assets/Textures/Red nothing.jpg" id="10_r06rs"]
+[ext_resource type="Texture2D" uid="uid://ddena70veefpp" path="res://Assets/Textures/Bright_green.png" id="11_7fx6u"]
+[ext_resource type="Texture2D" uid="uid://bi34yrgwk17g3" path="res://Assets/Textures/Gray nothing.jpg" id="13_2ecny"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_njhnx"]
 font = ExtResource("7_iy82y")
@@ -90,9 +94,9 @@ script = ExtResource("5_bh4el")
 [node name="DMG_TBT" type="Label" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 152.5
+offset_left = 173.5
 offset_top = 9.99999
-offset_right = 245.5
+offset_right = 266.5
 offset_bottom = 107.0
 text = "26"
 label_settings = SubResource("LabelSettings_njhnx")
@@ -105,5 +109,29 @@ offset_left = 180.0
 offset_right = 180.0
 script = ExtResource("8_cbyqh")
 BUILDING_SCENE = ExtResource("9_apk20")
+
+[node name="Plating_bar_red_green" type="TextureProgressBar" parent="."]
+layout_mode = 0
+offset_left = 174.0
+offset_right = 190.0
+offset_bottom = 120.0
+max_value = 5.0
+value = 5.0
+rounded = true
+fill_mode = 3
+nine_patch_stretch = true
+texture_under = ExtResource("10_r06rs")
+texture_progress = ExtResource("11_7fx6u")
+
+[node name="Plating_bar_black" type="TextureProgressBar" parent="Plating_bar_red_green"]
+layout_mode = 0
+offset_right = 16.0
+offset_bottom = 120.0
+max_value = 5.0
+rounded = true
+fill_mode = 2
+nine_patch_stretch = true
+texture_over = ExtResource("10_dopm3")
+texture_progress = ExtResource("13_2ecny")
 
 [connection signal="child_exiting_tree" from="Buildings" to="Buildings" method="_on_child_exiting_tree"]

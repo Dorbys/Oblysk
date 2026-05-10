@@ -23,19 +23,22 @@ var SPELLS_DB = [
 ["Duel",3,6,Enums.Targeting.one_ally, Enums.Targeting.one_enemy, false,"Hero"],
 ["Morning",7,1, Enums.Targeting.one_unit, Enums.Targeting.none,false,"Unit"],
 ["Hmmmmm",5,12, Enums.Targeting.lane, Enums.Targeting.none,false,"Lane"],
-["My_peak",5,5, Enums.Targeting.one_ally, Enums.Targeting.none,false,"Hero"],
+["My_peak",5,2, Enums.Targeting.one_ally, Enums.Targeting.none,false,"Hero"],
 ["SummonTwo",3,1, Enums.Targeting.lane, Enums.Targeting.none,false,"Lane"],
 ["Swap",2,3,Enums.Targeting.one_ally, Enums.Targeting.one_ally, false,"Unit"]
 ]
 # Called when the node enters the scene tree for the first time.
 
-func Dorbystrike(target, _current_player = ""):
+func Dorbystrike(target, _current_player = "", _rpced = false):
 	await target.take_damage(5-target.ArmorC)
 	
 	
-func Duel(Caster, Target1, _current_player = ""):
+func Duel(Caster, Target1, _current_player = "", _sync_data = null, _rpced = false):
 	var attack1 = Caster.AttackC - Target1.ArmorC
 	var attack2 = Target1.AttackC - Caster.ArmorC #CURRENT IMPLLLLLLLL
+	Caster.SMASH()
+	Target1.SMASH()
+	await get_tree().create_timer(0.35).timeout
 
 	Caster.take_damage(attack2)
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
@@ -43,37 +46,43 @@ func Duel(Caster, Target1, _current_player = ""):
 	#hero_death_Care in CardLayer can manage heroes dying at the "same" time
 	await Target1.take_damage(attack1)
 
-func SummonTwo(allied_row, _current_player = "", rpced = false):
-	if rpced == false:
-		for i in 2:
-			await allied_row.spawn_unit(6, null, false, false)
-			await get_tree().create_timer(Base.FAKE_DELTA).timeout
-		allied_row.mass_second_ready()
-	await get_tree().create_timer(0.2).timeout
+func SummonTwo(allied_row, _current_player = "", _rpced = false):
+	if _rpced == false:
+		allied_row.spawn_unit(6, 2, null, false, false)
+		#allied_row.mass_second_ready()
+
+		
+	#await get_tree().create_timer(0.2).timeout #???
 	
 		
-func My_peak(target, _current_player = ""):
+func My_peak(target, _current_player = "", _rpced = false):
 	target.can_lvlup = false
-	for i in 5:
-		Base.Player_heroes[i].Lvlup_xp += 2
 	
+	target.Siege = true
 	target.increase_HealthM(5,1)
 	target.increase_ArmorM(1,1)
-	target.Siege = true
 	target.increase_AttackM(5,1)	
 	
+	if _rpced == false:
+		for i in 5:
+			Base.Player_heroes[i].Lvlup_xp += 2
+	else:
+		for i in 5:
+			Base.Opponent_heroes[i].Lvlup_xp += 2
+		
 	await target.XP_panel.update_xp_labels()
 	
-func Morning(target, _current_player = ""):
+func Morning(target, _current_player = "", _rpced = false):
 	var previous_health = target.HealthC
 	target.HealthC = -1
 	target.updateS()
 	await target.increase_damage_to_be_taken(0)
-	if target.faction == "alpha":
-		target.XP_panel.increase_xp(2* (previous_health+1))
+	if _rpced == false:
+		if target.faction == "alpha":
+			target.XP_panel.increase_xp(2* (previous_health+1))
 		
-func Annihilate(target, _current_player = ""):
-	var DAMAGE = 12
+func Annihilate(target, _current_player = "", _rpced = false):
+	var DAMAGE = 16
 	var HP = target.HealthC
 	var expected_damage = DAMAGE
 	if expected_damage > HP:
@@ -82,29 +91,30 @@ func Annihilate(target, _current_player = ""):
 		expected_damage -= damage_to_tower
 	await target.take_damage(expected_damage)
 	
-func Hmmmmm(_allied_lane, _current_player = ""):
+func Hmmmmm(_allied_lane, _current_player = "", _rpced = false):
 	pass
 
-func Bread(allied_lane, _current_player = ""):
-	await allied_lane.scrollh.draw_cards(2)
+func Bread(allied_lane, _current_player = "", _rpced = false):
+	if _rpced == false:
+		await allied_lane.scrollh.draw_cards(2)
 		
-func Swap(swapped_unit, swapping_unit, _current_player = ""):
-	swapped_unit.annul_my_presence()
-	swapping_unit.annul_my_presence()
+func Swap(swapped_unit, swapping_unit, _current_player = "", _sync_data = null, _rpced = false):
+	await swapped_unit.annul_my_presence()
+	await swapping_unit.annul_my_presence()
 	
 
 	
-	var retarget = swapped_unit.targeting
-	swapped_unit.targeting = swapping_unit.targeting
-	swapping_unit.targeting = retarget
+	#var retarget = swapped_unit.targeting
+	#swapped_unit.targeting = swapping_unit.targeting
+	#swapping_unit.targeting = retarget
 	#swap their targeting
 	
-	var straiged = swapped_unit.straight_target
-	var sideged = swapped_unit.side_target
-	swapped_unit.straight_target = swapping_unit.straight_target
-	swapped_unit.side_target = swapping_unit.side_target
-	swapping_unit.straight_target = straiged
-	swapping_unit.side_target = sideged
+	#var straiged = swapped_unit.straight_target
+	##var sideged = swapped_unit.side_target
+	#swapped_unit.straight_target = swapping_unit.straight_target
+	##swapped_unit.side_target = swapping_unit.side_target
+	#swapping_unit.straight_target = straiged
+	#swapping_unit.side_target = sideged
 	
 	var id_1 = swapped_unit.get_index()
 	var id_2 = swapping_unit.get_index()
@@ -116,8 +126,8 @@ func Swap(swapped_unit, swapping_unit, _current_player = ""):
 	
 	swapped_unit.redirect_damage_to_me_again()
 	swapping_unit.redirect_damage_to_me_again()
-	swapped_unit.refresh_my_combat_damage()
-	swapping_unit.refresh_my_combat_damage()
+	swapped_unit.curve_straight(false)
+	swapping_unit.curve_straight(false)
 	
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	await swapped_unit.tower_layer.unit_order_changed_signal(swapped_unit.my_lane)

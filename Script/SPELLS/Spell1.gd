@@ -58,16 +58,17 @@ func _ready():
 
 		
 func _get_drag_data(_at_position):
-	var manacheck = does_player_have_enough_mana(self)
-	if manacheck == true:
-		var herocheck = arena_rect.is_there_a_hero_check()
-		if herocheck == true:
-			var action_check
-			if Lobby.MULTIPLAYER == true:
-				action_check = does_player_have_action()
-			else:
-				action_check = true
-			if action_check == true:
+	if action_and_caster_and_mana_available():
+	#var manacheck = does_player_have_enough_mana(self)
+	#if manacheck == true:
+		#var herocheck = arena_rect.is_there_a_hero_check()
+		#if herocheck == true:
+			#var action_check
+			#if Lobby.MULTIPLAYER == true:
+				#action_check = does_player_have_action()
+			#else:
+				#action_check = true
+			#if action_check == true:
 				Base.lock_pass_button()
 				#until preview is gone
 				the_button.global_lets_hide_abilities_and_items()
@@ -94,9 +95,9 @@ func _get_drag_data(_at_position):
 				
 				return [TYPE,Identification, self.get_index(), cross_lane, 
 				Card_from_lvlup, Secondary_targets, Is_played_on, Lobby.current_player]
-			else: you_dont_have_action(self)
-		else: no_hero_to_cast_this(self)
-	else: not_enough_mana(self)
+			#else: you_dont_have_action(self)
+		#else: no_hero_to_cast_this(self)
+	#else: not_enough_mana(self)
 	
 func create_preview(ID):
 	var preview = Scene.instantiate()

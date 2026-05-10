@@ -3,6 +3,7 @@ extends Building_passive_ability
 
 
 func _ready():
+	#push_error("bombard ready")
 	get_parent().text_for_tooltip = "Round end: Deal " +str(DAMAGE) + " physical damage to a random enemy in a random lane"	
 	BUTTON.round_end_signal_list.append(self)
 	

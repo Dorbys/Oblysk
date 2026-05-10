@@ -19,6 +19,7 @@ outline_color = Color(0, 0, 0, 1)
 layout_mode = 3
 anchors_preset = 0
 scale = Vector2(0.66, 0.66)
+mouse_filter = 2
 script = ExtResource("1_l3q7a")
 
 [node name="Beta_pfp" type="TextureRect" parent="."]
@@ -64,6 +65,7 @@ vertical_alignment = 2
 [node name="Beta_initiative_marker" type="TextureRect" parent="Beta_pfp"]
 unique_name_in_owner = true
 visible = false
+layout_mode = 0
 offset_right = 60.0
 offset_bottom = 60.0
 texture = ExtResource("6_sgng6")
@@ -74,6 +76,7 @@ layout_mode = 0
 offset_top = 480.0
 offset_right = 240.0
 offset_bottom = 720.0
+mouse_filter = 2
 texture = ExtResource("5_6ncok")
 expand_mode = 1
 
@@ -114,8 +117,10 @@ vertical_alignment = 2
 [node name="Alpha_initiative_marker" type="TextureRect" parent="Alpha_pfp"]
 unique_name_in_owner = true
 visible = false
+layout_mode = 0
 offset_top = -1.21216
 offset_right = 60.0
 offset_bottom = 58.7878
+mouse_filter = 2
 texture = ExtResource("6_sgng6")
 expand_mode = 1

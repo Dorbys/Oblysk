@@ -10,8 +10,8 @@ extends ColorRect
 @onready var beta_arena_rect3 = $"../../../Last_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect" 
 var my_lane
 
-var scale_down = 0.58
-#how much do we scale down the units
+#var scale_down = 0.58
+##how much do we scale down the units
 var overlap_modifier = 0.4
 #if we are over capacity, how much of the card that is beaing placed over
 #should remain visible
@@ -33,6 +33,7 @@ func _ready():
 			my_lane = arena_rect2
 		"LastLaneDeployRect":
 			my_lane = arena_rect3
+			capacity = 4
 		"BetaFirstLaneDeployRect":
 			my_lane = beta_arena_rect1
 			faction = "Beta"
@@ -42,7 +43,8 @@ func _ready():
 		"BetaLastLaneDeployRect":
 			my_lane = beta_arena_rect3
 			faction = "Beta"
-			
+			capacity = 4
+
 
 
 
@@ -108,7 +110,7 @@ func collide_units(skip_target = -1, pretty = 1):
 	var target 
 	var tween
 	if pretty == 1:
-		tween = get_tree().create_tween().set_parallel(true)
+		tween = get_tree().create_tween().set_parallel(true).set_ease(Tween.EASE_OUT)
 		tween.pause()
 	for i in population:
 		if i == skip_target:
@@ -126,10 +128,10 @@ func collide_units(skip_target = -1, pretty = 1):
 		if i+1>capacity: #theres +1 cuz i begins at 0 and I want to keep capacity clear
 #			get_child(i).position.x = (0.5 * Base.CARD_WIDTH) + ((i-capacity) * Base.CARD_WIDTH * scale_down)
 #			get_child(i).position.y = Base.CARD_HEIGHT*scale_down
-			destination_X = (0.5 * Base.CARD_WIDTH * scale_down) + ((i-capacity) * Base.CARD_WIDTH * scale_down)
-			destination_Y = Base.CARD_HEIGHT*scale_down*overlap_modifier + Y_OFFSET
+			destination_X = (0.5 * Base.CARD_WIDTH * Base.pre_deploy_scale_down) + ((i-capacity) * Base.CARD_WIDTH * Base.pre_deploy_scale_down)
+			destination_Y = Base.CARD_HEIGHT*Base.pre_deploy_scale_down*overlap_modifier + Y_OFFSET
 		else: 
-			destination_X = (0.5 * Base.CARD_WIDTH * scale_down) + (i * Base.CARD_WIDTH * scale_down)
+			destination_X = (0.5 * Base.CARD_WIDTH * Base.pre_deploy_scale_down) + (i * Base.CARD_WIDTH * Base.pre_deploy_scale_down)
 			destination_Y = 0 + Y_OFFSET
 #			get_child(i).position.y = 0
 		if pretty == 1:
@@ -142,7 +144,7 @@ func collide_units(skip_target = -1, pretty = 1):
 		else:
 			target.position.x = destination_X
 			target.position.y = destination_Y 
-			target.scale = Vector2(scale_down,scale_down)
+			target.scale = Vector2(Base.pre_deploy_scale_down,Base.pre_deploy_scale_down)
 			
 	if pretty == 1:
 		Base.lock_pass_button()
@@ -167,10 +169,10 @@ func _drop_data(_at_position, data):
 		var population = get_child_count()
 		if population >= capacity:
 			
-			destination_X = (0.5 * Base.CARD_WIDTH * scale_down ) + ((population-capacity) * Base.CARD_WIDTH * scale_down)
-			destination_Y = (Base.CARD_HEIGHT * scale_down * overlap_modifier) + Y_OFFSET
+			destination_X = (0.5 * Base.CARD_WIDTH * Base.pre_deploy_scale_down ) + ((population-capacity) * Base.CARD_WIDTH * Base.pre_deploy_scale_down)
+			destination_Y = (Base.CARD_HEIGHT * Base.pre_deploy_scale_down * overlap_modifier) + Y_OFFSET
 		else: 
-			destination_X = (0.5 * Base.CARD_WIDTH * scale_down) + (population * Base.CARD_WIDTH * scale_down)
+			destination_X = (0.5 * Base.CARD_WIDTH * Base.pre_deploy_scale_down) + (population * Base.CARD_WIDTH * Base.pre_deploy_scale_down)
 			destination_Y = 0 + Y_OFFSET
 	#			get_child(i).position.y = 0
 		destination_X += global_position.x
@@ -186,7 +188,7 @@ func _drop_data(_at_position, data):
 		var tween = create_tween().set_parallel(true)
 		tween.tween_property(target,"global_position:x",destination_X,movement_time)
 		tween.tween_property(target,"global_position:y",destination_Y,movement_time)
-		tween.tween_property(target,"scale",Vector2(scale_down,scale_down),movement_time)
+		tween.tween_property(target,"scale",Vector2(Base.pre_deploy_scale_down,Base.pre_deploy_scale_down),movement_time)
 		
 		#movement is done twice because moving the hero from one nodes position to enother 
 		#has to be done outside collide()
@@ -202,7 +204,7 @@ func _drop_data(_at_position, data):
 		
 		data[1].remove_child(target)
 
-		target.scale = Vector2(scale_down,scale_down)
+		target.scale = Vector2(Base.pre_deploy_scale_down,Base.pre_deploy_scale_down)
 		add_child(target)
 			
 		collide_units()
@@ -238,7 +240,7 @@ func _drop_data(_at_position, data):
 func deploy_unit(target):
 	if target.HERO == true:
 		target.appear_alive()
-		target.leave_draggable_state()
+		#target.leave_draggable_state()
 		my_lane.respawn_here(target)
 		
 		
@@ -249,11 +251,11 @@ func deploy_unit(target):
 		target.queue_free()
 	
 	elif target.Unit_Name == "Skelegone":
-		my_lane.spawn_unit(3)
+		my_lane.spawn_unit(3,1)
 		target.queue_free()
 	else:
 		#sommelier
-		my_lane.spawn_unit(4)
+		my_lane.spawn_unit(4,1)
 		target.queue_free()
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout		
 		
@@ -261,7 +263,7 @@ func deploy_unit_MP(target):
 	#only in multiplayer
 	if target.HERO == true:
 		target.appear_alive()
-		target.leave_draggable_state()
+		#target.leave_draggable_state()
 		if Lobby.host == true:
 			my_lane.respawn_here(target)
 		
@@ -276,13 +278,20 @@ func deploy_unit_MP(target):
 		
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	
-func clear_creeps_and_undraggable_heroes():
+func clear_creeps():
 	#since joiner doesnt actually deploy, deploy rects need to clean up
 	for i in range(get_child_count() - 1, -1, -1):
 		var target = get_child(i)
 		if target.HERO == true:
 			target.appear_alive()
-			target.leave_draggable_state()
+			#target.leave_draggable_state()
 		elif target.Unit_Name == "AlphaCreep":
 			target.queue_free()
 			
+func clear_draggable_heroes():
+	#since joiner doesnt actually deploy, deploy rects need to clean up
+	for i in range(get_child_count() - 1, -1, -1):
+		var target = get_child(i)
+		if target.HERO == true:
+			target.appear_alive()
+			#target.leave_draggable_state()

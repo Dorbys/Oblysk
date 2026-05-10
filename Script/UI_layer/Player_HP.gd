@@ -15,11 +15,12 @@ func _ready():
 	
 	
 	
-func tower_destroyed(which_one):
+func tower_destroyed(which_one, health_loss):
+	#also called when just plating is decreased
 	if which_one == "TowerA":
-		decrease_alpha_players_HP(1)
+		decrease_alpha_players_HP(health_loss)
 	elif which_one == "TowerB":
-		decrease_beta_players_HP(1)
+		decrease_beta_players_HP(health_loss)
 
 func decrease_alpha_players_HP(amount):
 	await decrease_players_hp(Alpha, 0, amount)

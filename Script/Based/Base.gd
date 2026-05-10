@@ -9,7 +9,8 @@ extends Node
 
 
 
-var PLAYTEST = false
+var PLAYTEST = true
+
 #change to 1 to shuffle deck, set mana and XP, hide tech stuff,
 #turns off alwayscaster
 #you can play all units into enemy side
@@ -90,8 +91,8 @@ preload("res://Assets/CardsPNGS/Creep_abilities/Zombie.png")]
 #currently stores alphacreep and betacreeep
 var card = load("res://Scenes/UNIT/Unit1.tscn")
 #var card = scene.instantiate()
-var PlayerDeck =  [["spell",0],["spell",8],["creep",2],["creep",6],["spell",7],
-	["spell",7],["creep",0],["creep",1],["build", 0],["item", 0]]
+var PlayerDeck =  [["spell",0],["spell",8],["creep",0],["creep",6],["spell",7],
+	["creep",5],["creep",0],["creep",1],["build", 0],["item", 0], ["spell",6], ["spell",3]]
 	
 	
 	
@@ -102,7 +103,8 @@ var playtest_deck = [
 	["spell",6], ["creep",0],["creep",1],["creep",5],["build", 0],
 	["spell",0],["spell",1],["spell",3],["spell",4],["spell",5],
 	["spell",8], ["creep",0],["creep",1],["creep",5],["build", 0],
-	["spell",8],["spell",8],["spell",7],["spell",7],["spell",7]]
+	["spell",8],["spell",8],["spell",7],["spell",7],["spell",7],
+	["creep",6],["creep",6], ["item", 0], ["item", 0]]
 
 	
 var index = PlayerDeck.find(["creep",0])
@@ -111,7 +113,7 @@ var HeroDeck = [1,4,2,3,0]
 #DORBYS 	PLOTT 		KAJUS		KIMMEDI 	ACAMAR
 #var HeroDeck = [1, 1 , 1, 1, 1,]
 #this is copied over and reordered to OpponentDeck atm 
-var OpponentHeroDeck = [0,3,1,4,2]
+var OpponentHeroDeck = [0,3,1,2,4]
 
 
 	
@@ -126,12 +128,13 @@ var LAST_TOWER_HP = 23
 
 var CARD_WIDTH = 216
 var CARD_HEIGHT = 360
+var pre_deploy_scale_down = 0.5
 
 var FAKE_DELTA = 1/60.0
 var FAKE_GAMMA = 1/42.0
 var FAKE_OMEGA = 1/9.0
 var MICRO_TIME = 1/240.0
-#cuz nearsimultaneous shit
+#cuz nearsimultaneous shit _wha
 var HERO_COUNT = 5
 #How many heroes per player
 
@@ -152,6 +155,7 @@ var Main_phase = 0
 #for unit gd   combat_damage_refresh
 #determined by BUTTON
 
+#ccc
 var current_lane = 1
 var viewed_lane = 1
 #used for scrolling lanes
@@ -176,6 +180,14 @@ var aura_unique_id = 0
 
 var game_started_yet_bruh = false
 	#set to true in THEbutton's _ready()
+	
+#######################################################################
+### 						ANIMATION VARIABLES 						  ###
+#######################################################################	
+
+var visible_death_anim_length = 0.6
+var death_anim_length = 0.9	
+	
 	
 #######################################################################
 ### 					DEBUGGING VARIABLES 						###
@@ -364,10 +376,18 @@ func _notification(notification_type):
 
 
 func lock_pass_button():
+	push_error("LOCKING: " + str(CAN_CLICK_BUTTON_NOW))
 	CAN_CLICK_BUTTON_NOW += 1
-	the_button.set_disabled(true)
+	if the_button != null:
+		the_button.set_disabled(true)
+	else: push_error("the_button not present")
+		#caused crashes when closing game during deployment
+	
 	
 func unlock_pass_button(forced = false):
+	if the_button == null:
+		return button_gone_error()
+	push_error("UNLOCKING: " + str(CAN_CLICK_BUTTON_NOW))
 	if Lobby.MULTIPLAYER == true:
 		if granted_action == 1:
 			if forced == true:
@@ -380,7 +400,11 @@ func unlock_pass_button(forced = false):
 	elif Lobby.MULTIPLAYER == false:
 		if forced == true:
 			CAN_CLICK_BUTTON_NOW = 1
-			the_button.set_disabled(false)
+			if the_button != null:
+				the_button.set_disabled(false)
+			else: push_error("the_button not present")
+				#caused crashes when closing game during deployment
+			
 		else:
 			CAN_CLICK_BUTTON_NOW -= 1
 			if CAN_CLICK_BUTTON_NOW == 1:
@@ -421,6 +445,10 @@ func receive_granted_action():
 	the_button.show_opponent_turn_is_over()
 	Lobby.update_current_player()
 	
+func receive_granted_action_for_lane4():
+	#so that it doesn't force unlock button before heroes have decided deployment
+	granted_action = 1
+	
 func grant_an_action():
 	#after you do an action that passes the turn to opponent
 	#used when you don't pass the initiative (passing with initiative)
@@ -449,3 +477,13 @@ func switch_passing_status():
 	else:
 		passing = true
 		the_button.passing_status_indicator.visible = false
+
+
+#######################################################################
+### 					ERRORING FUNCTIONS 							###
+#######################################################################	
+
+
+func button_gone_error():
+	push_error("button gone")
+	return 42
