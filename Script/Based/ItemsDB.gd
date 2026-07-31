@@ -17,8 +17,8 @@ var COOLDOWNPOSITION = 3
 
 
 var ITEMS_DB = [
-	["Blink_axe", 1, -1,2],
-	["Oblysk", 1, -1, 0]]
+	["Blink_axe", 2, -1,2],
+	["Oblysk", 2, -1, 0]]
 
 
 func get_cooldown(item_name: String):
@@ -33,10 +33,12 @@ func Blink_axe(blinker, destination, forced_slot, _rpced = false):
 	if _rpced == true:
 		destination = destination.abarena
 	var landing_slot:int
-	blinker.pull_me_out_of_this_lane()
+	await blinker.pull_me_out_of_this_lane()
 	landing_slot = await destination.land_here(blinker, forced_slot)
 		#who's landing and from where
-	push_error(blinker.name + " is landing at: " +str(landing_slot))
+	var movement_sfx = load("res://Assets/Sounds/SFX/Movement.mp3")
+	blinker.play_spammable_sfx(movement_sfx, "movement")
+	push_error(blinker.Unit_Name + " is landing at: " +str(landing_slot))
 	return landing_slot
 
 

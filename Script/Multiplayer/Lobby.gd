@@ -14,6 +14,8 @@ var opponent_peer_id:int
 
 var player_name:String
 #from lineedit
+var opponent_name:String
+#from Player_HP rpced over
 
 var host: bool = false
 var player: String 

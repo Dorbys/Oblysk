@@ -3,22 +3,23 @@ extends Control
 #also spawns as child of UI layer
 
 @onready var XP_panel = $"../XP_Panel"
+@onready var the_button = $"../THE_BUTTON"
 
 @onready var Card_layer1 = $"../../First_lane/Card_layer"
-@onready var arena_rect1 = $"../../First_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
-@onready var abarena_rect1 = $"../../First_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
+#@onready var arena_rect1 = $"../../First_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
+#@onready var abarena_rect1 = $"../../First_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
 
 @onready var Card_layer2 = $"../../Mid_lane/Card_layer"
-@onready var arena_rect2 = $"../../Mid_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
-@onready var abarena_rect2 = $"../../Mid_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
+#@onready var arena_rect2 = $"../../Mid_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
+#@onready var abarena_rect2 = $"../../Mid_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
 
 @onready var Card_layer3 = $"../../Last_lane/Card_layer"
-@onready var arena_rect3 = $"../../Last_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
-@onready var abarena_rect3 = $"../../Last_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
+#@onready var arena_rect3 = $"../../Last_lane/Card_layer/SCROLLA/Arena/SIZECHECK/ArenaRect"
+#@onready var abarena_rect3 = $"../../Last_lane/Card_layer/SCROLLB/Abarena/SIZECHECK/ArenaRect"
 
 var Card_layer 
-var arena_rect 
-var abarena_rect
+#var arena_rect 
+#var abarena_rect
 
 
 
@@ -31,22 +32,17 @@ func _ready():
 	new_lane()
 	update_XP(true)
 	Base.lock_pass_button()
+	the_button.global_lets_hide_abilities_and_items()
 
 	
 func new_lane():
 	match Base.current_lane:
 		1:
 			Card_layer = Card_layer1
-			arena_rect = arena_rect1
-			abarena_rect = abarena_rect1
 		2:
 			Card_layer = Card_layer2
-			arena_rect = arena_rect2
-			abarena_rect = abarena_rect2
 		3:
 			Card_layer = Card_layer3
-			arena_rect = arena_rect3
-			abarena_rect = abarena_rect3
 	
 func update_XP(first_time = false):
 	XP = XP_panel.XP
@@ -58,6 +54,8 @@ func update_XP(first_time = false):
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 		delete_myself()
+	elif Input.is_action_just_pressed("Camera_zoom_out"):
+		delete_myself()
 
 
 
@@ -68,6 +66,7 @@ func _input(event):
 
 
 func delete_myself():
+	the_button.global_lets_reshow_abilities_and_items()
 	Card_layer.lets_stop_targeting()
 #	for i in arena_rect.get_child_count():
 #		var target = arena_rect.get_child(i)

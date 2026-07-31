@@ -12,13 +12,13 @@
 [ext_resource type="PackedScene" uid="uid://d3jknhi2o25m5" path="res://Scenes/EFFECTS/IEffect.tscn" id="8_w0v0q"]
 
 [node name="SCROLLA" type="ScrollContainer"]
-offset_right = 1900.0
+offset_right = 2030.0
 offset_bottom = 800.0
 scale = Vector2(0.8, 0.8)
 mouse_filter = 2
 theme = ExtResource("1_rwa2n")
 follow_focus = true
-horizontal_scroll_mode = 3
+horizontal_scroll_mode = 0
 vertical_scroll_mode = 0
 scroll_deadzone = 10
 script = ExtResource("2_p58ki")
@@ -26,10 +26,10 @@ script = ExtResource("2_p58ki")
 [node name="Arena" type="BoxContainer" parent="."]
 self_modulate = Color(1, 1, 1, 0)
 clip_children = 1
-custom_minimum_size = Vector2(1150, 625)
+custom_minimum_size = Vector2(2030, 625)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 6
+size_flags_vertical = 3
 script = ExtResource("3_6kukc")
 
 [node name="SIZECHECK" type="PanelContainer" parent="Arena"]
@@ -47,12 +47,14 @@ script = ExtResource("8_kdq13")
 
 [node name="ArenaMid" type="TextureRect" parent="Arena/SIZECHECK"]
 layout_mode = 2
+mouse_filter = 2
 expand_mode = 1
 
 [node name="ArenaRect" type="ColorRect" parent="Arena/SIZECHECK"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-color = Color(0, 0.227451, 0.227451, 0)
+color = Color(1, 1, 1, 0)
 script = ExtResource("4_sj4ya")
 CARD = ExtResource("6_mayyw")
 SHADOW = ExtResource("2_ks0je")

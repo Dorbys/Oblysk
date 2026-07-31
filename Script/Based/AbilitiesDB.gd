@@ -2,8 +2,9 @@ extends Node
 
 
 # Called when the node enters the scene tree for the first time.
-#func _ready():
-#	pass # Replace with function body.
+func _ready():
+	projectile1 = preload("uid://gj5kh01onyqa")
+						#projectile1
 #
 #
 ## Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -48,7 +49,7 @@ func Advance(Caster):
 
 
 #func Warmarch(Target):
-	#Target.increase_AttackM(-2, 1)	
+	#Target.increase_AttackM(-2, true)	
 	#await Target.take_damage(2)
 
 
@@ -67,16 +68,32 @@ func Advance(Caster):
 	
 var MP5_DAMAGE = 4
 var MP5_description = "Monday: I deal " + str(MP5_DAMAGE) + " physical damage to a random enemy"	
-func MP5(target):
+func MP5(target, caster):
 	var expected_damage = MP5_DAMAGE - target.ArmorC
 	if expected_damage < 0:
 		expected_damage = 0
-	#really gotta put this inside take_dmg function.... rly mb
-	var died = target.take_damage(expected_damage)
+	await projectile_animation(caster, target)	
+
+	var died = await target.take_damage(expected_damage)
 	if died:
-		await get_tree().create_timer(Base.visible_death_anim_length).timeout
+		await get_tree().create_timer(Base.death_anim_length).timeout
+	#currently outside kimmedi's passive for sync, alt?
 
 
+
+###########################################################################
+######################			ANIMATIONS			######################
+###########################################################################
+
+var projectile1
+
+func projectile_animation(caster, target):
+	var another = projectile1.instantiate()
+	another.global_position = caster.global_position + Vector2(0,Base.head_offset)
+	another.destination = target.get_global_position() + Vector2(0,Base.head_offset) 
+	caster.effect_layer.add_child(another)	
+	while another.finished == false:
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 
 
 

@@ -1,10 +1,12 @@
 extends TextureRect
-
+#node which sits under tower/buildings
 
 
 @onready var my_tower = $"../.."
 @onready var UI_layer = $"../../../../../UI_layer"
 
+@onready var building_audio: AudioStreamPlayer2D = %Building_audio
+	#used by building abilities
 
 var my_lane
 var opp_lane
@@ -22,11 +24,14 @@ var Build_Pfp
 
 var aura_unique_id
 
+var destroy_time = 0.5
 var text_for_tooltip = "tooltip didn't load properly"
+
+var visual_center:Vector2
 
 func _ready():
 	texture = Build_Pfp
-	
+	visual_center = global_position + size / Vector2(2.0, 2.0)
 	
 	if is_aura == true:
 		aura_unique_id = Base.aura_unique_id
@@ -41,6 +46,7 @@ func _ready():
 		var passiveload = load("res://Script/PassiveBuildingsList/" +str(Build_name) +".gd")
 		Passive_ability_node.set_script(passiveload)
 		Passive_ability_node.visible = false
+		Passive_ability_node.house = self
 		add_child(Passive_ability_node)
 		
 	if my_tower.name == "TowerA":
@@ -107,14 +113,16 @@ func _ready():
 				if wielder.TYPE == "unit":
 					target	= wielder.lane_auras
 					affect_unit(target,wielder)
+	
 
 func affect_unit(target, wielder):
-	push_error("AFFECTING " +wielder.Unit_Name + " lane: " + str(wielder.my_lane))
+	#push_error("AFFECTING " +wielder.Unit_Name + " lane: " + str(wielder.my_lane))
 	if %Affection.do_I_affect_this(wielder) == true:
 		var node_name = str(Build_name) + "_" + str(aura_unique_id)
 		if target.has_node(node_name):
 			target.get_node(node_name).CHECKED = true
 			#if its already affected by me, no reason to affect it again
+			return 0
 		else:
 			var aura_effect = Control.new()
 			var aurascript = load("res://Script/AurasFromBuildingsList/" +str(Build_name) +".gd")
@@ -123,7 +131,9 @@ func affect_unit(target, wielder):
 			target.add_child(aura_effect)
 #			push_error("adding aura to: " +str(target.name) + str(target.get_child_count()))
 			#target is the slot for laneaura effects
-	
+			return 0
+	else:
+		return 0
 	
 func  do_I_affect_faction(faction):
 	if faction == "alpha":
@@ -140,16 +150,20 @@ func  do_I_affect_faction(faction):
 	
 func destroy_myself():
 	#There is no checking for stopping affecting units, demo only for opp and timed
-	var destr_time = 0.5
+	
 	var tween = create_tween().set_parallel(true)
-	tween.tween_property(self, "modulate:a", 0, destr_time)
-	await get_tree().create_timer(destr_time).timeout 
+	tween.tween_property(self, "modulate:a", 0, destroy_time)
+	await tween.finished
 #	card_layer.lane_aura_check_both()
-	#trying to call this via on_child_Exited from buildings of tower
+	#calling this via on_child_Exited from buildings of tower
 	self.queue_free()
 	
 	
-		
+func play_sfx(type:String, sfx_name:String):
+	var file_address = "res://Assets/Sounds/SFX/" +type + "s/" + sfx_name + ".mp3"
+	var target_sfx = load(file_address)	
+	building_audio.stream = target_sfx
+	building_audio.play()		
 	
 	
 	

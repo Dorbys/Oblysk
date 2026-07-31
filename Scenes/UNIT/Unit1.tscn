@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://bayidy5c8jqm4"]
+[gd_scene load_steps=31 format=3 uid="uid://bayidy5c8jqm4"]
 
 [ext_resource type="Script" uid="uid://qecb7manyl5v" path="res://Script/Unit1.gd" id="1_58f8m"]
 [ext_resource type="PackedScene" uid="uid://dmaqk1n41c6o5" path="res://Scenes/EFFECTS/SEffect.tscn" id="2_jshfr"]
@@ -9,7 +9,10 @@
 [ext_resource type="PackedScene" uid="uid://1qxt0o7ufabr" path="res://Scenes/UI/Covering.tscn" id="6_diytq"]
 [ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="6_xyfb1"]
 [ext_resource type="LabelSettings" uid="uid://c3htsyeddmmay" path="res://Setts/Labels/Stats.tres" id="7_mya13"]
+[ext_resource type="PackedScene" uid="uid://bi7ldjutq2kuu" path="res://Scenes/UNIT/Lvlupping_effect.tscn" id="7_p2p02"]
+[ext_resource type="PackedScene" uid="uid://v5oullu23bf4" path="res://Scenes/UNIT/Visual/Stat_change_visual.tscn" id="8_4kuyx"]
 [ext_resource type="Texture2D" uid="uid://bxn2mkbkberl1" path="res://Assets/CardsPNGS/CardUI/Inventory sword.png" id="8_kj6o8"]
+[ext_resource type="AudioStream" uid="uid://dwh5w4l0awant" path="res://Assets/Sounds/SFX/Land.mp3" id="8_lu7sw"]
 [ext_resource type="Texture2D" uid="uid://da11g0qs7vep1" path="res://icon.svg" id="8_xaqce"]
 [ext_resource type="Texture2D" uid="uid://cyabcdh11jaxs" path="res://Assets/CardsPNGS/CardUI/Inventory special.png" id="9_qrgby"]
 [ext_resource type="Texture2D" uid="uid://bsg0uej28g8jr" path="res://Assets/CardsPNGS/Heroes/Dorbys.png" id="9_unpde"]
@@ -18,7 +21,6 @@
 [ext_resource type="Script" uid="uid://cnxv8fqsrnq2r" path="res://Script/UNITS/Arrow_combat.gd" id="10_wsnbo"]
 [ext_resource type="Script" uid="uid://ciq5nhqh1xjg1" path="res://Script/UI_layer/Tooltip.gd" id="12_8wtn5"]
 [ext_resource type="LabelSettings" uid="uid://ucthkrf481c6" path="res://Setts/Labels/Cooldown.tres" id="12_jtwlf"]
-[ext_resource type="PackedScene" uid="uid://1ii2eu8a2p22" path="res://Scenes/UI/No_action_warning.tscn" id="12_p2p02"]
 [ext_resource type="Texture2D" uid="uid://f6k8coqa3pyq" path="res://Assets/Boardstuff/arrow_target2.png" id="13_06qur"]
 [ext_resource type="Script" uid="uid://siu3aeiuf2rp" path="res://Script/UNITS/Unit_Lane_auras.gd" id="13_iuwco"]
 [ext_resource type="PackedScene" uid="uid://blvlp7vt2ydtm" path="res://Scenes/UI/Tooltip_container.tscn" id="13_u8fq3"]
@@ -26,7 +28,7 @@
 [ext_resource type="Texture2D" uid="uid://mx5vriwhyhxd" path="res://Assets/CardsUI/grim-reaper.png" id="16_rwel1"]
 [ext_resource type="Script" uid="uid://doabennqlnlt6" path="res://Script/UNITS/DraggingRect.gd" id="17_ef5kf"]
 [ext_resource type="Script" uid="uid://c2s0hiwnd7rmq" path="res://Script/UNITS/Item_slot.gd" id="21_nustg"]
-[ext_resource type="PackedScene" uid="uid://cenvkv14icjac" path="res://Scenes/UNIT/UnitEmptyPreview.tscn" id="23_sgdew"]
+[ext_resource type="PackedScene" uid="uid://cenvkv14icjac" path="res://Scenes/UNIT/UnitDeplorPreview2ig.tscn" id="23_sgdew"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_owja7"]
 font = ExtResource("15_ceog3")
@@ -39,17 +41,30 @@ outline_color = Color(0, 0, 0, 1)
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 3
 anchors_preset = 0
+pivot_offset = Vector2(0, 180)
 script = ExtResource("1_58f8m")
 EFFECT = ExtResource("2_jshfr")
 IEFFECT = ExtResource("3_thguv")
 ATEFFECT = ExtResource("4_y51pp")
 LVLUPEFFECT = ExtResource("5_h3hi2")
 COVERING = ExtResource("6_diytq")
+LVLUPPING = ExtResource("7_p2p02")
+stat_change_visual = ExtResource("8_4kuyx")
+
+[node name="particle_holder" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_top = 180.0
+offset_bottom = 180.0
+
+[node name="SFX_base" type="AudioStreamPlayer2D" parent="particle_holder"]
+unique_name_in_owner = true
+stream = ExtResource("8_lu7sw")
 
 [node name="Slacksus" type="TextureRect" parent="."]
 layout_mode = 0
-offset_left = -108.0
-offset_right = 108.0
+offset_left = -110.0
+offset_right = 110.0
 offset_bottom = 360.0
 texture = ExtResource("6_xyfb1")
 expand_mode = 1
@@ -58,8 +73,8 @@ expand_mode = 1
 unique_name_in_owner = true
 layout_mode = 2
 offset_top = 302.0
-offset_right = 55.0
-offset_bottom = 359.0
+offset_right = 56.0
+offset_bottom = 358.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 size_flags_stretch_ratio = 10.0
@@ -70,7 +85,6 @@ vertical_alignment = 1
 
 [node name="AR" type="Label" parent="Slacksus"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 offset_left = 81.0
 offset_top = 302.0
@@ -87,23 +101,23 @@ vertical_alignment = 1
 [node name="HP" type="Label" parent="Slacksus"]
 unique_name_in_owner = true
 layout_mode = 2
-offset_left = 160.0
+offset_left = 164.0
 offset_top = 303.0
-offset_right = 216.0
-offset_bottom = 360.0
+offset_right = 220.0
+offset_bottom = 359.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 size_flags_stretch_ratio = 10.0
 text = "10"
 label_settings = ExtResource("7_mya13")
-horizontal_alignment = 2
+horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="UNIT_JPEG" type="TextureRect" parent="Slacksus"]
 unique_name_in_owner = true
 layout_mode = 2
 offset_top = 38.0
-offset_right = 216.0
+offset_right = 220.0
 offset_bottom = 303.0
 size_flags_vertical = 3
 size_flags_stretch_ratio = 16.0
@@ -111,20 +125,29 @@ mouse_filter = 2
 texture = ExtResource("9_unpde")
 expand_mode = 4
 
+[node name="DEATH" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+visibility_layer = 2
+layout_mode = 0
+offset_left = -15.0
+offset_top = 49.0
+offset_right = 247.0
+offset_bottom = 311.0
+mouse_filter = 2
+texture = ExtResource("16_rwel1")
+expand_mode = 1
+
 [node name="Ability1" type="TextureRect" parent="Slacksus"]
 unique_name_in_owner = true
-z_index = 1
 layout_mode = 0
 offset_left = 7.0
 offset_top = 235.0
 offset_right = 65.0
 offset_bottom = 293.0
 mouse_filter = 2
-mouse_default_cursor_shape = 2
 texture = ExtResource("8_xaqce")
 expand_mode = 1
 script = ExtResource("6_7tni5")
-no_action_warning = ExtResource("12_p2p02")
 
 [node name="Ability_field" type="TextureRect" parent="Slacksus/Ability1" node_paths=PackedStringArray("owner_node")]
 unique_name_in_owner = true
@@ -175,26 +198,14 @@ script = ExtResource("10_wsnbo")
 unique_name_in_owner = true
 z_index = 1
 layout_mode = 0
-offset_left = 144.0
+offset_left = 164.0
 offset_top = 261.0
-offset_right = 212.0
-offset_bottom = 314.0
+offset_right = 220.0
+offset_bottom = 317.0
 text = "26"
 label_settings = SubResource("LabelSettings_owja7")
-horizontal_alignment = 2
+horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="DEATH" type="TextureRect" parent="Slacksus"]
-unique_name_in_owner = true
-visibility_layer = 2
-layout_mode = 0
-offset_left = -16.0
-offset_top = 49.0
-offset_right = 246.0
-offset_bottom = 311.0
-mouse_filter = 2
-texture = ExtResource("16_rwel1")
-expand_mode = 1
 
 [node name="Lane_auras" type="Control" parent="Slacksus"]
 unique_name_in_owner = true
@@ -305,14 +316,11 @@ unique_name_in_owner = true
 visible = false
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0
-offset_left = -108.0
-offset_right = 108.0
+offset_left = -110.0
+offset_right = 110.0
 offset_bottom = 360.0
 script = ExtResource("17_ef5kf")
 SCENE = ExtResource("23_sgdew")
 
 [connection signal="mouse_entered" from="Slacksus" to="." method="_on_slacksus_mouse_entered"]
 [connection signal="mouse_exited" from="Slacksus" to="." method="_on_slacksus_mouse_exited"]
-[connection signal="gui_input" from="weapon_slot" to="weapon_slot" method="_on_gui_input"]
-[connection signal="gui_input" from="special_slot" to="special_slot" method="_on_gui_input"]
-[connection signal="gui_input" from="armor_slot" to="armor_slot" method="_on_gui_input"]

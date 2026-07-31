@@ -1,20 +1,31 @@
-extends Control
+extends VFX_class
 
-@onready var audio_stream_player_2d: AudioStreamPlayer2D = $Projectile/AudioStreamPlayer2D
+@onready var scoping: AudioStreamPlayer2D = $Projectile/Scoping
+@onready var awp: AudioStreamPlayer2D = $Projectile/Awp
 
-var time_to_travel = 1
+var speed = 3000
+var time_to_travel
 var destination:Vector2 
+var finished = false
+	#to know when to deal damage
 
 func _ready() -> void:
-	push_error("proj destination: " +str(destination))
-	audio_stream_player_2d.play()
+	#push_error("proj destination: " +str(destination))
+	time_to_travel = calculate_time_to_travel()
+	scoping.play()
+	
+func calculate_time_to_travel() -> float:
+	var distance = global_position.distance_to(destination)
+	return distance / speed
+
+func _on_scoping_finished() -> void:
+	awp.play()
+	visible = true
 	var tween = create_tween()
 	tween.tween_property(self, "global_position",destination,time_to_travel)
 	await tween.finished
-	visible=false
+	visible = false
+	finished = true
 
-
-
-
-func _on_audio_stream_player_2d_finished() -> void:
-	self.queue_free()
+func _on_awp_finished() -> void:
+	queue_free()

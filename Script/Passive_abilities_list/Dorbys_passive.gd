@@ -8,7 +8,7 @@ func _ready():
 	wielder.Ability1.text_for_tooltip = description
 	await get_tree().create_timer(Base.FAKE_GAMMA).timeout 
 	wielder.Siege = true
-	wielder.increase_AttackM(0, 1)
+	wielder.increase_AttackM(0, false)
 	
 	
 	

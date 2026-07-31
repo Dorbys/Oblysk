@@ -1,4 +1,4 @@
-extends Control
+extends empty_preview
 
 var Unit_Name = "AlphaCreep"
 var Unit_Pfp 
@@ -7,17 +7,17 @@ var Unit_Ability_cooldown
 var Unit_Attack = 1
 var Unit_Health = 2
 var Unit_Armor = 0
-var Identification = 3
 var Card_Cost = 0
 #var UNIT = 1
 #var SPELL = 0
-var TYPE = "unit"
 var has_ability = false
 #var actually_exiting = 1
 
 var Card_XP
 
 func _ready():
+	TYPE = "unit"
+
 	%NAME.text = Unit_Name
 	%ATK.text = str(Unit_Attack)
 	%HP.text = str(Unit_Health)

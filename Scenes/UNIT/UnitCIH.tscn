@@ -1,8 +1,8 @@
 [gd_scene load_steps=12 format=3 uid="uid://cauryrpdbrtky"]
 
-[ext_resource type="Script" uid="uid://jjmso125q3n1" path="res://Script/UNITS/UnCIHERR.gd" id="1_uqjfn"]
+[ext_resource type="Script" uid="uid://jjmso125q3n1" path="res://Script/UNITS/UnitCIH.gd" id="1_uqjfn"]
+[ext_resource type="PackedScene" uid="uid://dlw1m0ncyr2sg" path="res://Scenes/UNIT/Unit_empty_preview.tscn" id="3_e3qac"]
 [ext_resource type="PackedScene" uid="uid://ev4s6r8o0qsf" path="res://Scenes/UNIT/UnitPreview.tscn" id="3_uju4r"]
-[ext_resource type="PackedScene" uid="uid://dlw1m0ncyr2sg" path="res://Scenes/UNIT/UnitCihPreview.tscn" id="4_b3voe"]
 [ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="4_bp3rg"]
 [ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="5_dnkr0"]
 [ext_resource type="LabelSettings" uid="uid://c3htsyeddmmay" path="res://Setts/Labels/Stats.tres" id="6_21o0c"]
@@ -17,7 +17,7 @@ layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_uqjfn")
 Scene = ExtResource("3_uju4r")
-PreviewScene = ExtResource("4_b3voe")
+empty_preview_scene = ExtResource("3_e3qac")
 
 [node name="Slacksus" type="TextureRect" parent="."]
 layout_mode = 0

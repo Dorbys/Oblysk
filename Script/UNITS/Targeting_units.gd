@@ -162,6 +162,8 @@ func _process(_delta):
 	if len(TList) < I_want_targets:
 		pass
 	elif len(TList) == I_want_targets:
+		visible = false
+		hide_used_card()
 		match I_want_targets:
 			#the problem might come from here, since we don't stop the process
 				#as soon as we hit I_want_targets
@@ -177,6 +179,11 @@ func _process(_delta):
 	else: 
 		push_error("Too many targets :(")
 		
+		
+func hide_used_card():
+	if My_hand_position != null:
+			hand_rect.hide_used_card(My_hand_position)
+			
 		
 func handle_one_target():
 	if Card_ID != null:
@@ -215,8 +222,8 @@ func handle_two_targets():
 
 			
 		
-		await tower_layer.something_targeted_signal(TList[0],DBList[Card_ID])
-		await tower_layer.something_targeted_signal(TList[1],DBList[Card_ID])	
+		#await tower_layer.something_targeted_signal(TList[0],DBList[Card_ID])
+		#await tower_layer.something_targeted_signal(TList[1],DBList[Card_ID])	
 		#FOR PASSIVES
 		
 		delete_myself(true)
@@ -224,8 +231,8 @@ func handle_two_targets():
 	elif Ability_ID != null:
 		origin_ability.activate_cooldown()
 		
-		await tower_layer.something_targeted_signal(TList[0],AbilitiesDB.ABILITIES_DB[Ability_ID])
-		await tower_layer.something_targeted_signal(TList[1],AbilitiesDB.ABILITIES_DB[Ability_ID])
+		#await tower_layer.something_targeted_signal(TList[0],AbilitiesDB.ABILITIES_DB[Ability_ID])
+		#await tower_layer.something_targeted_signal(TList[1],AbilitiesDB.ABILITIES_DB[Ability_ID])
 		#FOR PASSIVES
 		
 		#not sure why abilites done via DB and DBList		
@@ -236,8 +243,8 @@ func handle_two_targets():
 	elif Item_ID != null:
 		origin_item.activate_cooldown()
 		
-		await tower_layer.something_targeted_signal(TList[0],DBList[Item_ID])
-		await tower_layer.something_targeted_signal(TList[1],DBList[Item_ID])	
+		#await tower_layer.something_targeted_signal(TList[0],DBList[Item_ID])
+		#await tower_layer.something_targeted_signal(TList[1],DBList[Item_ID])	
 		#FOR PASSIVES mbhere
 		var func_to_call = str(DBList[Item_ID][DB.NAMEPOSITION])
 		var sync_data = await DB.call(func_to_call,TList[0],TList[1], null)
@@ -261,8 +268,7 @@ func delete_myself(used):
 	arena_rect.TargetingSpell = 0
 	abarena_rect.TargetingSpell = 0
 	if used == true:
-		if My_hand_position != null:
-			hand_rect.used_card(My_hand_position)
+		hand_rect.consume_hidden_card()
 
 
 	if Secondary_targets == Enums.Targeting.lane:

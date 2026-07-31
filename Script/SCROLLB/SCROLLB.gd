@@ -1,5 +1,8 @@
 extends ScrollContainer
 
+@onready var scrolling_area: Control = %Scrolling_area
+	#used to determine whether to scroll in input.gd
+	
 var prep_time = 0.25
 var charge_time = 0.1
 var back_time = 0.4

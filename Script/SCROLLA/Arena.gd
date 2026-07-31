@@ -32,14 +32,12 @@ func _on_arena_rect_child_exiting_tree(_node):
 	OPrena.stretching_for_scroll(ChildCount)
 
 func stretching_for_scroll(population):
-#	await get_tree().create_timer(Base.FAKE_DELTA).timeout
-#	Don't rememeber why it was here
 
-	var capacity = 7
+	var capacity = 8
 	if population > capacity:
-		self.custom_minimum_size.x = -arena_rect.OFFSET + population* (Base.CARD_WIDTH + arena_rect.OFFSET)
+		self.custom_minimum_size.x = arena_rect.OFFSET + population* (Base.CARD_WIDTH + arena_rect.OFFSET)
 #		scrolla.horizontal_scroll_mode
-#		print(self.custom_minimum_size.x)
+	#push_error("arena min size: " + str(self.custom_minimum_size.x))
 
 
 func move_roof_to_front():
@@ -52,6 +50,13 @@ func move_roof_back():
 #	print("Frontline is now: " +str(sizecheck.get_child(2).name))
 #used for moving ArenaRect and ArenaRoof to the front so that spells can target units by 
 #hovering over them, whereas placing units is done without cards interfering
+
+func eclipse_abarena():
+	arena_rect.card_layer.eclipse_abarena()
+	
+func uneclipse_abarena():
+	arena_rect.card_layer.uneclipse_abarena()
+	
 
 func move_arena_mid_to_front():
 	sizecheck.move_child(arena_mid,2)

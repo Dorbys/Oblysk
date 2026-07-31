@@ -1,0 +1,70 @@
+[gd_scene load_steps=8 format=3 uid="uid://b7qx6gh3ihf6c"]
+
+[ext_resource type="Script" uid="uid://cilsttbbujxps" path="res://Script/VFX/Railgun_vfx.gd" id="1_lgxur"]
+[ext_resource type="Texture2D" uid="uid://chetlkkyabepx" path="res://Assets/VFX/Laser1.png" id="2_lweck"]
+[ext_resource type="AudioStream" uid="uid://b52srwhf1jlpd" path="res://Assets/Sounds/SFX/lvlup_spells/Railgun.mp3" id="3_vgqe0"]
+
+[sub_resource type="Curve" id="Curve_d4eut"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.334375, 0.991413), 0.0, 0.0, 0, 0, Vector2(0.340625, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_t3u3k"]
+curve = SubResource("Curve_d4eut")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dah7m"]
+particle_flag_align_y = true
+particle_flag_rotate_y = true
+direction = Vector3(2.4, -1, 0)
+spread = 0.0
+initial_velocity_min = 1000.0
+initial_velocity_max = 1000.0
+gravity = Vector3(0, 0, 0)
+color = Color(2, 2, 2, 1)
+alpha_curve = SubResource("CurveTexture_t3u3k")
+
+[sub_resource type="Environment" id="Environment_0shmf"]
+background_mode = 3
+glow_enabled = true
+glow_levels/1 = 16.0
+glow_levels/3 = 0.0
+glow_levels/7 = 0.26
+glow_blend_mode = 0
+glow_hdr_threshold = 0.92
+
+[node name="Railgun_vfx" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_lgxur")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = -110.0
+offset_top = -143.0
+offset_right = 110.0
+offset_bottom = 217.0
+color = Color(1, 1, 1, 0.262)
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(-990, 391)
+emitting = false
+amount = 1
+texture = ExtResource("2_lweck")
+lifetime = 3.0
+one_shot = true
+speed_scale = 4.0
+fixed_fps = 60
+visibility_rect = Rect2(-5000, -5000, 10000, 10000)
+trail_enabled = true
+trail_lifetime = 1.0
+process_material = SubResource("ParticleProcessMaterial_dah7m")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0shmf")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_vgqe0")
+autoplay = true
+
+[connection signal="finished" from="AudioStreamPlayer2D" to="." method="_on_audio_stream_player_2d_finished"]

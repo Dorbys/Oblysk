@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://ev4s6r8o0qsf"]
 
-[ext_resource type="Script" path="res://Script/UNITS/UnitPreview.gd" id="1_k8ngv"]
+[ext_resource type="Script" uid="uid://jnw1mgrls4s" path="res://Script/UNITS/UnitPreview.gd" id="1_k8ngv"]
 [ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="2_ivf6r"]
 [ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="3_bn35u"]
 [ext_resource type="LabelSettings" uid="uid://c6k6apdugj728" path="res://Setts/Labels/StatsPreview.tres" id="4_nn2vs"]
@@ -26,7 +26,7 @@ mouse_filter = 2
 texture = ExtResource("2_ivf6r")
 expand_mode = 1
 
-[node name="NAME" type="Label" parent="Slacksus"]
+[node name="Name_label" type="Label" parent="Slacksus"]
 unique_name_in_owner = true
 layout_mode = 2
 offset_right = 216.0
@@ -38,7 +38,7 @@ label_settings = ExtResource("3_bn35u")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ATK" type="Label" parent="Slacksus"]
+[node name="Attack_label" type="Label" parent="Slacksus"]
 unique_name_in_owner = true
 layout_mode = 2
 offset_top = 303.0
@@ -52,7 +52,7 @@ label_settings = ExtResource("4_nn2vs")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AR" type="Label" parent="Slacksus"]
+[node name="Armor_label" type="Label" parent="Slacksus"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -68,7 +68,7 @@ label_settings = ExtResource("5_wfwhk")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HP" type="Label" parent="Slacksus"]
+[node name="HP_label" type="Label" parent="Slacksus"]
 unique_name_in_owner = true
 layout_mode = 2
 offset_left = 161.0
@@ -83,7 +83,7 @@ label_settings = ExtResource("4_nn2vs")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HERO_JPEG" type="TextureRect" parent="Slacksus"]
+[node name="Art_rect" type="TextureRect" parent="Slacksus"]
 unique_name_in_owner = true
 layout_mode = 2
 offset_left = -1.0
@@ -117,7 +117,7 @@ mouse_filter = 2
 texture = ExtResource("7_c8kpj")
 expand_mode = 1
 
-[node name="COST" type="Label" parent="Slacksus"]
+[node name="Cost_label" type="Label" parent="Slacksus"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_right = 47.0
@@ -130,13 +130,13 @@ label_settings = ExtResource("8_wtqoq")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="XP" type="Label" parent="."]
+[node name="XP_label" type="Label" parent="Slacksus"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = -110.0
-offset_top = -35.0
-offset_right = -70.0
-offset_bottom = 4.0
+offset_left = -2.0
+offset_top = 35.0
+offset_right = 38.0
+offset_bottom = 74.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 size_flags_stretch_ratio = 10.0
@@ -144,5 +144,17 @@ text = "10"
 label_settings = ExtResource("9_38kqy")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Class_compatibility" type="Control" parent="Slacksus"]
+visible = false
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Description_label" type="Label" parent="Slacksus/Class_compatibility"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
 
 [connection signal="tree_exited" from="." to="." method="_on_tree_exited"]

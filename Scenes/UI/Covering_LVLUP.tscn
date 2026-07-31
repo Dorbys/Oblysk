@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dyxi37xxloi5e"]
 
-[ext_resource type="Script" path="res://Script/UI_layer/Covering_LVLUP.gd" id="1_46gok"]
+[ext_resource type="Script" uid="uid://b01l1pwgxxa4g" path="res://Script/UI_layer/Covering_LVLUP.gd" id="1_46gok"]
 [ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="2_fm15n"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_42gmq"]

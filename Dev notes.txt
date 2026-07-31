@@ -38,6 +38,7 @@ Robots laughing at pathetic attempt to attach a virus to their routine update, c
 (Dying) u fuck up everything u touch ... did you ever touch smt already fucked up? | You | Laughs dying "and look what you did" dies of laughter
 It's not a tech (cyborg upgrade), it's silicon based parasite
 Not death maintainer link spell
+race completely dependant on nanite maintenance since pre-birth
 
 
 
@@ -200,12 +201,38 @@ cont simplification into the damage redirection and anullment funcs and spawn_un
 when one slot empty and other would be 0 or max, the max when rpced eats the unit at 0
 double second ready on Golem spawn
 
+make lanetargeted spells including bread or hmmm be able to be played on either lane and autotarget
+scrolling history scrolls arena
+game over sound blocking - stopprogress instead
+scrolling units in lanes 2 3
+duel still ugly
+bob's name doesnt display on gameover
+day phases rework, zombie doesnt spawn from gate
+day phases rework, order of passive calls, buildings 
+being able to pass before wednesday end 
+making cards whose preview is being dragged invisible
+    classification
+    disable hover_preview  while dragging cards
+    cards with animation regain visibility after preview exits tree, even when played 
+
+
+
 ##################################################################################################################
 
 
-PT TIME?
+next_build 0.0545 
+
+   
 
 
+
+anims
+
+
+
+explan:
+    cards types/cost/effect/xp 
+    hero cards
 
 
 Arena_rect has get_opposer func, update this to end itself if it gets out of bounds for x rounds
@@ -242,17 +269,15 @@ Arena_rect has get_opposer func, update this to end itself if it gets out of bou
 
 
 
-Kimmedi passive on kill
-        refreshes dmbt on the side of the shooter but not the other, if shot from joiner
-            might be due to low priviliges
-        worked last time, siege not confirmed
-    DOES work when there is no phase overlap, siege not confirmed
-
 
 
 ((((((((((((((((((((((((((((( look out for )))))))))))))))))))))))))))))
-My_peak possibly increasing attack before granting siege?
 
+passive rng outside monday would need increased sync
+
+kimmedi passive doubletrigged?
+
+after lvlupping a lot and then playing golem, SP lost action
 
 ((((((((((((((((((((((((((((( look out for )))))))))))))))))))))))))))))
 

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bou36k508xpqq"
+path="res://.godot/imported/anil boom freesound_community-propane-tank-03b-108375 short.mp3-b8d3cfc196e6b23c31fe61b8058b58f6.mp3str"
+
+[deps]
+
+source_file="res://Assets/Sounds/SFX/spells/anil boom freesound_community-propane-tank-03b-108375 short.mp3"
+dest_files=["res://.godot/imported/anil boom freesound_community-propane-tank-03b-108375 short.mp3-b8d3cfc196e6b23c31fe61b8058b58f6.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -4,10 +4,13 @@ extends Control
 var TYPE = "void"
 var VOIDING = 0
 
+
 #card placement empty slots
 var SETT = 0
 var SITT = 0
 var Replaced_a_void = 0
+
+var alive = false
 
 var opposable = 1
 #whether I can be considered an opposer (I'm empty opposer)

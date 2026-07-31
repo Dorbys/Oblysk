@@ -57,8 +57,10 @@ func _on_pressed():
 		%Player_HP.decrease_alpha_players_HP(5)
 	elif option_button.text == "Hurt opponent":
 		%Player_HP.decrease_beta_players_HP(5)
-	elif option_button.text == "Monday phase":
-		card_layer.monday_phase()
+	elif option_button.text == "Monday":
+		card_layer.day_x_phase("monday")
+	elif option_button.text == "Tuesday":
+		card_layer.day_x_phase("tuesday")
 	elif option_button.text == "-1HP target unit":
 		ui_layer.add_child(hp_minus_covering.instantiate())
 	elif option_button.text == "PLUS 1HP target unit":
@@ -68,3 +70,4 @@ func _on_pressed():
 	elif option_button.text == "Reduce cooldowns":
 		arena_rect.mass_reduce_cooldowns(12)
 		abarena_rect.mass_reduce_cooldowns(12)
+	

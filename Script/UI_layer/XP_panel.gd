@@ -41,7 +41,7 @@ func mirror_my_xp_change(amount):
 #var HeroDeck = [0,4,2,3,1]
 #ACAMAR 	PLOTT 		KAJUS		KIMMEDI 	DORBYS
 func _ready():
-	#HERE 
+
 	await get_tree().create_timer(1).timeout
 
 	
@@ -71,9 +71,13 @@ func _on_mouse_exited():
 
 
 func _on_button_pressed():
+	if Base.viewed_lane == 4: 
+		return
 	if Lobby.MULTIPLAYER == true:
-		if Base.granted_action == 1:
+		if UI_layer.does_player_have_action() == true:
 			lvlupping()
+		else:
+			UI_layer.you_dont_have_action()
 	else:
 		lvlupping()
 	

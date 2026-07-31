@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5iatwndx552y"]
+
+[ext_resource type="Texture2D" uid="uid://cytrcm51w8w04" path="res://Assets/Effects/ATEFFECT.png" id="1_b34eh"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="TextureRect" type="TextureRect" parent="."]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = -110.0
+offset_top = -180.0
+offset_right = 110.0
+offset_bottom = 180.0
+pivot_offset = Vector2(110, 180)
+texture = ExtResource("1_b34eh")
+expand_mode = 1

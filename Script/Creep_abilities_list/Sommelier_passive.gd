@@ -3,14 +3,21 @@ extends Unit_passive_ability
 
 
 var ARMOR = 1
-var DAMAGE = 5
+var DAMAGE = 3
 var INCREMENT = 3
 var description = "Adjecent enemies have -" +str(ARMOR) +" armor.
-Monday: I deal " + str(DAMAGE) + " physical damage to enemy tower and increase my damage by " +str(INCREMENT)
+Monday: I deal " + str(DAMAGE) + " physical damage to enemy tower and increase this damage by " +str(INCREMENT)
+
+var ready_to_affect = false
+	#so that we don't affect units by effects that would trigger before ready()
+		#such as UNITSMOVEDYO when adding me as unit
+
+
 
 func _ready():
 	wielder.Ability1.text_for_tooltip = description
-	tower_layer.monday_phase_list.append(self)
+	tower_layer.passive_phase_array.append(self)
+	tower_layer.monday_phase_array.append(self)
 	tower_layer.unit_order_changed_array.append(self)
 	await get_tree().create_timer(0.2).timeout 
 	aura_unique_id = Base.aura_unique_id
@@ -19,23 +26,39 @@ func _ready():
 	#takes care of pos_aura array in arenarect and binary var
 	aura_affect_primary_targets()
 	
+	projectile = load("uid://b2btlak4xqp14")
+				#Projectile2_flame_bones
 
 func new_lane(new_tower_layer):
-	if self not in new_tower_layer.monday_phase_list:
-		new_tower_layer.monday_phase_list.append(self)
-
-func monday_phase():
-	Sommelier()
+	if self not in new_tower_layer.monday_phase_array:
+		new_tower_layer.monday_phase_array.append(self)
+	if self not in new_tower_layer.passive_phase_array:
+		new_tower_layer.passive_phase_array.append(self)
 		
-func Sommelier():
-	wielder.MYrena_rect.OPTower.take_damage(DAMAGE)
-	DAMAGE += 3
+func passive_phase():
+	sommelier_aura()
+	
+func monday_phase():
+	await sommelier()
+		
+		
+func sommelier_aura():		
 	refresh_my_aura()
+	
+
+func sommelier():
+	var target = wielder.MYrena_rect.OPTower
+	await projectile_animation(wielder.get_visual_center(), target.visual_center)
+	var died = await target.take_damage(DAMAGE)
+	DAMAGE += INCREMENT
+	if died:
+		await get_tree().create_timer(Base.death_anim_length).timeout
+	
 	description = "Adjecent enemies have -" +str(ARMOR) +" armor.
-Monday: I deal " + str(DAMAGE) + " damage to enemy tower, increase damage by " +str(INCREMENT)
+Monday: I deal " + str(DAMAGE) + " damage to enemy tower, increase this damage by " +str(INCREMENT)
 	wielder.Ability1.text_for_tooltip = description
 	
-	
+
 	
 	
 ###############################################################
@@ -57,6 +80,8 @@ func do_I_affect_this(target):
 	else: return false
 	
 func aura_affect_primary_targets():
+	ready_to_affect = true
+	#push_error("affecting primaries")
 	var id = wielder.get_index()
 	var population = wielder.MYrena_rect.get_child_count()
 	var target
@@ -74,9 +99,12 @@ func aura_affect_primary_targets():
 	
 	
 func affect_unit(target):
+	if ready_to_affect == false:
+		push_error("not ready to affect units")
 	#target is the auraslot already
-#	push_error("AFFECTING")
-	if target.has_node(aura_name+str(aura_unique_id)) == false:
+
+	elif target.has_node(aura_name+str(aura_unique_id)) == false:
+		push_error("AFFECTING")
 		var aura_effect = Control.new()
 		aura_effect.name = aura_name+str(aura_unique_id)
 		var aurascript = load("res://Script/AurasFromBuildingsList/" +aura_name + ".gd")

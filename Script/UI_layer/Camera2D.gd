@@ -13,8 +13,8 @@ var my_scale = 3.12
 var camera_zoom = Vector2(0.3204,0.3204)
 #so many decimal numbers so that it looks like camera scales together
 	#aka ui doesnt slide
-var move_time_long = 1
-var move_time_short = 0.4
+var move_time_long
+var move_time_short
 
 var moving = false
 #to prevent multiple presses making animation ugly
@@ -22,6 +22,15 @@ var moving = false
 var cameras_deployment_phase = false
 #to not make spawner visible when moving to L4 after L3
 
+var movement_locked = false
+#for effects which require zooming in a specific lane, eg duel
+
+
+func _ready() -> void:
+	move_time_long = Base.camera_move_time_long
+	move_time_short = Base.camera_move_time_short
+	
+	
 func move_camera_to_lane(number):
 	if moving == false and number != Base.viewed_lane:
 		remove_tooltips()
@@ -51,37 +60,42 @@ func move_camera_to_lane(number):
 				var tween = create_tween()
 				tween.tween_property(self,"position",Base.LANE1_COORDINATES,move_time_short)
 				
+				await tween.finished
 				Base.viewed_lane = 1
 				oblysk.new_lane()
 				#making sure we can scroll only what should be capable now
-			2:			
+
+			2:
 				moving = true
 				var tween = create_tween()
 				tween.tween_property(self,"position",Base.LANE2_COORDINATES,move_time_short)
 				
+				await tween.finished
 				Base.viewed_lane = 2
 				oblysk.new_lane()
 				#making sure we can scroll only what should be capable now
+
 			3:
 				moving = true
 				var tween = create_tween()
 				tween.tween_property(self,"position",Base.LANE3_COORDINATES,move_time_short)
 				
+				await tween.finished
 				Base.viewed_lane = 3
 				oblysk.new_lane()
 				#making sure we can scroll only what should be capable now
+
 			4:
-#				moving = false
-				#why is this here
 				moving = true
 				camera_zoom_out()
 			_:
 				
 				push_error("UI_layer doesn't know where it should move camera to")
 		if number != 4:
-			await get_tree().create_timer(move_time_short).timeout 
+			#await get_tree().create_timer(move_time_short).timeout 
 			moving = false
-				
+	elif number == Base.viewed_lane:	
+		await get_tree().create_timer(move_time_short).timeout 
 			
 func camera_zoom_out():
 	#in keyboard input this is acessed directly instead of moving lane to 4

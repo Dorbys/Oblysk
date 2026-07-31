@@ -10,7 +10,7 @@ var address = "192.168.0.85"
 
 #var opponent_peer_id
 ##int 1 if joiner, random if hoster
-#in Lobby.gd better
+#in Lobby.gd better1
 var my_peer_id
 #needed?
 
@@ -35,7 +35,7 @@ func _on_host_pressed():
 	multiplayer.multiplayer_peer = multiplayer_peer
 	#telling game that we are the server
 	my_peer_id = 1
-	#server's id is always 1
+	#server's id is always 1\\
 	if Lobby.player_name == "":
 		Lobby.player_name = "host"
 
@@ -63,8 +63,7 @@ func someone_joined(new_peer_id):
 		gain_starting_initiative()
 	rpc_id(new_peer_id, "start_game")
 	start_game()
-	#since the rpc travels for a moment, it's better to send it BEFORE 
-		#starting the game localy
+
 	
 
 func _on_close_waiting_button_pressed():
@@ -127,7 +126,7 @@ func gain_starting_initiative():
 	
 	
 func _input(event):
-	if Input.is_action_just_pressed("Terminate") and Base.PLAYTEST == false:
+	if Input.is_action_just_pressed("Terminate"): #and Base.PLAYTEST == false
 		get_tree().quit()
 
 

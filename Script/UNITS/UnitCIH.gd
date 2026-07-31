@@ -1,0 +1,136 @@
+extends Card_In_Hand
+
+
+
+@export var Scene: PackedScene			#PREVIEW WHEN DRAGGING
+@export var empty_preview_scene: PackedScene 	#PREVIEW WHEN HOVERED OVER
+
+
+#to prevent multiple previews
+var showing = 0
+
+
+var Unit_Name = "E"
+var Card_pfp 
+var Unit_Ability_texture
+var Unit_Ability_cooldown
+var Unit_Attack = 1
+var Unit_Health = 2
+var Unit_Armor = 0
+var Card_Cost = 0
+
+#var UNIT = 1
+var TYPE = "unit"
+var Identification = 3
+var HERO
+var has_ability = false
+
+var Card_XP
+
+
+func _ready():
+	%NAME.text = Unit_Name
+	%ATK.text = str(Unit_Attack)
+	%HP.text = str(Unit_Health)
+	%AR.text = str(Unit_Armor)
+	%HERO_JPEG.texture = Card_pfp
+	%Ability1.texture = Unit_Ability_texture
+	if Unit_Armor != 0:
+		%AR.modulate = Base.Black_color
+	%COST.text = str(Card_Cost)
+	if Card_XP == 0:
+		%XP.visible = false
+	else:
+		%XP.visible = true
+		%XP.text = str(Card_XP)
+	
+	if has_ability == false:
+		%Ability1.visible = false
+
+	
+	new_lane()
+	
+
+
+		
+
+
+		
+func _get_drag_data(_at_position):
+	if action_and_caster_and_mana_available():
+		Base.lock_pass_button()
+		#until preview is gone
+		var drag_preview = create_preview(Identification)
+		set_drag_preview(drag_preview)
+		drag_preview.modulate.a = .5
+		
+
+		arena_rect.Carrying = 1
+		arena.move_roof_to_front()
+		if Base.PLAYTEST == false:
+			abarena_rect.Carrying = 1
+			abarena.move_roof_to_front()
+		else:
+			arena.eclipse_abarena()
+		
+		
+		return [TYPE, Identification, self.get_index(), has_ability]
+
+
+
+func create_preview(ID):
+	var preview = Scene.instantiate()
+	assign_stats(preview, ID)
+	
+	
+
+	return preview
+	
+func assign_stats(preview, ID):
+	preview.previewed_card = self
+	preview.card_DB = CreepsDB
+	var DB_slot = CreepsDB.CREEPS_DB[ID]
+	preview.card_art = Base.CREEP_TEXTURES[ID]
+	preview.card_name = DB_slot[CreepsDB.NAMEPOSITION]
+	preview.Unit_Attack = DB_slot[CreepsDB.ATTACKPOSITION]
+	preview.Unit_Health = DB_slot[CreepsDB.HEALTHPOSITION]
+	preview.Unit_Armor = DB_slot[CreepsDB.ARMORPOSITION]
+	preview.card_cost = DB_slot[CreepsDB.COSTPOSITION]
+	preview.card_xp = DB_slot[CreepsDB.XPPOSITION]
+	preview.Identification = ID
+	
+	if DB_slot[CreepsDB.ABILITYPOSITION] == true:
+		preview.Unit_Ability_texture = Base.CREEP_ABILITY_TEXTURES[ID]
+		preview.Unit_Ability_cooldown = AbilitiesDB.CREEP_ABILITIES_DB[ID][AbilitiesDB.COOLDOWNPOSITION]
+		preview.has_ability = true
+	
+	preview.has_ability = has_ability
+	
+	
+		
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+func _on_slacksus_mouse_entered():
+	create_empty_preview(self,Identification)
+
+
+func _on_slacksus_mouse_exited():
+	remove_card_in_hand_preview(self)

@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://r785avsyfdxf"]
 
-[ext_resource type="Script" path="res://Script/UI_layer/Player_HP.gd" id="1_l3q7a"]
+[ext_resource type="Script" uid="uid://bm1ivh5d2toyx" path="res://Script/UI_layer/Player_HP.gd" id="1_l3q7a"]
 [ext_resource type="Texture2D" uid="uid://dbrik7o5nd31y" path="res://Assets/Antag.png" id="2_2p88f"]
 [ext_resource type="LabelSettings" uid="uid://d0suxobd3mvgd" path="res://Setts/Labels/Player_HP.tres" id="3_vgq2f"]
 [ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="4_6wx0a"]
@@ -24,8 +24,10 @@ script = ExtResource("1_l3q7a")
 
 [node name="Beta_pfp" type="TextureRect" parent="."]
 layout_mode = 0
-offset_right = 240.0
-offset_bottom = 240.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 235.0
+offset_bottom = 235.0
 texture = ExtResource("2_2p88f")
 expand_mode = 1
 
@@ -54,10 +56,10 @@ vertical_alignment = 1
 
 [node name="Beta_name" type="Label" parent="Beta_pfp"]
 layout_mode = 0
-offset_top = -87.8788
-offset_right = 239.0
-offset_bottom = -1.87878
-text = "Bob"
+offset_top = -82.0
+offset_right = 230.0
+offset_bottom = 4.0
+text = "didnt load"
 label_settings = ExtResource("5_farna")
 horizontal_alignment = 1
 vertical_alignment = 2
@@ -73,9 +75,10 @@ expand_mode = 1
 
 [node name="Alpha_pfp" type="TextureRect" parent="."]
 layout_mode = 0
-offset_top = 480.0
-offset_right = 240.0
-offset_bottom = 720.0
+offset_left = 5.0
+offset_top = 485.0
+offset_right = 235.0
+offset_bottom = 715.0
 mouse_filter = 2
 texture = ExtResource("5_6ncok")
 expand_mode = 1
@@ -106,9 +109,9 @@ vertical_alignment = 1
 
 [node name="Alpha_name" type="Label" parent="Alpha_pfp"]
 layout_mode = 0
-offset_top = -87.8788
-offset_right = 239.0
-offset_bottom = -1.87878
+offset_top = -82.0
+offset_right = 230.0
+offset_bottom = 4.0
 text = "didnt load"
 label_settings = ExtResource("5_farna")
 horizontal_alignment = 1

@@ -9,9 +9,9 @@ extends Node
 
 
 
-var PLAYTEST = true
+var PLAYTEST = false
 
-#change to 1 to shuffle deck, set mana and XP, hide tech stuff,
+#change to true to shuffle deck, set mana and XP, hide tech stuff,
 #turns off alwayscaster
 #you can play all units into enemy side
 #Bombard building doesnt bombard
@@ -79,7 +79,7 @@ preload("res://Assets/CardsPNGS/Creeps/Skelegone.png"),
 preload("res://Assets/CardsPNGS/Creeps/Sommelier.png"),
 preload("res://Assets/CardsPNGS/Creeps/Warbear.jpg"),
 preload("res://Assets/CardsPNGS/Creeps/Zombie.png")]
-var SPECIAL_TEXTURES = [preload("res://Assets/CardsPNGS/Special/Alpha_creep.png"),
+var SPECIAL_TEXTURES = [preload("res://Assets/CardsPNGS/Special/Alpha_creep.jpg"),
 preload("res://Assets/CardsPNGS/Special/Beta_creep.png")]
 var CREEP_ABILITY_TEXTURES = [preload("res://Assets/CardsPNGS/Creep_abilities/Golem.jpg"),
 preload("res://Assets/CardsPNGS/Creep_abilities/Hitman.jpg"),
@@ -91,8 +91,10 @@ preload("res://Assets/CardsPNGS/Creep_abilities/Zombie.png")]
 #currently stores alphacreep and betacreeep
 var card = load("res://Scenes/UNIT/Unit1.tscn")
 #var card = scene.instantiate()
-var PlayerDeck =  [["spell",0],["spell",8],["creep",0],["creep",6],["spell",7],
-	["creep",5],["creep",0],["creep",1],["build", 0],["item", 0], ["spell",6], ["spell",3]]
+#ddd
+var PlayerDeck =  [["spell",0],["spell",8],["creep",0],["creep",5],["spell",7],
+	["item",0],["build",0]]
+	
 	
 	
 	
@@ -109,11 +111,12 @@ var playtest_deck = [
 	
 var index = PlayerDeck.find(["creep",0])
 	
-var HeroDeck = [1,4,2,3,0]
-#DORBYS 	PLOTT 		KAJUS		KIMMEDI 	ACAMAR
+var HeroDeck = [1,4, 3, 0, 2 , ]
+#DORBYS 	PLOTT 	KIMMEDI  ACAMAR KAJUS   	
+#hhh
 #var HeroDeck = [1, 1 , 1, 1, 1,]
 #this is copied over and reordered to OpponentDeck atm 
-var OpponentHeroDeck = [0,3,1,2,4]
+var OpponentHeroDeck = [1,2,0,3,4,]
 
 
 	
@@ -126,9 +129,10 @@ var Opponent_heroes = []
 
 var LAST_TOWER_HP = 23
 
-var CARD_WIDTH = 216
+var CARD_WIDTH = 220
 var CARD_HEIGHT = 360
 var pre_deploy_scale_down = 0.5
+var SCROLLA_SCALE = Vector2(0.8, 0.8)
 
 var FAKE_DELTA = 1/60.0
 var FAKE_GAMMA = 1/42.0
@@ -138,15 +142,15 @@ var MICRO_TIME = 1/240.0
 var HERO_COUNT = 5
 #How many heroes per player
 
-var Red_color = Color(250,0,0)
-var Green_color = Color(0,250,0)
-var Blue_color = Color(0,0,250)
+var Red_color = Color(1,0,0)
+var Green_color = Color(0,1,0)
+var Blue_color = Color(0,0,1)
 var Black_color = Color(0,0,0)
 var White_color = Color(1,1,1)
 var Orange_color = Color(1, 0.6, 0)
 
 
-var Combat_phase = 0
+var Combat_phase:bool = false
 var CAN_CLICK_BUTTON_NOW = 1
 #used for locking the pass button
 #when its 1 button can be clicked, locking increases int by 1, unlocking decreases
@@ -179,7 +183,7 @@ var aura_unique_id = 0
 #this allows auras to stack
 
 var game_started_yet_bruh = false
-	#set to true in THEbutton's _ready()
+	#set to true in spawner's INITIATE_THE_GAME()
 	
 #######################################################################
 ### 						ANIMATION VARIABLES 						  ###
@@ -187,8 +191,22 @@ var game_started_yet_bruh = false
 
 var visible_death_anim_length = 0.6
 var death_anim_length = 0.9	
+var hit_anim_length = 0.1	
+
+var head_offset = 0.2 *CARD_HEIGHT
+
+var SMASH_animation_time = 0.75
+
+var camera_move_time_long  = 1
+var camera_move_time_short = 0.4
 	
 	
+#######################################################################
+### 					GLOBAL ARRAYS		 						###
+#######################################################################	
+var spammable_sfx = []
+#string name of sfx name is put here while playing to prevent spam
+
 #######################################################################
 ### 					DEBUGGING VARIABLES 						###
 #######################################################################	
@@ -203,14 +221,24 @@ func _ready():
 	if PLAYTEST == true:
 		PlayerDeck= playtest_deck
 		PlayerDeck.shuffle()
+	
 		
 	while game_started_yet_bruh == false:
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+		
+	if passing == false:
+		receive_the_initiative()
+		the_button.enable_me()
+		
 	if Lobby.MULTIPLAYER == true:
 		if initiative == 0:
 		#If I wasnt chosen as the starting player in the Main_menu.gd
 			pass_the_initiative()
 			#calls receive for opp
+	else:
+		initiative = 1
+		#against bots, you always start
+		#also used to determine dayphase order
 			
 func swap_player_decks():
 	#this will be replaced by sending playerdecks later on
@@ -348,6 +376,7 @@ func move_to_next_lane():
 		
 
 func _notification(notification_type):
+	#???
 	match notification_type:
 		NOTIFICATION_DRAG_END:
 			show_CIH_preview = false
@@ -379,7 +408,7 @@ func lock_pass_button():
 	push_error("LOCKING: " + str(CAN_CLICK_BUTTON_NOW))
 	CAN_CLICK_BUTTON_NOW += 1
 	if the_button != null:
-		the_button.set_disabled(true)
+		the_button.disable_me()
 	else: push_error("the_button not present")
 		#caused crashes when closing game during deployment
 	
@@ -392,30 +421,30 @@ func unlock_pass_button(forced = false):
 		if granted_action == 1:
 			if forced == true:
 				CAN_CLICK_BUTTON_NOW = 1
-				the_button.set_disabled(false)
+				the_button.enable_me()
 			else:
 				CAN_CLICK_BUTTON_NOW -= 1
 				if CAN_CLICK_BUTTON_NOW == 1:
-					the_button.set_disabled(false)
+					the_button.enable_me()
 	elif Lobby.MULTIPLAYER == false:
 		if forced == true:
 			CAN_CLICK_BUTTON_NOW = 1
 			if the_button != null:
-				the_button.set_disabled(false)
+				the_button.enable_me()
 			else: push_error("the_button not present")
 				#caused crashes when closing game during deployment
 			
 		else:
 			CAN_CLICK_BUTTON_NOW -= 1
 			if CAN_CLICK_BUTTON_NOW == 1:
-				the_button.set_disabled(false)
+				the_button.enable_me()
 				
 func refresh_pass_button():
 	#only in Multiplayer because locking thebutton increases lock by 1
 	if granted_action == 1: #initiative
-		the_button.set_disabled(false)
+		the_button.enable_me()
 	elif granted_action == 0:
-		the_button.set_disabled(true)
+		the_button.disable_me()
 	else: push_error("Unknown Base.granted_action value") #initiative
 
 @rpc("any_peer", "call_remote", "reliable")
@@ -449,8 +478,18 @@ func receive_granted_action_for_lane4():
 	#so that it doesn't force unlock button before heroes have decided deployment
 	granted_action = 1
 	
+func return_granted_action_for_lane4():
+	granted_action = 0
+	
+func gain_singleplayer_action():
+	#so that you can't play without action/outside button in sp
+	granted_action = 1
+	
+	
+	
+	
 func grant_an_action():
-	#after you do an action that passes the turn to opponent
+	#after you do an action that alts the turn to opponent
 	#used when you don't pass the initiative (passing with initiative)
 	if passing == true:
 		granted_action = 0
@@ -458,6 +497,8 @@ func grant_an_action():
 		rpc_id(Lobby.opponent_peer_id, "receive_granted_action")
 		the_button.show_opponent_turn_begins()
 		Lobby.update_current_player()
+	else:
+		rpc_id(Lobby.opponent_peer_id, "receive_granted_action")
 	
 
 	
@@ -465,7 +506,23 @@ func grant_an_action():
 func increase_aura_unique_id():
 	aura_unique_id += 1	
 
+func _input(_event: InputEvent) -> void:
+	if Input.is_action_just_pressed("Terminate"):
+		get_tree().quit()
+		
+		
+#######################################################################
+### 					BORROWED NODE FUNCTIONS 						###
+#######################################################################	
+	#eg when db wants to talk to camera node
+	
+func get_screen_center():
+	return the_button.camera_2d.get_screen_center_position()
 
+func play_global_sfx(type:String, sfx_name:String):
+	the_button.play_global_sfx(type, sfx_name)
+
+		
 
 #######################################################################
 ### 					DEBUGGING FUNCTIONS 						###

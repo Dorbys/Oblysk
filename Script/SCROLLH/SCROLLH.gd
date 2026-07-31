@@ -2,19 +2,22 @@ extends ScrollContainer
 
 @onready var hand_rect = %HandRect
 @onready var opponent_scrollh = $"../Opponent_info/Opponent_SCROLLH"
+@onready var draw_sfx: AudioStreamPlayer = %Draw_sfx
 
 
 
 
 func _on_draw_1_pressed():
 	draw_cards(12)
-	push_error("drawing here")
+	#push_error("drawing here")
 		
 func draw_cards(amount):
 	if Lobby.MULTIPLAYER == true:
 		show_opponent_drawing_cards(amount)
 	for i in amount:
-		%HandRect.drawing()
+		draw_sfx.play()
+		hand_rect.drawing()
+		
 	#so that it's easier to call from outside
 
 

@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://3hwcj8w7v8io"]
 
-[ext_resource type="Script" path="res://Script/UI_layer/XP_panel.gd" id="1_b685o"]
+[ext_resource type="Script" uid="uid://q1xt0v8jicj7" path="res://Script/UI_layer/XP_panel.gd" id="1_b685o"]
 [ext_resource type="LabelSettings" uid="uid://diptopk45kn1x" path="res://Setts/Labels/XP_Panel_XP.tres" id="2_6o23c"]
 [ext_resource type="PackedScene" uid="uid://dyxi37xxloi5e" path="res://Scenes/UI/Covering_LVLUP.tscn" id="2_rrefg"]
 [ext_resource type="Texture2D" uid="uid://bwrv2au3kpysq" path="res://Assets/PREUI/Hover_XP_Heroes.jpg" id="3_jrw3h"]

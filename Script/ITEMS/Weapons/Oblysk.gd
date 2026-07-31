@@ -21,10 +21,10 @@ func _ready():
 	item_slot.item_equipped()
 	
 	wielder.weapon_equipped = true
-	wielder.increase_AttackM(Damage, 1)
+	wielder.increase_AttackM(Damage, true)
 	
 func being_replaced(caller):
-	wielder.increase_AttackM(-Damage, 1)
+	wielder.increase_AttackM(-Damage, true)
 #	item_slot.texture=null
 	item_slot.add_child(caller)
 	self.queue_free()

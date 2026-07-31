@@ -33,24 +33,42 @@ script = ExtResource("3_htty0")
 [node name="SCROLLA" parent="Card_layer" instance=ExtResource("5_lscxd")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 150.0
-offset_top = 455.0
-offset_right = 2150.0
-offset_bottom = 1255.0
+offset_left = 148.0
+offset_top = 175.0
+offset_right = 2178.0
+offset_bottom = 1531.0
+horizontal_scroll_mode = 3
 
 [node name="SCROLLB" parent="Card_layer" instance=ExtResource("6_hdrlq")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 150.0
-offset_top = -60.0
-offset_right = 2150.0
-offset_bottom = 665.0
+offset_left = 148.0
+offset_top = -25.0
+offset_right = 2177.0
+offset_bottom = 624.0
+scroll_horizontal_custom_step = 10.0
 
 [node name="Card_drop_block_area" type="Control" parent="Card_layer"]
 anchors_preset = 0
 offset_top = 837.0
 offset_right = 1920.0
 offset_bottom = 1080.0
+
+[node name="Card_drop_block_areaR" type="Control" parent="Card_layer"]
+anchors_preset = 0
+offset_left = 1753.0
+offset_right = 1923.0
+offset_bottom = 1080.0
+
+[node name="Scrolling_area" type="ColorRect" parent="Card_layer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 201.0
+offset_top = 188.0
+offset_right = 1785.0
+offset_bottom = 805.0
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
 
 [node name="Tower_layer" type="Control" parent="."]
 anchors_preset = 0
@@ -81,6 +99,7 @@ offset_bottom = 1080.0
 unique_name_in_owner = true
 visible = false
 modulate = Color(0.164706, 1, 1, 1)
+self_modulate = Color(1, 1, 1, 0)
 layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0

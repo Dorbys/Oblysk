@@ -3,10 +3,10 @@ extends Unit_passive_ability
 
 
 func _ready():
-	tower_layer.monday_phase_list.append(self)
+	tower_layer.monday_phase_array.append(self)
 
 func new_lane(new_tower_layer):
-	new_tower_layer.monday_phase_list.append(self)
+	new_tower_layer.monday_phase_array.append(self)
 
 func monday_phase():
 	find_new_head()

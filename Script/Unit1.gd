@@ -1,7 +1,16 @@
 extends Control
 
+@export var EFFECT: PackedScene
+@export var IEFFECT: PackedScene
+@export var ATEFFECT: PackedScene
+@export var LVLUPEFFECT: PackedScene
+@export var COVERING: PackedScene
+@export var LVLUPPING: PackedScene
+@export var stat_change_visual: PackedScene
+
 @onready var D12 = $"../../../../../../../D12"
 @onready var UI_layer = $"../../../../../../../UI_layer"
+@onready var effect_layer = $"../../../../../../../Effect_layer"
 @onready var hand_rect = $"../../../../../../../UI_layer/SCROLLH/HANDA/SIZECHECK/HandRect"
 @onready var XP_panel = $"../../../../../../../UI_layer/XP_Panel"
 
@@ -11,17 +20,17 @@ extends Control
 @onready var tower_layer = $"../../../../../../Tower_layer"
 @onready var tower_mana = $"../../../../../../Tower_layer/TowerA/Mana_display/Current_mana"
 @onready var MYrena_rect = $".."
+@onready var SCROLLA = $"../../../.."
 
 @onready var Ability1 = $"Slacksus/Ability1"
 @onready var lane_auras = %Lane_auras
 @onready var position_auras = %Position_auras
 #used for inflicting position based auras
+@onready var particle_holder: Control = %particle_holder
+@onready var sfx_base: AudioStreamPlayer2D = %SFX_base
 
-@export var EFFECT: PackedScene
-@export var IEFFECT: PackedScene
-@export var ATEFFECT: PackedScene
-@export var LVLUPEFFECT: PackedScene
-@export var COVERING: PackedScene
+
+
 
 
 var Unit_Name = "E"
@@ -109,7 +118,7 @@ var weapon_equipped = 0
 var special_equipped = 0
 var armour_equipped = 0
 var item_equipped = [placeholder, weapon_equipped,special_equipped,armour_equipped]
-var item_script_folders = ["Placeholder/", "Weapons/", "Specials/", "Armours/"]
+var item_script_folders = ["Placeholder2/", "Placeholder/", "Weapons/", "Specials/", "Armours/"]
 #for loading item scripts
 
 #var targeting = "straight"
@@ -131,6 +140,12 @@ var straight_target = null
 var death_shader = preload("res://Assets/Shaders/ShadeShade.gdshader")
 #makes hero_jpeg grayscale
 
+var animating:bool = false
+#when dueling or other animations that shouldn't be interrupted by eg getting hit
+
+var flinching:bool = true
+#whether to show getting_hit_animation #used in eg duel 
+
 var faction 
 # "alpha" or "beta"
 #used for determining which auras should affect the unit and which not
@@ -144,9 +159,9 @@ var Card_from_lvlup = false
 var has_ability = false
 #used for hiding the ability if there is none on this unit
 
-var NATURAL_CHILD_COUNT = 5
+var NATURAL_CHILD_COUNT = 6
 #used for cleaning off effects such as being targeted by item during equipment
-#last modified: increased to 5 because of DraggingRect
+#last modified: increased to 6 because of particle_holder
 
 
 var my_lane = 0
@@ -171,6 +186,8 @@ var readied = false
 #turns true after any second_ready function
 	#used for spawning units without second_readying them
 	#to then mass ready them
+	
+var visual_center:Vector2
 
 #######################################################################
 ### 					MULTIPLAYER VARIABLES						###
@@ -203,9 +220,11 @@ var my_target_deployment_lane: int = 0
 
 var can_lvlup = true
 
+#######################################################################
+### 						2BLOADED VARIABLES 						###
+#######################################################################
 
-
-
+var equip_sfx
 
 
 
@@ -327,7 +346,8 @@ func _ready():
 	LVLUP_type = LvlupDB.LVLUPS_DB[Identification][LvlupDB.TYPEPOSITION]
 	#used for determining the type of lvlup card
 	
-	
+	get_visual_center()
+	equip_sfx = load("uid://cn5ktynbjrdjj")
 	
 	#if Base.Main_phase == 1:
 		#await get_tree().create_timer(0.2).timeout 
@@ -405,7 +425,8 @@ func respawn(silent = 0):
 
 func land():
 	#blink ig
-	new_lane()
+	push_error("landing")
+	await new_lane()
 	curve_straight()
 	
 	
@@ -484,11 +505,13 @@ func pre_deploy_respawn():
 
 
 
-func increase_AttackM(how_much, loudness):
+func increase_AttackM(how_much, loudness:bool):
+	if loudness == true:
+		stat_change_animation("AttackM", how_much)
 	annul_my_damage()
 	AttackM += how_much
 	AttackC += how_much
-	if loudness == 1:
+	if loudness == true:
 		updateS()
 	
 #func decrease_AttackM(how_much, loudness):
@@ -499,6 +522,8 @@ func increase_AttackM(how_much, loudness):
 #		updateS()
 		
 func increase_HealthC(how_much):
+	if Base.Combat_phase == false:
+		stat_change_animation("HealthC", how_much)
 	HealthC += how_much
 	if HealthC > HealthM:
 		HealthC = HealthM
@@ -506,14 +531,18 @@ func increase_HealthC(how_much):
 	refresh_combat_damage_on_me()
 	
 		
-func increase_HealthM(how_much, loudness):
+func increase_HealthM(how_much, loudness:bool):
+	if loudness == true:
+		stat_change_animation("HealthC", how_much)
 	HealthM += how_much
 	HealthC += how_much
-	if loudness == 1:
+	if loudness == true:
 		updateS()
 	refresh_combat_damage_on_me()
 		
-func increase_ArmorM(how_much,loudness = 1):
+func increase_ArmorM(how_much,loudness:bool = true):
+	if loudness == true:
+		stat_change_animation("ArmorM", how_much)
 	await annul_damage_directed_to_me()
 	ArmorM += how_much
 	ArmorC += how_much
@@ -521,7 +550,7 @@ func increase_ArmorM(how_much,loudness = 1):
 	
 
 	
-	if loudness == 1:
+	if loudness == true:
 		
 		updateS()
 
@@ -537,11 +566,11 @@ func updateS(silent = false):
 	else: 
 		%ATK.modulate = Base.Black_color
 			
-	if HealthC < Unit_Health:
+	if HealthC < HealthM:
 		%HP.modulate = Base.Red_color
 	elif HealthC > Unit_Health:
 		%HP.modulate = Base.Green_color
-	else:
+	elif Unit_Health == HealthM:
 		%HP.modulate = Base.Black_color
 	
 	if ArmorC < Unit_Armor:
@@ -565,14 +594,24 @@ func updateS(silent = false):
 		
 	if silent == false:
 		refresh_my_combat_damage()
+		
+func heal(amount:int):
+	if HealthC < HealthM:
+		heal_applied_animation()
+		increase_HealthC(amount)		
 
 	
 func take_damage(Damage):
+	if Base.Combat_phase == false: 
+		stat_change_animation("HealthC", -Damage)
 	HealthC -= Damage
 	if HealthC <= 0:
 		Death_sudden(Damage)
 		return true
 	else:
+		if Base.Combat_phase == false: 
+			getting_hit_animation()
+
 		updateS()
 		increase_damage_to_be_taken(0)
 		return false
@@ -588,8 +627,8 @@ func Death_sudden(DMG):
 	death_animation(DMG)
 	var opposer = await get_opposer()
 		
-	if Base.Combat_phase == 0:
-		push_error("nolongering")
+	if Base.Combat_phase == false:
+		#push_error("nolongering")
 		#if targeting == "straight":
 			#push_error("nolongering straight")
 			#if straight_target != null:
@@ -619,26 +658,12 @@ func Death_sudden(DMG):
 		card_layer.Death_care(self, id, par)
 	else :
 		clean_myself_from_effects()
-		cleanse_me_from_position_auras()
+		await remove_position_and_lane_auras()
 		card_layer.Hero_death_care(self, id, par)
 	
 	if (has_position_aura == true):
 		Ability1.get_child(2).remove_aura_on_death()
 	
-#var VDAL = card_layer.visible_card_layer.death_anim_length
-var mid_damage = 11.0
-var DM = 1 #Direction modifier
-func death_animation(DMG):
-	if MYrena_rect.MY_identity == "B":
-		# "B" Means we are in Abarena
-		DM = -1
-	var push_modifier = 0.6 + DMG/mid_damage
-	var tween = create_tween().set_parallel(true)
-	tween.tween_property(self, "position",Vector2(0,300*push_modifier*DM),
-	 Base.death_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
-	tween.tween_property(self, "modulate:a", 0, Base.visible_death_anim_length)
-	tween.tween_property(self,
-	"rotation_degrees", -15, Base.death_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
 
 func take_combat_damage():
 	take_damage(damage_to_be_taken)
@@ -646,7 +671,7 @@ func take_combat_damage():
 
 func refresh_neighbours_from_my_death(id, _parent, opposer):
 	#push_error(str(Unit_Name) + " is refreshing ngh from its death at " +str(get_index()))
-##	if Base.Combat_phase == 0:
+##	if Base.Combat_phase == false:
 ##already checked in parent function
 	#push_error("type: " +str(opposer.TYPE) + " alive: " +str(opposer.alive))
 	if opposer.TYPE == "unit" and opposer.alive == true:
@@ -731,6 +756,8 @@ func before_prep_phase():
 	#if HERO == true:
 		#push_error("before prep for unit" + Unit_Name + "index: " +str(get_index()))
 	#increase_damage_to_be_taken(-damage_to_be_taken)
+	readied = true
+	
 	damage_to_be_taken = 0
 	besieged_damage = 0
 	await check_damage_to_be_taken() 
@@ -749,6 +776,8 @@ func prep_phase():
 	#elif Lobby.MULTIPLAYER == false:
 		#refresh_my_combat_damage()
 	curve_straight(false)
+	
+	
 ################################################################
 
 
@@ -853,25 +882,26 @@ func _drop_data(_at_position, DropData):
 			#If the card is from lvlup, we need to change the DB 
 			
 		if DropData[5] == Enums.Targeting.none:
+			hand_rect.hide_used_card(DropData[2])
 			var which_function:String = str(DBList[DropData[1]][DB.NAMEPOSITION])
 			if Lobby.MULTIPLAYER == true:
-				drop_data_multiplayer_funcall(DropData[0],DropData[1],which_function, DropData[7])
+				await drop_data_multiplayer_funcall(DropData[0],DropData[1],which_function, DropData[7])
 			else:
-				DB.call(which_function,self, DropData[7])
+				await DB.call(which_function,self, DropData[7])
 			#Resolves spell effect
 			
-			hand_rect.used_card(DropData[2])
+			hand_rect.consume_hidden_card()
 			#Removes the card
 			clean_myself_from_effects()
 			#cleaning to prevent bs
 			await get_tree().create_timer(Base.FAKE_DELTA).timeout
-			hand_rect.collide_cards()
 			await tower_layer.unit_targeted_signal(self,DBList[DropData[1]])
-			#FOR PASSIVES
+
 			
 		elif DropData[5] != Enums.Targeting.none:
 			#
 			#TEMPORARY SOLUTION I BELIEVE
+				#sure bro
 			
 			var another = COVERING.instantiate()
 			#Covering handles the passives here
@@ -879,6 +909,7 @@ func _drop_data(_at_position, DropData):
 				another.from_lvlup_card = true
 				#This basically transfers the responsibility to deal with 
 				#possibly being from different DB to covering
+					#???
 				
 			another.I_want_targets = 2
 			another.Card_ID = DropData[1]
@@ -915,6 +946,7 @@ func item_equipping_multiplayer(ID):
 		card_layer.make_my_mirror_unit_equip_item(ID, MY_UNIQUE_UNIT_KEY)
 		
 func equip_item(ID):
+	play_spammable_sfx(equip_sfx, "equip")
 	var Item_type = ItemsDB.ITEMS_DB[ID][ItemsDB.ITEMMPOSITION]
 	var Target_slot = self.get_child(Item_type)
 	var loaded_item = load("res://Scenes/Items/Item_base.tscn")
@@ -944,9 +976,9 @@ func drop_data_multiplayer_funcall(spelltype:String, spell_id:int, function_to_b
 		#await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		#DB.call(function_to_be_called,self,current_player)
 	#else:
-	DB.call(function_to_be_called,self,current_player)
-	await get_tree().create_timer(Base.FAKE_DELTA).timeout
-	card_layer.make_mirror_unit_receive_spell_call(spelltype, spell_id, MY_UNIQUE_UNIT_KEY, current_player)
+	
+	await card_layer.make_mirror_unit_receive_spell_call(spelltype, spell_id, MY_UNIQUE_UNIT_KEY, current_player)
+	await DB.call(function_to_be_called,self,current_player)
 
 	
 	
@@ -991,7 +1023,7 @@ func effect_over_hovered_unit(_cond1, _cond2, effect, _caller):
 		var another = effect.instantiate()
 #		print("I added the kid again lol")
 #		another.position.x = -0
-		self.add_child(another)
+		add_child(another)
 #		print("adding")
 	elif population == NATURAL_CHILD_COUNT+1:
 #		var ETarget = MYrena_mid.get_child(0)
@@ -1058,21 +1090,32 @@ func show_I_can_lvlup(XP, caller):
 	else: Im_no_longer_clickable()
 		
 func LVLUP():
+	
+	
 	LEVEL += 1
 	leveling = 0
 #	Im_no_longer_clickable()
 	if is_connected("gui_input", _on_ColorRect_input):
 		disconnect("gui_input", _on_ColorRect_input)
 		ConnectionB = 0
+	
+	lvlup_animation()
+		
 	XP_panel.increase_xp(-Lvlup_xp)
 	Targeter.update_XP()
-	increase_AttackM(1,1)
-	increase_HealthM(1,1)
+	increase_AttackM(1,true)
+	increase_HealthM(1,true)
 	await hand_rect.draw_a_lvlup_card(Identification, LVLUP_type)
 	card_layer.make_my_mirror_unit_lvlup(MY_UNIQUE_UNIT_KEY)
-
+	
+func lvlup_animation():
+	var another = LVLUPPING.instantiate()
+	send_particle_to_effect_layer(another)
+	
 func pretend_LVLUP():
 	#for opponent heroes
+	lvlup_animation()
+	
 	LEVEL += 1
 	leveling = 0
 	increase_AttackM(1,1)
@@ -1199,19 +1242,25 @@ func curve_straight(call_for_opposer = true):
 	#targeting = "straight"	
 	#%Arrow_combat.curve_straight()
 	var opposer = await get_opposer()
-	#push_error("opposer type: " + opposer.TYPE)
-	#push_error(str(Unit_Name +" is curving straight" + " faction: " +faction + " index: " +str(get_index()) + "opposertype: " + opposer.TYPE))
+	#push_error("opposer type: " + opposer.TYPE + " alive: " +str(opposer.alive))
+	#push_error(str(Unit_Name +" is curving straight" + " faction: " +faction + " index: " +str(get_index()) + " opposertype: " + opposer.TYPE))
 
-	if opposer.TYPE == "unit":
+	if opposer.TYPE == "unit" and opposer.alive == true:
 		#redirect_damage(OPrena.get_child(get_index()))
+		#push_error("redirecting to a living opposer at " +str(get_index()))
 		redirect_damage(opposer)
 		
 		if call_for_opposer == true:
 			opposer.curve_straight(false)
 	else:	
+		#push_error("didnt curve str opposer type: " +opposer.TYPE + " alive: " +str(opposer.alive))
 		redirect_damage(MYrena_rect.OPTower)
 	
 	my_damage_was_annuled = false
+	readied = true
+	#was causeing problems when spawning unit to be secondreadied would
+		#change it's armor before secondready
+		#current sol: reducing armor awaits the readied bool
 			
 		
 		
@@ -1352,6 +1401,8 @@ func curve_straight(call_for_opposer = true):
 #		MYrena_rect.OPTower.Im_no_longer_straight_attacked_by(self, false, 0)
 		
 func refresh_my_combat_damage():
+	if alive == false: 
+		return
 	annul_my_damage()
 	if Base.Main_phase == 0 and alive == true:
 		#match targeting:
@@ -1371,7 +1422,7 @@ func refresh_my_combat_damage():
 		curve_straight(false)
 			#"right":
 					#curve_right()
-		#push_error("#CURVEREMOVED2")
+		#push_error("CURVING STRAIGHTE")
 	elif Base.Main_phase == 0 and alive == false:
 		pass
 		#this happens during game start and causes no problems
@@ -1383,18 +1434,20 @@ func refresh_combat_damage_on_me():
 	increase_damage_to_be_taken(0)
 				
 func annul_damage_directed_to_me():
+	if alive == false:
+		return
 	#for calcing armor and so on 
 	#var expected_damage = 0
 	#var opposer = await get_opposer()
 	#if opposer.TYPE == "unit" and opposer.straight_target == self: # and opposer.damage_used_up_1 > 0
 		#if opposer.my_damage_was_annuled == false:
 		#opposer.my_damage_was_annuled = true
-		push_error("annulling dmgtbt by -" + str(damage_to_be_taken))
-		damage_to_be_taken = 0
-		check_damage_to_be_taken()
-		if besieged_damage > 0:
-			card_layer.unit_no_longer_being_sieged(faction, besieged_damage)
-			besieged_damage = 0
+		#push_error("annulling dmgtbt by -" + str(damage_to_be_taken))
+	damage_to_be_taken = 0
+	check_damage_to_be_taken()
+	if besieged_damage > 0:
+		card_layer.unit_no_longer_being_sieged(faction, besieged_damage)
+		besieged_damage = 0
 
 		
 		#expected_damage = opposer.AttackC - ArmorC #opposer.damage_used_up_1
@@ -1420,6 +1473,8 @@ func annul_damage_directed_to_me():
 		#increase_damage_to_be_taken(0)
 	
 func redirect_damage_to_me_again():
+	if alive == false:
+		return
 	#for calcing armor updates and so on 
 	#var id = get_index()
 	#var comp = id #-1
@@ -1446,6 +1501,7 @@ func redirect_damage_to_me_again():
 	
 	#comp = id
 	var opposer = await get_opposer()
+	#push_error("redirecting damage to me again")
 	if opposer.TYPE == "unit" and opposer.AttackC > 0: # damage_used_up_1and opposer.straight_target == self: 
 		opposer.redirect_damage(self)
 	check_damage_to_be_taken()
@@ -1480,34 +1536,36 @@ func redirect_damage_to_me_again():
 	#THIS IS USED IN COMBINATION WITH ANNUL DAMAGE DIRECTED TO ME
 
 func annul_my_damage(remove_targets_straight_target = false):
+	if alive == false:
+		return
 	#annuls damage that I'm declaring on other units or tower
 	
 	#remove_targets_straight_target now expands the usage to anull the opposer
 		#for anulling presence, since we dont get_opposer in anul_damage_directed_to_me()
 		#
 	#if my_damage_was_annuled == false:
-		if straight_target != null:
-			#my_damage_was_annuled = true
-			#if side_target	!= null:
-				#side_target.Im_no_longer_side_attacked_by(self)
-				#straight_target.Im_no_longer_straight_attacked_by(self)
-			#else:
-			#push_error("annuling damage of " +Unit_Name + " dmg: " +str(AttackC))
-			straight_target.Im_no_longer_attacked_only_by(self,Siege)
-			if straight_target.TYPE == "unit" and remove_targets_straight_target == true:
-				straight_target.straight_target = null
-				straight_target.my_damage_was_annuled = true
-			straight_target = null
-			
+	if straight_target != null:
+		#my_damage_was_annuled = true
+		#if side_target	!= null:
+			#side_target.Im_no_longer_side_attacked_by(self)
+			#straight_target.Im_no_longer_straight_attacked_by(self)
+		#else:
+		#push_error("annuling damage of " +Unit_Name + " dmg: " +str(AttackC))
+		straight_target.Im_no_longer_attacked_only_by(self,Siege)
+		if straight_target.TYPE == "unit" and remove_targets_straight_target == true:
+			straight_target.straight_target = null
+			straight_target.my_damage_was_annuled = true
+		straight_target = null
+		
 
-		else:
-			#push_error("straight target was null during annuling my damage")
-			pass
+	else:
+		#push_error("straight target was null during annuling my damage")
+		pass
 				
 	
 func redirect_damage(target):
 	var opposer = await get_opposer()
-	#if HERO == true:
+	#if HERO == true and opposer.TYPE == "unit":
 		#push_error(Unit_Name + " id: " + str(get_index()) + " is redirecting dmg to " + target.Unit_Name)
 	
 	#if straight_target == null:
@@ -1521,7 +1579,9 @@ func redirect_damage(target):
 		#push_error("straight_target_type = " + straight_target.TYPE)
 	if straight_target == null: # and damage_used_up_1 == 0+damage_used_up_2 
 		#first redirection after appearing
-		if opposer.TYPE == "unit":
+		#push_error("straight target null")
+		if opposer.TYPE == "unit" and opposer.alive:
+			#push_error("curving into opposer")
 			#%Arrow_combat.curve_straight()
 			#hoply fixes the correct mathly but not graphical curving  
 			straight_target = opposer
@@ -1529,6 +1589,7 @@ func redirect_damage(target):
 			#straight_target.curve_straight()
 		
 		else:
+			#push_error("pushing tower")
 			straight_target = MYrena_rect.OPTower
 			straight_target.Im_attacked_only_by(self, Siege)
 			
@@ -1542,6 +1603,7 @@ func redirect_damage(target):
 		straight_target.Im_attacked_only_by(self, Siege)
 	elif straight_target.TYPE == "tower":
 		#when redirecting to tower again (after annullment)
+		#push_error("redirecting damage to tower agane")
 		straight_target.Im_attacked_only_by(self, Siege)
 	elif straight_target.TYPE == "unit" and opposer.TYPE == "unit":
 		#straight_target.Im_no_longer_attacked_only_by(self, Siege)
@@ -1743,6 +1805,7 @@ func ignore_opposer():
 		
 
 func increase_damage_to_be_taken(amount, check_for_siege = true): 
+	#ddd
 	var problem = false
 	#for debugging
 	
@@ -1833,7 +1896,7 @@ func check_damage_to_be_taken():
 
 func show_incoming_death():
 #	%DEATH.visible = true
-	%DEATH.modulate.a = 0.6
+	%DEATH.modulate.a = 0.75
 	var death_material : ShaderMaterial = ShaderMaterial.new()
 	death_material.shader = death_shader
 	%UNIT_JPEG.material = death_material
@@ -1879,25 +1942,26 @@ func leave_draggable_state():
 func new_lane():
 	#when a unit is moved to a new lane, these need to be updated
 	var old_lane = my_lane
-	refresh_my_lane_int()
-	if old_lane != my_lane:
+	await refresh_my_lane_int()
+	#if old_lane != my_lane:
+		#this if is obsolete, since tower layer can remove you from it's array when ur dead
 		
-		if Passiveness == true and has_ability == true:
-			Ability1.get_child(2).remove_myself_from_old_array(tower_layer)
-		
-		card_layer = $"../../../../.."
-		tower_layer = $"../../../../../../Tower_layer"
-		tower_mana = $"../../../../../../Tower_layer/TowerA/Mana_display/Current_mana"
-		MYrena_rect = $".."
-		OPrena = MYrena_rect.OPrena_rect
-		
-		
-		
-		if Passiveness == true and has_ability == true:
-	#		print("ability shit part of newlane is trigging")
-			Ability1.get_child(2).new_lane(tower_layer)
-		#this connects the unit to the correct signal hub
-			#child 2 of ability is the one that is created during ready
+	if Passiveness == true and has_ability == true:
+		await Ability1.get_child(2).remove_myself_from_old_array(tower_layer)
+	
+	card_layer = $"../../../../.."
+	tower_layer = $"../../../../../../Tower_layer"
+	tower_mana = $"../../../../../../Tower_layer/TowerA/Mana_display/Current_mana"
+	MYrena_rect = $".."
+	OPrena = MYrena_rect.OPrena_rect
+	
+	
+	
+	if Passiveness == true and has_ability == true:
+		#push_error("ability shit part of newlane is trigging")
+		await Ability1.get_child(2).new_lane(tower_layer)
+	#this connects the unit to the correct signal hub
+		#child 2 of ability is the one that is created during ready
 	#push_error("newlane completed for " + Unit_Name + str(my_lane))
 	
 	
@@ -1916,6 +1980,8 @@ func refresh_my_lane_int():
 		"Last_lane":
 			my_lane = 3
 	#just int doesnt work with nodes but crosslane stuff
+	return 0
+	#awaiterer
 	
 func appear_dead():
 	alive = 0
@@ -1938,7 +2004,7 @@ func get_opposer(Index = get_index()):
 			#testing this to solve problem where last slot A 
 			#becomes second to last due to bonus void in B (spawning)
 			opposer = OPrena.get_child(Index)
-		push_error("still waiting for opposer at: " + str(Index))
+		#push_error("still waiting for opposer at: " + str(Index))
 
 	return opposer
 		
@@ -1957,14 +2023,15 @@ func annul_my_presence():
 	await annul_damage_directed_to_me() 	
 	await annul_my_damage(true)
 	
-func cleanse_me_from_position_auras():
-	for i in %Position_auras.get_child_count():
-		%Position_auras.get_child(i-1).get_removed()
+#func cleanse_me_from_position_auras():
+	#for i in %Position_auras.get_child_count():
+		#%Position_auras.get_child(i-1).get_removed()
 	
 func pull_me_out_of_this_lane():
 	var my_index = get_index()
+	await remove_position_and_lane_auras()
 	await annul_my_presence()
-	cleanse_me_from_position_auras()
+	
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	#the damage2 doesn't seem to be annulled soon enough
 	
@@ -1979,6 +2046,21 @@ func pull_me_out_of_this_lane():
 		#if it had opposer void, I should now curve straight
 		#which I'm checking by whether there is a unit as my left-target
 
+func remove_position_and_lane_auras():
+	push_error("removing position and lane auras")
+	for i in range(lane_auras.get_child_count()-1, -1,-1):
+		await lane_auras.get_child(i).get_removed()
+		push_error("auranumber: " +str(i))
+		
+	push_error("lane auras removed")	
+	for i in range(position_auras.get_child_count()-1,-1,-1):
+		await position_auras.get_child(i).get_removed()	
+		push_error("auranumber: " +str(i))
+		
+	push_error("position auras removed")
+		
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout	
+		
 #func refresh_me_from_being_annulled():
 	#if my_damage_was_annuled == false:
 		#push_error("unit forced to be refreshed_from_being_annulled despite not being annulled")
@@ -2009,6 +2091,10 @@ func pull_me_out_of_this_lane():
 		##refresh_my_combat_damage()	
 		#curve_straight()	
 	#
+	
+func get_visual_center():
+	visual_center = global_position + Vector2(0.0,Base.head_offset)
+	return visual_center
 	
 func hide_ability_and_items_mb():
 	#sets mouse filter to ignore, used when targeting units
@@ -2061,17 +2147,81 @@ func force_remove_myself_from_trigger_array():
 		Ability1.get_child(2).remove_myself_from_old_array(tower_layer)
 
 
+#func calc_particle_holder_scaled_position():
+	#the problem had to be somewhere else, dunno where
+		#"solved" by adding effecter node in Lvlupping_effect.tscn
+	#var real_position = particle_holder.global_position
+	#var space_l = real_position - SCROLLA.global_position
+	#var space_r = real_position - space_l
+	#var result = space_l + (Base.SCROLLA_SCALE * space_r)
+	##return result
+	#return particle_holder.global_position
 
+#var current_spammable_sfx:String = ""
+func play_spammable_sfx(loaded_sfx, sfx_name):
+	var new_sfx = AudioStreamPlayer2D.new()
+	particle_holder.add_child(new_sfx)
+	new_sfx.stream = loaded_sfx
+	new_sfx.play()
+	#current_spammable_sfx = sfx_name
+	new_sfx.finished.connect(_on_new_sfx_base_finished.bind(new_sfx, sfx_name))
 
-
-
+func _on_new_sfx_base_finished(sfx_node: AudioStreamPlayer2D, sfx_name: String) -> void:
+	if sfx_name in Base.spammable_sfx:
+		Base.spammable_sfx.erase(sfx_name)
+	sfx_node.queue_free()
 
 
 #######################################################################
 ### 						ANIMATIONS 								###
 #######################################################################
 
-func SMASH():
+func particle_holder_based_animation(caller_name:String):
+	#animations "Inside card_layer area of the screen" -> SCROLLA Scaling
+	animating = true
+	var animation_scene = load("res://Scenes/VFX/" +caller_name + "_vfx.tscn")
+	var another = animation_scene.instantiate()
+	if another != null:
+		send_particle_to_effect_layer(another)
+		while animating:
+			await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	else:
+		push_error("null caller name: " +caller_name)
+		
+func UI_layer_based_animation(caller_name:String):
+	#whole screen animations -> NO SCROLLA scaling
+	animating = true
+	var animation_scene = load("res://Scenes/VFX/" +caller_name + "_vfx.tscn")
+	var another = animation_scene.instantiate()
+	if another != null:
+		another.wielder = self
+		UI_layer.add_child(another)
+		while animating:
+			await get_tree().create_timer(Base.FAKE_DELTA).timeout
+	else:
+		push_error("null caller name: " +caller_name)
+		
+		
+func move_z_forward():
+	z_index += 1
+func move_z_backwards():
+	z_index -= 1
+#used to move me to top when I'm moved eg to middle of screen
+func dont_flinch():
+	flinching = false
+func flinch_again():
+	flinching = true
+	
+	
+func send_particle_to_effect_layer(another:Node):
+	another.wielder = self
+	another.global_position = particle_holder.global_position
+	another.scale = Base.SCROLLA_SCALE
+	effect_layer.add_child(another)
+
+func SMASH(wait_for_backing:bool = true):
+	#include backing can be skipped when casting duel
+	animating = true
 	var prep_time = 0.25
 	var charge_time = 0.1
 	var back_time = 0.4
@@ -2088,12 +2238,96 @@ func SMASH():
 	tween.tween_property(self, "position", Vector2(x,y+prep_distance), prep_time)
 	tween.tween_property(self, 
 	"position", Vector2(x,y+prep_distance-charge_distance), charge_time)
-	tween.tween_property(self, "position", Vector2(x,y), back_time)
+	await tween.finished
+	var tween2 = get_tree().create_tween()
+	if wait_for_backing: 
+		push_error("backing")
+		tween2.tween_property(self, "position", Vector2(x,y), back_time)
+		await tween2.finished
+		animating = false
+	else:
+		tween2.tween_property(self, "position", Vector2(x,y), back_time)
+		animating = false
 
 
+#var VDAL = card_layer.visible_card_layer.death_anim_length
+var mid_damage = 11.0
+var DM = 1 #Direction modifier
+func death_animation(DMG):
+	if MYrena_rect.MY_identity == "B":
+		# "B" Means we are in Abarena
+		DM = -1
+	var push_modifier = 0.6 + DMG/mid_damage
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(self, "position",Vector2(0,300*push_modifier*DM),
+	 Base.death_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
+	tween.tween_property(self, "modulate:a", 0, Base.visible_death_anim_length)
+	tween.tween_property(self,
+	"rotation_degrees", -15, Base.death_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
 
+func getting_hit_animation():
+	if animating or not flinching: 
+		return
+	if MYrena_rect.MY_identity == "B":
+		# "B" Means we are in Abarena
+		DM = -1
+	var y_distance = 20
+	var anim_angle = -5
+	var neutral_color = Color(1.0, 1.0, 1.0, 1.0)
+	var target_color = Color(1.0, 0.7, 0.7, 0.85)
+	
+	var tween = create_tween().set_parallel(true)
+	tween.tween_property(self, "position",Vector2(0,y_distance * DM),
+	 Base.hit_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
+	tween.tween_property(self, "modulate", target_color, Base.hit_anim_length)
+	tween.tween_property(self,
+	"rotation_degrees", anim_angle, Base.hit_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
+	await tween.finished
+	var tween2 = create_tween().set_parallel(true)
+	tween2.tween_property(self, "position",Vector2(0,y_distance * DM * -1),
+	 Base.hit_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
+	tween2.tween_property(self, "modulate", neutral_color, Base.hit_anim_length)
+	tween2.tween_property(self,
+	"rotation_degrees", -anim_angle, Base.hit_anim_length).as_relative().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
 
+func debuff_applied_animation():
+	particle_holder_based_animation("Debuff_applied")
 
+func buff_applied_animation():
+	particle_holder_based_animation("Buff_applied")
+
+func heal_applied_animation():
+	particle_holder_based_animation("Heal")
+	
+var stat_sca_counts = {
+	"HealthC": 0,
+	"AttackM": 0,
+	"ArmorM": 0 }
+#to move the sca a bit higher to not cover simultaneous changes
+
+func stat_change_animation(changed_stat:String, change_amount:int):
+	#push_error("stat_change_animation, stat: " + changed_stat + ", amount: " + str(change_amount))
+	if change_amount == 0:
+		return
+	var target_stat_position:Vector2
+	match changed_stat:
+		"HealthC":
+			target_stat_position = %HP.global_position - particle_holder.global_position
+		"AttackM": 
+			target_stat_position = %ATK.global_position - particle_holder.global_position
+		"ArmorM" :
+			target_stat_position = %AR.global_position - particle_holder.global_position
+	stat_sca_counts[changed_stat] += 1
+	#push_error("global position: " + str(target_stat_position))		
+	var another = stat_change_visual.instantiate()
+	another.global_position = particle_holder.position
+	another.target_stat_position = target_stat_position
+	another.stat_change_value = change_amount
+	another.simultaneous_position = stat_sca_counts[changed_stat]
+	another.wielder = self
+	effect_layer.add_child(another)
+	await get_tree().create_timer(another.tween_duration).timeout
+	stat_sca_counts[changed_stat] -= 1
 
 #######################################################################
 ### 						Debug functions						###
@@ -2101,11 +2335,11 @@ func SMASH():
 
 func minus_hp(mirror = true):
 	#mirror set to false only when receiving rpc to not loop
-	increase_HealthM(-1,1)
+	increase_HealthC(-1)
 	if mirror == true:
 		card_layer.make_my_mirror_minus_hp(MY_UNIQUE_UNIT_KEY)
 		
 func plus_hp(mirror = true):
-	increase_HealthM(-1,1)
+	increase_HealthC(1)
 	if mirror == true:
 		card_layer.make_my_mirror_plus_hp(MY_UNIQUE_UNIT_KEY)

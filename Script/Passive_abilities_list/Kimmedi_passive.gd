@@ -4,10 +4,9 @@ extends Unit_passive_ability
 
 var DAMAGE
 var description 
-var projectile
 
 func _ready():
-	projectile = preload("res://Scenes/VFX/Projectile1.tscn")
+	
 	DAMAGE = AbilitiesDB.MP5_DAMAGE
 	description = AbilitiesDB.MP5_description
 	if Lobby.MULTIPLAYER == true:
@@ -29,24 +28,28 @@ func _ready():
 	wielder.Ability1.text_for_tooltip = description
 	var ab = get_parent()
 	ab.connection_to_passive = self
-	tower_layer.monday_phase_list.append(self)
-	tower_layer.lvlup_list.append(self)
+	tower_layer.monday_phase_array.append(self)
+	tower_layer.lvlup_array.append(self)
 	
 
 func new_lane(new_tower_layer):
-	if self not in new_tower_layer.monday_phase_list:
+	if self not in new_tower_layer.monday_phase_array:
 		push_error("appending Kimmedi to: " +str(new_tower_layer))
-		new_tower_layer.monday_phase_list.append(self)
-#	if self not in new_tower_layer.lvlup_list:	
-#		tower_layer.lvlup_list.append(self)
+		new_tower_layer.monday_phase_array.append(self)
+#	if self not in new_tower_layer.lvlup_array:	
+#		tower_layer.lvlup_array.append(self)
+	else:
+		push_error("kimmedi already on the array: " +str(new_tower_layer.monday_phase_array.size))
 
 func remove_myself_from_old_array(old_tower_layer):
 	#when I enter a new lane, I need to remove myself from the old one
 	#dunno how to get this to class
-	if self in old_tower_layer.monday_phase_list:
-#		push_error("length of monday list: " +str(len(old_tower_layer.monday_phase_list)))
-		old_tower_layer.monday_phase_list.erase(self)
-#		push_error("length of monday list: " +str(len(old_tower_layer.monday_phase_list)))
+	if self in old_tower_layer.monday_phase_array:
+		push_error("removing Kimmedi from: " +str(old_tower_layer))
+#		push_error("length of monday array: " +str(len(old_tower_layer.monday_phase_array)))
+		old_tower_layer.monday_phase_array.erase(self)
+		await get_tree().create_timer(Base.FAKE_DELTA).timeout
+#		push_error("length of monday array: " +str(len(old_tower_layer.monday_phase_array)))
 	
 	
 	
@@ -99,14 +102,11 @@ func MP5():
 #		#really gotta put this inside take_dmg function....
 #			#usure?
 #		target.take_damage(expected_damage)
-		#projectile_animation(target)
 		
-		await AbilitiesDB.call(sister,target)
+		var stored_target_unique_key = target.MY_UNIQUE_UNIT_KEY
+		#in case it dies and we need to mirror it
+		await AbilitiesDB.call(sister, target, wielder)
 		
 		if Lobby.MULTIPLAYER == true and wielder.faction == "alpha":
-			await wielder.card_layer.make_my_mirror_unit_receive_ability_call(target.MY_UNIQUE_UNIT_KEY, sister)
-		
-#func projectile_animation(target):
-	#var another = projectile.instantiate()
-	#another.destination = target.get_global_position()
-	#get_parent().add_child(another)	
+			await wielder.card_layer.make_my_mirror_unit_receive_ability_call(stored_target_unique_key, sister, wielder.MY_UNIQUE_UNIT_KEY)
+	

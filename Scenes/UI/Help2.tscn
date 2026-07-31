@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://chwge1hn36jor"]
+[gd_scene load_steps=7 format=3 uid="uid://chwge1hn36jor"]
 
 [ext_resource type="Script" uid="uid://c67dtndip8kqb" path="res://Help_input.gd" id="1_bktb5"]
 [ext_resource type="Texture2D" uid="uid://c310f6bg4juto" path="res://Assets/Help_screen/Keyboard shortcuts.png" id="2_slnj5"]
+[ext_resource type="LabelSettings" uid="uid://bu32m0h5263l1" path="res://Setts/Labels/Help2.tres" id="3_00ia6"]
 [ext_resource type="Texture2D" uid="uid://ftu6xcnibqig" path="res://Assets/Help_screen/Unit_ability.png" id="3_cg2yd"]
 [ext_resource type="Texture2D" uid="uid://6ia3j2ibb5g5" path="res://Assets/Help_screen/Mana.png" id="4_00ia6"]
 [ext_resource type="Texture2D" uid="uid://cym7gnvv6i2m4" path="res://Assets/Help_screen/LVLUP.png" id="5_1eiui"]
@@ -22,28 +23,110 @@ offset_right = 1920.0
 offset_bottom = 1080.0
 texture = ExtResource("2_slnj5")
 
+[node name="Label" type="Label" parent="Help_holder/Keyboard_shortcuts"]
+layout_mode = 0
+offset_left = 445.0
+offset_top = 729.0
+offset_right = 913.0
+offset_bottom = 776.0
+text = "L "
+label_settings = ExtResource("3_00ia6")
+
+[node name="Label2" type="Label" parent="Help_holder/Keyboard_shortcuts"]
+offset_left = 626.0
+offset_top = 729.0
+offset_right = 1094.0
+offset_bottom = 776.0
+text = "preview LVLUP cards"
+label_settings = ExtResource("3_00ia6")
+
+[node name="ColorRect" type="ColorRect" parent="Help_holder/Keyboard_shortcuts"]
+layout_mode = 0
+offset_left = 414.0
+offset_top = 913.0
+offset_right = 1054.0
+offset_bottom = 1069.0
+color = Color(0, 0, 0, 1)
+
 [node name="Unit_ability" type="TextureRect" parent="Help_holder"]
 visible = false
+layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
 texture = ExtResource("3_cg2yd")
 
 [node name="Mana" type="TextureRect" parent="Help_holder"]
 visible = false
+layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
 texture = ExtResource("4_00ia6")
 
 [node name="Lvlup" type="TextureRect" parent="Help_holder"]
 visible = false
+layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
 texture = ExtResource("5_1eiui")
 
+[node name="Tower_damage" type="ColorRect" parent="Help_holder"]
+visible = false
+layout_mode = 0
+offset_left = 353.0
+offset_top = 612.0
+offset_right = 876.0
+offset_bottom = 954.0
+color = Color(0, 0, 0, 1)
+
+[node name="Tower_damage" type="ColorRect" parent="Help_holder/Tower_damage"]
+offset_left = 711.0
+offset_right = 1222.0
+offset_bottom = 342.0
+color = Color(0, 0, 0, 1)
+
+[node name="Tower_damage2" type="ColorRect" parent="Help_holder/Tower_damage"]
+offset_right = 1222.0
+offset_bottom = 214.0
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="Help_holder/Tower_damage/Tower_damage2"]
+layout_mode = 0
+offset_right = 1222.0
+offset_bottom = 47.0
+text = "Tower has 5 platings (the green bar)"
+label_settings = ExtResource("3_00ia6")
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="Help_holder/Tower_damage/Tower_damage2"]
+offset_top = 49.0
+offset_right = 1222.0
+offset_bottom = 96.0
+text = "1 tower plating has 10 health"
+label_settings = ExtResource("3_00ia6")
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="Help_holder/Tower_damage/Tower_damage2"]
+offset_top = 95.0
+offset_right = 1222.0
+offset_bottom = 142.0
+text = "Losing 1 plating = -1 Player HP"
+label_settings = ExtResource("3_00ia6")
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="Help_holder/Tower_damage/Tower_damage2"]
+offset_top = 145.0
+offset_right = 1222.0
+offset_bottom = 192.0
+text = "Losing fifth = additional -5HP, losing tenth = additional -10HP"
+label_settings = ExtResource("3_00ia6")
+horizontal_alignment = 1
+
 [node name="Screenblock" type="Control" parent="."]
 anchors_preset = 0
-offset_right = 1920.0
-offset_bottom = 1080.0
+offset_left = -23.0
+offset_top = -2.0
+offset_right = 1897.0
+offset_bottom = 1078.0
 
 [node name="Close_button" type="Button" parent="."]
 layout_mode = 0

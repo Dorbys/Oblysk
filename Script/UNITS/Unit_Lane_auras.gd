@@ -12,7 +12,7 @@ func reupdate(faction):
 			
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 
-		wielder.card_layer.refresh_lane_auras(self,faction, wielder)
+		await wielder.card_layer.refresh_lane_auras(self,faction, wielder)
 		
 		for i in range(population - 1, -1, -1):
 	#		push_error("reupdating at " +str(i))

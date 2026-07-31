@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3 uid="uid://bi7ldjutq2kuu"]
+
+[ext_resource type="Texture2D" uid="uid://cr8eutds3q8pe" path="res://Assets/Effects/LVLUP_completed_effect.png" id="1_nbxwp"]
+[ext_resource type="Script" uid="uid://p3vpu5umvtnm" path="res://Script/Tween_animations/Lvlupping_effect.gd" id="1_ugod5"]
+[ext_resource type="AudioStream" uid="uid://bfxxndpv4a8f7" path="res://Assets/Sounds/victory trumpet.mp3" id="2_e37jv"]
+[ext_resource type="Texture2D" uid="uid://dosfqr13ucbje" path="res://Assets/Particles/star.png" id="3_r8ao1"]
+[ext_resource type="Material" uid="uid://uxl515xrlwp2" path="res://Assets/Particles/Particle_materials/Lvlupping_effect.tres" id="4_e37jv"]
+
+[node name="Lvlup_complete_effecter" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_ugod5")
+
+[node name="Effect" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -110.0
+offset_top = -180.0
+offset_right = 110.0
+offset_bottom = 180.0
+pivot_offset = Vector2(110, 180)
+mouse_filter = 2
+texture = ExtResource("1_nbxwp")
+expand_mode = 1
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("2_e37jv")
+volume_db = -6.0
+max_polyphony = 24
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+unique_name_in_owner = true
+emitting = false
+amount = 50
+texture = ExtResource("3_r8ao1")
+one_shot = true
+explosiveness = 1.0
+fixed_fps = 60
+process_material = ExtResource("4_e37jv")

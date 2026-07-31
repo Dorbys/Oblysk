@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bebg654ub0p52"]
 
 [ext_resource type="Texture2D" uid="uid://bg8rk744cq7nw" path="res://Assets/PREUI/arrow orange.png" id="1_7b5dk"]
-[ext_resource type="Script" path="res://Script/UI_layer/History/Action_history.gd" id="1_bye2v"]
+[ext_resource type="Script" uid="uid://dawyknu86mcdj" path="res://Script/UI_layer/History/Action_history.gd" id="1_bye2v"]
 [ext_resource type="Texture2D" uid="uid://cn2q7kassqkcn" path="res://Assets/Gradients/history gradient 1.png" id="2_jb51e"]
 [ext_resource type="PackedScene" uid="uid://cjrr8kmtjdqo5" path="res://Scenes/UI/History/Played_card.tscn" id="3_4pwpj"]
 

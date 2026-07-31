@@ -1,6 +1,6 @@
 extends TextureRect
 
-@export var no_action_warning: PackedScene
+#@export var no_action_warning: PackedScene
 
 
 @onready var UI_layer = $"../../../../../../../../../UI_layer"
@@ -46,6 +46,9 @@ func Im_active_and_ready():
 	#since this is called on ready() of Unit
 	await activate_cooldown()
 	reshow_myself()
+	
+	#current theoretical: starting cooldowns are 1 bellow max
+	decrease_cooldown()
 		
 func Im_passive_and_ready():
 	passiveness = true
@@ -68,14 +71,16 @@ func activate_cooldown(_rpced = false):
 	reshow_myself()
 	#for tooltip visibility
 	
-	if Lobby.MULTIPLAYER == true and _rpced == false and wielder.readied == true:
-		#readied check to prevent startup problems
+	if Lobby.MULTIPLAYER == true and _rpced == false and wielder.readied == true and Base.game_started_yet_bruh:
+		# readied check to prevent startup problems
+			# same reason for game_started_yet_bruh
 		wielder.card_layer.mirror_ability_activate_cooldown(wielder.MY_UNIQUE_UNIT_KEY)
 		
 
 
 func decrease_cooldown():
 	if CooldownC != null:
+		#push_error("decreasing cooldown")
 		CooldownC -= 1
 		if CooldownC < 0:
 			CooldownC = 0
@@ -98,7 +103,6 @@ func make_cooldown_off():
 	#starts disconnected
 	self_modulate = Color(1,1,1)
 	%Cooldown.self_modulate.a = 0
-	%Ability_field.mouse_default_cursor_shape = CURSOR_POINTING_HAND
 
 
 
@@ -108,7 +112,7 @@ func make_cooldown_off():
 func _on_ability_field_gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 			if event.is_pressed():
-				var action_check = does_player_have_action()
+				var action_check = wielder.UI_layer.does_player_have_action()
 				if action_check == true:
 					#print("ABILITY 1 CLICKED")
 	#				%Ability_field.MOUSE_FILTER_STOP
@@ -138,7 +142,7 @@ func _on_ability_field_gui_input(event):
 					
 					%Ability_field._mouse_exited()
 				else:
-					you_dont_have_action()
+					UI_layer.you_dont_have_action()
 				
 func disconnect_myself():
 	if ConnectionT == 1:
@@ -149,7 +153,7 @@ func disconnect_myself():
 
 func reconnect_myself():
 	
-	if passiveness == false and ConnectionT == 0:
+	if passiveness == false and ConnectionT == 0 and wielder.faction == "alpha":
 		push_error("reconnecting because: ")
 		#Because I have no idea how to check wheter its DISCONNECTED
 		%Ability_field.connect("gui_input", _on_ability_field_gui_input)
@@ -157,6 +161,7 @@ func reconnect_myself():
 		ConnectionT = 1
 		
 func hide_myself():
+	#push_error("ability hiding")
 	#Is now hiding Ability_field because that carries the tooltip
 		#self is now always ignoring
 #	self.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -168,13 +173,14 @@ func hide_myself():
 	#THIS ENOUGH WHEN THE TEXTURE DOESNT CHANGE
 	
 func reshow_myself():
+	#push_error("ability reshowing")
 	#if CooldownC == null or CooldownC < 1:
 	#this no longer needed?
 	
 #		self.mouse_filter = Control.MOUSE_FILTER_STOP
 			#Is now hiding Ability_field because that carries the tooltip
 				#self is now always ignoring
-		%Ability_field.mouse_filter = Control.MOUSE_FILTER_STOP
+	%Ability_field.mouse_filter = Control.MOUSE_FILTER_STOP
 		
 		
 func Im_looking_for_targets_visual():
@@ -188,13 +194,5 @@ func check_cooldown_penetrability():
 		else:
 			disconnect_myself()
 			
-func does_player_have_action():
-	if Base.granted_action == 1:
-		return true
-	else:
-		push_error("not your action :<")
-		return false
+
 		
-func you_dont_have_action():
-	var action_jumpscare = no_action_warning.instantiate()
-	UI_layer.add_child(action_jumpscare)

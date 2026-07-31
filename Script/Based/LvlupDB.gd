@@ -16,26 +16,32 @@ var ISPLAYEDONPOSITION = 6
 	#outdated and converted to strings
 
 var LVLUPS_DB = [
-["Fresh_on", 3, Enums.Targeting.one_ally,11,Enums.Targeting.none,false, "Unit"],
-["Duplicate",1,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"], 
+["Fresh_on", 2, Enums.Targeting.one_ally,11,Enums.Targeting.none,false, "Unit"],
+["Duplicate",2,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"], 
 ["Legion",8,Enums.Targeting.lane,11,Enums.Targeting.none,false, "Lane"],
 ["Railgun", 2,Enums.Targeting.one_unit,11,Enums.Targeting.none,true, "Unit"],
-["Exreality", 5,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"],
+["Exreality", 3,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"],
 ["Extreality", 88,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"],
 ["Extreality", 88,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"],
 ["Extreality", 88,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"],
 ["Extreality", 88,Enums.Targeting.lane,11,Enums.Targeting.none, false, "Lane"]]
 # Called when the node enters the scene tree for the first time.
 
+func play_lvlup_sfx(lvlup_name:String):
+	Base.play_global_sfx("lvlup_spell", lvlup_name)
+
+
+
 func Fresh_on(Target, _current_player = "", _rpced = false):
 	var diff = Target.HealthM - Target.HealthC
-	await Target.increase_HealthC(2)
+	await Target.heal(3)
 	
 	if _rpced == false:
-		if diff >= 2:
+		if diff >= 3:
 			Target.MYrena_rect.scrollh.draw_cards(1)
 	
 func Duplicate(lane, _current_player = "", _rpced = false):
+	play_lvlup_sfx("Duplicate")
 	if _rpced == false:
 		var ITEM_ID = 1
 		
@@ -46,6 +52,7 @@ func Duplicate(lane, _current_player = "", _rpced = false):
 		await handa.collide_cards()
 	
 func Legion(allied_row, _current_player = "", _rpced = false):
+	play_lvlup_sfx("Legion")
 	var target_lanes = [allied_row.BUTTON.arena_rect1, allied_row.BUTTON.arena_rect2,
 	allied_row.BUTTON.arena_rect3]
 	if Base.current_lane < 4:
@@ -63,6 +70,8 @@ var railgun_join_owner:int
 var opponent_railgun_damage = 3
 var Railgun_damage = 3
 func Railgun(target, _current_player = "", _rpced = false):
+	Base.lock_pass_button()
+	await target.particle_holder_based_animation("Railgun")
 	if Lobby.MULTIPLAYER == false or _current_player == Lobby.player:
 		#If I cast this, use my damage
 		target.take_damage(Railgun_damage)
@@ -83,6 +92,7 @@ increase cost and damage of future railguns by 1")
 		+str(railgun_host_owner) + " join: " +str(railgun_join_owner))
 		var connection_to_p = Lobby.universal_global_unit_array[rg_owner].Ability1.get_child(2)
 		await connection_to_p.new_snipe_damage(Railgun_damage)
+		Base.unlock_pass_button()
 	
 
 func Exreality(lane, _current_player = "", _rpced = false):
@@ -104,13 +114,16 @@ func Exreality(lane, _current_player = "", _rpced = false):
 		
 	var population = opp_buildings.get_child_count()
 	if population > 0:
+		play_lvlup_sfx("Exreality")
 		var gamba = randi()%population
 		opp_buildings.get_child(gamba).destroy_myself()
+	else:
+		play_lvlup_sfx("Exreality_no_target")
 		
 		
-var Fresh_on_description = "Heal 2 Health to an allied unit, 
-if at least 2 health was healed, draw a card"
-var Duplicate_description = "Creates a historical weapon"
+var Fresh_on_description = "Heal 3 Health to an allied unit, 
+if at least 3 health was healed, draw a card"
+var Duplicate_description = "Creates a historical 5ATK weapon"
 var Legion_description = "Summon two legionaires to both other lanes"
 var Railgun_description = str("Deal " +str(Railgun_damage) + " magical damage to a unit in any lane,
 increase cost and damage of future railguns by 1")

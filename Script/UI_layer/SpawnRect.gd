@@ -46,14 +46,15 @@ func INITIATE_THE_GAME():
 		
 	if Lobby.MULTIPLAYER == true:
 		player_HP.rpc_id(Lobby.opponent_peer_id, "set_opponent_name", Lobby.player_name)
-		
+	else:
+		player_HP.set_opponent_name("Bob")
 	player_HP.set_my_name(Lobby.player_name)	
 		
 	deploy_my_heroes()
 	#better to keep this clientside since we gonna wait for it from both
 	while  Lobby.MULTIPLAYER == true and opponent_initial_heroes_deployed == false:
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
-
+		push_error("waiting for initial hero deployment")
 #	for i in starting_creep_count:
 #		spawn_a_creep_in_random_lane_for_both_sides(0)
 		
@@ -81,8 +82,8 @@ func INITIATE_THE_GAME():
 		await get_tree().create_timer(0.5).timeout
 		await deploy_all()
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout #mb not needed
-		#rpc_joiner_deployment_is_ready()
-		#now send during monday phase
+		rpc_joiner_deployment_is_ready()
+
 		
 		#receive_deployment_complete_from_host()
 	else:
@@ -92,18 +93,26 @@ func INITIATE_THE_GAME():
 		await wait_for_host_to_rpc_me_deployment()
 		clear_creeps()
 		
-	#await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(0.1).timeout
 	#we were starting before all the creeps spawned lol
+		#then deployspawned creeps doublecurved
 	
 	BUTTON.global_prep_phase()
+	#push_error("DRAWING STARTING CARDS")
 	scrollh.draw_cards(8)
 	
-	BUTTON.card_layer.monday_phase()
+	BUTTON.card_layer.day_x_phase("monday")
 		#currently for kimmedi
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
-	BUTTON.card_layer.tuesday_phase()
+	BUTTON.card_layer.day_x_phase("tuesday")
 	#using BUTTON so that I don't have to count which card layer it is
 	#or load the cl1
+	
+	await get_tree().create_timer(Base.death_anim_length).timeout
+	
+	Base.game_started_yet_bruh = true
+	if not Lobby.MULTIPLAYER:
+		Base.unlock_pass_button(true)
 	
 func deploy_my_heroes():
 	#this is just for initiating the game when 3 heroes are waiting for init deployment
@@ -432,11 +441,13 @@ func _on_child_entered_tree(node):
 	collide_units()
 					
 func _on_child_order_changed():
-	push_error("child order changed")
+	#push_error("child order changed")
+	
 	if get_child_count() > 0:
 		Base.lock_pass_button()
 	else:
-		Base.unlock_pass_button(true)
+		if Base.game_started_yet_bruh:  #HERE
+			Base.unlock_pass_button(true)
 		#have to set forced as true because 'if' triggers more times than 'else'
 
 func lane_4_start():

@@ -15,6 +15,10 @@ var CooldownC
 var text_for_tooltip = "tooltip didn't load properly"
 var connectionT = 0
 
+func _ready() -> void:
+	if wielder.faction == "alpha":
+		reconnect_myself()
+
 func item_equipped():
 	reshow_myself()
 	#for tooltip to be able to be shown
@@ -39,7 +43,7 @@ func active_item_unequipped():
 
 var tries = 3
 func _on_gui_input(event):
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and UI_layer.does_player_have_action():
 		var target = get_child(2)
 		#child 0 is cooldown now, 1 is tooltipper
 		if target.has_method("item_clicked"):
@@ -96,7 +100,7 @@ func disconnect_myself():
 		mouse_default_cursor_shape = Control.CURSOR_ARROW
 
 func reconnect_myself():
-	if connectionT == 0:
+	if connectionT == 0 and wielder.faction == "alpha":
 		#Because I have no idea how to check wheter its DISCONNECTED
 		connect("gui_input", _on_gui_input)
 		connectionT = 1

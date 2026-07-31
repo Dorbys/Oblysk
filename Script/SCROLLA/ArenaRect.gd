@@ -24,7 +24,7 @@ var arena_meine: Node
 @export var IEFFECT: PackedScene
 @export var VOID: PackedScene
 @export var STARTSET = (Base.CARD_WIDTH/2.0)
-@export var OFFSET = 16
+@export var OFFSET = 30
 var distance_to_arena = 150
 #the arena node isn't glued to the left side of the screen
 var Card_and_offset = Base.CARD_WIDTH + OFFSET
@@ -44,13 +44,16 @@ var TargetingSpell = 0
 var EquippingItem = 0
 #var Iteming = 0
 
+var colliding = 0
+#whether collide_units() is running
 
 var OPrena_rect
 var OPrena_roof
 var MY_identity
 #to decide which side I'm on
-var OP_identity
+#var OP_identity
 #cuz children targeting is by 0 or 1 if we have two towers
+	#yeaah nah
 var OPTower
 var MYTower
 
@@ -61,8 +64,8 @@ var TYPE:String = "lane"
 
 var BOFFSET = 250
 # if this is abarena, I have to put units lower from top
-var AOFFSET = 100
-
+var AOFFSET:int #has to be calced in ready() due to parent property access 
+	
 var collide_time = 0.25
 # animation time of collide_units()
 
@@ -78,23 +81,32 @@ var has_position_aura_array = []
 
 
 func _ready():
+	AOFFSET = 100 + (275 / scroller.scale.y ) 
+		#addition cuz SCROLLA has been moved higher, to allow for allowing to swap
+		#child order when we need to target only our lane (SCROLLA moves to front)
+
 	if (self.get_parent().get_parent().name) == "Arena":
 		MY_identity = "A"
-		OP_identity = 1
+		#OP_identity = 1
 		OPTower = $"../../../../../Tower_layer/TowerB"
 		MYTower = $"../../../../../Tower_layer/TowerA"
 		abarena = $"../../../../SCROLLB/Abarena/SIZECHECK/ArenaRect"
-		
+		OPrena_rect = $"../../../../SCROLLB/Abarena/SIZECHECK/ArenaRect"
+		OPrena_roof = $"../../../../SCROLLB/Abarena/SIZECHECK/ArenaRoof"
+				
 	elif (self.get_parent().get_parent().name) == "Abarena":
 		MY_identity = "B"
-		OP_identity = 0
+		#OP_identity = 0
 		OPTower = $"../../../../../Tower_layer/TowerA"
 		MYTower = $"../../../../../Tower_layer/TowerB"
 		arena_meine = $"../../../../SCROLLA/Arena/SIZECHECK/ArenaRect"
+		OPrena_rect = $"../../../../SCROLLA/Arena/SIZECHECK/ArenaRect"
+		OPrena_roof = $"../../../../SCROLLA/Arena/SIZECHECK/ArenaRoof"
+		
 	else: push_error("Arena has an identity crisis :(")
 	
-	OPrena_rect = self.get_parent().get_parent().get_parent().get_parent().get_child(OP_identity).get_child(0).get_child(0).get_child(2)
-	OPrena_roof = self.get_parent().get_parent().get_parent().get_parent().get_child(OP_identity).get_child(0).get_child(0).get_child(0)
+	#OPrena_rect = self.get_parent().get_parent().get_parent().get_parent().get_child(OP_identity).get_child(0).get_child(0).get_child(2)
+	#OPrena_roof = self.get_parent().get_parent().get_parent().get_parent().get_child(OP_identity).get_child(0).get_child(0).get_child(0)
 #	print(self.get_parent().get_parent().name)
 
 	match lane.name:
@@ -111,7 +123,7 @@ func _ready():
 			push_error("ArenaRect appeared on an unkown lane")
 			
 
-var Slot_calc_top = 0 - STARTSET # dont scale ----> - distance_to_arena
+var Slot_calc_top = 0 - STARTSET - OFFSET # dont scale ----> - distance_to_arena
 var	Slot_calc_bot =	Card_and_offset
 	
 @rpc("any_peer", "call_remote", "reliable")
@@ -172,7 +184,7 @@ func Adding_Units(_at_position, ID):
 		another.position.x= STARTSET + population * (Card_and_offset)
 		add_child(another)
 	else:
-		another.position.x= STARTSET + Shadow_index * (Card_and_offset)
+		another.position.x= OFFSET + STARTSET + Shadow_index * (Card_and_offset)
 		#same as above, mb historical diff
 		add_child(another)
 #		for i in (population-Shadow_index):
@@ -180,6 +192,10 @@ func Adding_Units(_at_position, ID):
 				#ancient
 		move_child(another, Shadow_index)
 		collide_units()
+		
+	another.sfx_base.play()
+	#sound of landing
+	
 	if Lobby.MULTIPLAYER == true:
 		rpc_id(Lobby.opponent_peer_id, "spawn_unit", ID, 1, Shadow_index,  false)
 		#another.second_ready() #_without_curve_rng
@@ -192,6 +208,8 @@ func Adding_Units(_at_position, ID):
 
 	UNITS_MOVED_YO()
 	#signal yo
+	
+	
 	
 	
 	
@@ -272,12 +290,12 @@ func spawn_unit(ID, amount, rpced_slots = null, forced_here = false, readied = t
 					target_slot = rpced_slots[i][0]
 				slot_to_be_added = await new_random_slot(target_slot, keep_voids)
 			if amount > 1 and slot_to_be_added[1] == true: 
-				push_error("comparison of slot_to_be_added and childcount: " +str(slot_to_be_added) + " / " +str(get_child_count()))			
+				#push_error("comparison of slot_to_be_added and childcount: " +str(slot_to_be_added) + " / " +str(get_child_count()))			
 				if slot_to_be_added[0] == 0:
 					#when a new void at id 0 has been added
 					for j in spawning_slots.size():
 						spawning_slots[j][0] += 1
-						push_error("increasing spawning_slots[" +str(j) + "][0] by 1")
+						#push_error("increasing spawning_slots[" +str(j) + "][0] by 1")
 					#this calc is simplified when keeping voids
 				slot_to_be_added[0] += boost
 				if slot_to_be_added[0] == get_child_count():
@@ -342,9 +360,9 @@ func spawn_unit(ID, amount, rpced_slots = null, forced_here = false, readied = t
 		
 		another.HERO = false
 		if amount > 1:
-			another.position.x= STARTSET + spawning_slots[i][0] * (Card_and_offset)
+			another.position.x= OFFSET + STARTSET + spawning_slots[i][0] * (Card_and_offset)
 		else:
-			another.position.x= STARTSET + spawning_slots[i] * (Card_and_offset)
+			another.position.x= OFFSET + STARTSET + spawning_slots[i] * (Card_and_offset)
 		if MY_identity == "B": 
 			another.position.y = BOFFSET
 		else: another.position.y = AOFFSET
@@ -359,6 +377,8 @@ func spawn_unit(ID, amount, rpced_slots = null, forced_here = false, readied = t
 		if amount == 1:
 			move_child(another, spawning_slots[i])
 		anothers.append(another)
+		another.sfx_base.play()
+		#landing sound
 	##############
 	if amount > 1:
 		for i in amount:
@@ -401,7 +421,8 @@ func spawn_unit(ID, amount, rpced_slots = null, forced_here = false, readied = t
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		mass_second_ready()
 		
-
+	await get_tree().create_timer(Base.FAKE_DELTA).timeout	
+	return 0
 
 	
 
@@ -426,23 +447,30 @@ func Remove_Unit(which):
 	else: push_error("attempted to remove unit over population")
 
 #Yo you can call functions that are defined later on in gdscript, poggers
-func collide_units():
-
+func collide_units(include_y_axis:bool = false):
+	colliding += 1
+	#to keep track whether this is running
 	var population = get_child_count()
 	if population > 0:
 		var tween = create_tween().set_parallel(true)
 
 		for i in population:
 			tween.tween_property(get_child(i),
-			 "position:x", STARTSET + (i * (Card_and_offset)),
-			collide_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
-		
+			 "position:x", OFFSET + STARTSET + (i * (Card_and_offset)),
+			collide_time).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+			if include_y_axis:
+				if abarena:
+					tween.tween_property(get_child(i),"position:y",AOFFSET, collide_time)
+				else:
+					tween.tween_property(get_child(i),"position:y",BOFFSET, collide_time)
+		await tween.finished	
 #		if curve == true:
 #			for i in population:
 #				var target = get_child(i)
 #				if target.TYPE == "unit:
 #					target.curve_rng()
-
+	colliding -= 1
+	#to keep track whether this is running
 		
 func fake_collide_units(index):
 	#used to collide OPRena units when we are placing a unit
@@ -455,11 +483,11 @@ func fake_collide_units(index):
 		for i in population:
 			if i < index:
 				tween.tween_property(get_child(i),
-			 "position:x", STARTSET + (i * (Card_and_offset)),
+			 "position:x", OFFSET + STARTSET + (i * (Card_and_offset)),
 			0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 			else:
 				tween.tween_property(get_child(i),
-			 "position:x", STARTSET + ((i+1) * (Card_and_offset)),
+			 "position:x", OFFSET + STARTSET + ((i+1) * (Card_and_offset)),
 			0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CIRC)
 	
 #func place_me_pls(node, index):
@@ -478,7 +506,7 @@ func handle_has_ability_for_creeps(creep) -> Node:
 		
 func place_me_at(node, index):
 	move_child(node,index)
-	node.position.x = STARTSET + index * Card_and_offset
+	node.position.x = OFFSET + STARTSET + index * Card_and_offset
 	
 
 	
@@ -545,7 +573,7 @@ func Shadow_preview():
 			another.position.y = BOFFSET
 	else: another.position.y = AOFFSET
 	if New_Slot >= population:
-		another.position.x= STARTSET + population * (Card_and_offset)
+		another.position.x= OFFSET + STARTSET + population * (Card_and_offset)
 		
 		add_child(another)
 		Shadow_index = another.get_index()
@@ -569,7 +597,7 @@ func Shadow_preview():
 
 #		for i in (population-New_Slot):
 		move_child(another,New_Slot)
-		another.position.x= STARTSET + New_Slot*Card_and_offset
+		another.position.x= OFFSET + STARTSET + New_Slot*Card_and_offset
 		await get_tree().create_timer(Base.FAKE_DELTA).timeout
 		# KEEEEEEEEEEEEEEEEEEP IT HERE 
 		# after queuing you have to move children ASAP
@@ -638,6 +666,8 @@ func new_slot_for_shadow_preview():
 	#REWORK THIS FROM PAPER IG
 	if len(empty_slots) != 0:
 		New_Slot = round_to_closest_empty(New_Slot, empty_slots)
+	else:
+		New_Slot = round(New_Slot)
 	return New_Slot
 
 func new_slot_for_shadow_follow():
@@ -767,6 +797,7 @@ func replace_me_by_void(node, index, heroism, sett_status, sitt_status):
 	collide_units()
 	if heroism == 1:
 		Graveyard.Add_grave(node, self)
+	return 0
 		
 func maybe_clean_two_voids(index):
 		var A1 = self.get_child(index)
@@ -805,7 +836,16 @@ func swap_children(index1, index2):
 #	node.move_child(child2, index1)
 #	node.place_me_pls(child2,index1)
 
-
+func extract_children_into_array():
+	var result_array = []
+	for i in get_child_count():
+		var target = get_child(i)
+		if target.TYPE == "unit":
+			result_array.append(target)
+		else:
+			result_array.append(null)
+			
+	return result_array
 
 #func delayed_setting(type, number):
 #	#this might prevent the cursor moving to right left
@@ -972,6 +1012,7 @@ func respawn_here(target, rpced_slot = null, faction = null):
 	
 		
 func land_here(lander, forced_slot):
+	push_error("landhereing")
 	#same as respawn_here but for when a unit enters this lane from elsewhere
 	#D12 is used
 	var landing_slot
@@ -981,7 +1022,7 @@ func land_here(lander, forced_slot):
 		landing_slot = await new_random_slot()
 	lander.reparent(self)
 	move_child(lander, landing_slot)
-	lander.land()
+	await lander.land()
 	
 	
 	
@@ -1053,7 +1094,8 @@ func spawn_lane_creep(rpced_slot = null, forced_here = false):
 #		push_error("sending joiner order to spawn a lane creep at " +str(spawning_slot))
 	#if Lobby.MULTIPLAYER == true and rpced_slot != null:
 		#push_error("random creep spawned for joiner")
-		
+	UNITS_MOVED_YO()
+	
 func reset_curving():
 	#BRATTY CURVING, NEEDS TO BE CORRECTED
 	var population = get_child_count()

@@ -58,6 +58,7 @@ func new_damage_to_be_taken(healthloss, where):
 @rpc("any_peer" , "call_remote", "reliable")
 func set_opponent_name(given_name):
 	$Beta_pfp/Beta_name.text = given_name
+	Lobby.opponent_name = given_name
 		
 func set_my_name(given_name):
 	$Alpha_pfp/Alpha_name.text = given_name

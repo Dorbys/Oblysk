@@ -3,7 +3,8 @@ extends Control
 @onready var graveyard_showcase = $"../../UI_layer/Graveyard_showcase"
 @onready var dead_heroes = $"../../UI_layer/Graveyard_showcase/Dead_heroes"
 
-
+@onready var scrolla: ScrollContainer = %SCROLLA
+#@onready var scrollb: ScrollContainer = %SCROLLB
 @onready var arena_rect = $"SCROLLA/Arena/SIZECHECK/ArenaRect"
 @onready var abarena_rect = $"SCROLLB/Abarena/SIZECHECK/ArenaRect"
 #@onready var dead_heroesB = $"../UI_layer/Graveyard_showcase/Dead_heroesB"
@@ -24,6 +25,9 @@ var my_lane
 
 #var VOIDTYPE = 7
 var Targeting_now = 0
+
+var card_preview_being_dragged:bool = false
+
 
 #var Mirror = []
 func slot_care(node):
@@ -103,7 +107,7 @@ func slot_care(node):
 var dead_id = 0				
 func Hero_death_care(node, identification, parent):
 	await parent.replace_me_by_void(node,identification, 1,1,1)	
-	if Base.Combat_phase == 0:
+	if Base.Combat_phase == false:
 		parent.maybe_clean_two_voids(identification)
 
 
@@ -145,7 +149,7 @@ func Death_care(node, identification, parent):
 	#enough for dueling to decrease the HealthC of opposite
 	parent.replace_me_by_void(node,identification, 0,1,1) #hmmmmmm
 	
-	if Base.Combat_phase == 0:
+	if Base.Combat_phase == false:
 		parent.maybe_clean_two_voids(identification)
 #	if parent == arena_rect:
 #		var opposite = abarena_rect.get_child(identification)
@@ -275,9 +279,9 @@ func lets_lvlup(XP, caller):
 		var target = arena_rect.get_child(i)
 		if target.TYPE == "unit" and target.HERO == true:
 			target.show_I_can_lvlup(XP, caller)	
-		var target2 = abarena_rect.get_child(i)
-		if target2.TYPE == "unit" and target2.HERO == true:
-			target2.show_I_can_lvlup(XP, caller)	
+		#var target2 = abarena_rect.get_child(i)
+		#if target2.TYPE == "unit" and target2.HERO == true:
+			#target2.show_I_can_lvlup(XP, caller)	
 		
 func card_preview_targeting_non_single_exits_tree():				
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
@@ -324,42 +328,112 @@ func clear_up_both():
 		Double_collide()
 			
 func combat_phase_start():
-	Base.Combat_phase = 1
+	Base.Combat_phase = true
 	
 func combat_phase_end():
-	Base.Combat_phase = 0
+	Base.Combat_phase = false
 				
 func cleanup_phase():
 	await tower_layer.cleanup_phase_signal()
 	await apply_phase("cleanup_phase")
+	#await get_tree().create_timer(Base.visible_death_anim_length).timeout
 	
 	
 func prep_phase():
 	
 	await tower_layer.unit_order_changed_signal(my_lane)
+	await tower_layer.before_prep_phase()
 	await apply_phase("before_prep_phase")
 	await annul_tower_damage_to_be_done()
 	await apply_phase("prep_phase")
 	
-func monday_phase():
+func passive_phase():
 	if Lobby.MULTIPLAYER == true and Lobby.host == true:
 		
 		spawn_rect.rpc_joiner_deployment_is_ready()
-	push_error("monday phase")
-	await tower_layer.monday_phase_signal()
-	await get_tree().create_timer(0.3).timeout 
-	the_button.monday_completed()
+	push_error("passive phase")
+	await tower_layer.passive_phase_signal()
+	await get_tree().create_timer(0.1).timeout 
+	#???
+	#the_button.monday_completed()	
 	
-
+#func monday_phase():
+	##if Lobby.MULTIPLAYER == true and Lobby.host == true:
+		##
+		##spawn_rect.rpc_joiner_deployment_is_ready()
+	#push_error("monday phase")
+	#await tower_layer.day_phase_signal("monday")
+	##await get_tree().create_timer(0.3).timeout 
+	##???
+	
+	#the_button.monday_completed()
+	
+func day_x_phase(target_day:String):
+	push_error(target_day + " phase")
+	await tower_layer.day_x_phase_for_buildings(target_day)
+	#buildings trig before units
+	
+	var current_day_triggers = tower_layer.extract_day_x_triggers_into_array("unit", target_day)
+	var cdt_size = current_day_triggers.size()
+	if  cdt_size == 0:
+		day_completed(target_day)
+		return 0
+		#if there's noone who trigs today, we return
+		
+	var cdt_wielders = [] #current_day_triggers_wielders
+	for i in cdt_size:
+		cdt_wielders.append(current_day_triggers[i].wielder)
+	#now we have all units who trig today
+		#in the same order as their trigs in current_day_triggers array
+	
+	var alpha_squadron = arena_rect.extract_children_into_array()
+	var beta_squadron = abarena_rect.extract_children_into_array()
+	var squadrons = []
+	if Base.initiative == 1:
+		squadrons.append(alpha_squadron)
+		squadrons.append(beta_squadron)
+	else:
+		squadrons.append(beta_squadron)
+		squadrons.append(alpha_squadron)
+	#first of squadrons is of the player with initiative 
+		#which determines passive ability order
+		
+	for i in alpha_squadron.size():
+		for j in 2:
+			var target = squadrons[j][i]
+			if target != null:
+				var index = cdt_wielders.find(target)
+				if index != -1:
+					await current_day_triggers[index].call(target_day + "_phase")
+	day_completed(target_day)
+		
+func day_completed(target_day):
+	#effects that happen after all trigs of the day are completed
+	match target_day:
+		"monday":
+			the_button.monday_completed()
+		"tuesday":
+			tower_layer.remove_fortifications()
+		
+	
+	
+	
+	
 func tuesday_phase():
 	push_error("tuesday phase")
-	await tower_layer.tuesday_phase_signal()
-func wednesday_phase():
-	await tower_layer.wednesday_phase_signal()
-
+	await tower_layer.day_phase_signal("tuesday")
 	
+func wednesday_phase():
+	await tower_layer.day_phase_signal("wednesday")
+
 func friday_phase():
-	await tower_layer.friday_phase_signal()
+	await tower_layer.day_phase_signal("friday")
+	
+func saturday_phase():
+	await tower_layer.day_phase_signal("saturday")
+	
+func sunday_phase():
+	await tower_layer.day_phase_signal("sunday")
 			
 func apply_phase(phase):
 	for i in arena_rect.get_child_count():
@@ -394,8 +468,8 @@ func curve_rng_both():
 func refresh_lane_auras(target,faction,wielder):
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 	#waiting for a building to queue free possibly
-	lane_buildings_A.refresh_aura(target,faction, wielder)
-	lane_buildings_B.refresh_aura(target,faction, wielder)
+	await lane_buildings_A.refresh_aura(target,faction, wielder)
+	await lane_buildings_B.refresh_aura(target,faction, wielder)
 
 			
 func unit_being_sieged(faction, siege_dmg):
@@ -409,7 +483,7 @@ func unit_being_sieged(faction, siege_dmg):
 			print("faction in unit_being_sieged doesnt match again")	
 	
 func unit_no_longer_being_sieged(faction, siege_dmg):
-	push_error("UN siege dmg is: " +str(siege_dmg))
+	#push_error("UN siege dmg is: " +str(siege_dmg))
 	match faction:
 		"alpha":
 			tower_a.increase_damage_to_be_taken(-siege_dmg)
@@ -443,9 +517,20 @@ func lane_is_being_picked(caller,faction):
 	
 func lane_is_no_longer_being_picked():
 	%Lane_picker.hide_myself()
+	
+func card_preview_is_being_dragged():
+	card_preview_being_dragged = true
+	
+func card_preview_is_no_longer_being_dragged():
+	card_preview_being_dragged = false
+	
 
-
-
+func eclipse_abarena():
+	move_child(scrolla,1)
+	
+func uneclipse_abarena():
+	move_child(scrolla,0)
+	
 func lets_check_cooldown_penetrability():
 	for i in arena_rect.get_child_count():
 		var target = arena_rect.get_child(i)
@@ -560,13 +645,13 @@ func make_my_mirror_unit_lvlup(unit_unique_key:int):
 		push_error("lvlupping unit " +str(unit_unique_key))
 		
 @rpc("any_peer", "call_remote", "reliable")		
-func make_my_mirror_unit_receive_ability_call(unit_unique_key:int, funcall:String):
+func make_my_mirror_unit_receive_ability_call(unit_unique_key:int, funcall:String, caster_unique_key:int = -1):
 	if multiplayer.get_remote_sender_id() == 0:
-		rpc_id(Lobby.opponent_peer_id, "make_my_mirror_unit_receive_ability_call", unit_unique_key, funcall)
+		rpc_id(Lobby.opponent_peer_id, "make_my_mirror_unit_receive_ability_call", unit_unique_key, funcall, caster_unique_key)
 		push_error("sending rpc to receive ability_call to unit " +str(unit_unique_key) +" " +funcall)
 	else:
-		AbilitiesDB.call(funcall,Lobby.universal_global_unit_array[unit_unique_key])
-		push_error("unit receiving abilitycall " +str(unit_unique_key))
+		AbilitiesDB.call(funcall,Lobby.universal_global_unit_array[unit_unique_key], Lobby.universal_global_unit_array[caster_unique_key])
+		push_error("unit receiving abilitycall " +str(unit_unique_key) +  "from " +str(caster_unique_key))
 	
 #kinda no point in having the "unit" in make_my_mirror_unit
 	

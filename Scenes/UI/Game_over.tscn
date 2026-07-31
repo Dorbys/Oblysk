@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://biouc223p35ra"]
 
 [ext_resource type="Texture2D" uid="uid://dikj7ujrhrsrv" path="res://Assets/PREUI/Victory_screen_texture.jpg" id="1_a5wb1"]
-[ext_resource type="Script" path="res://Script/UI_layer/Game_over.gd" id="1_qmgp1"]
+[ext_resource type="Script" uid="uid://jjughyxonyg7" path="res://Script/UI_layer/Game_over.gd" id="1_qmgp1"]
 [ext_resource type="LabelSettings" uid="uid://bqrwlmos42tsw" path="res://Setts/Labels/GAMEOVER_WIN_BIG.tres" id="3_s5dcw"]
 [ext_resource type="LabelSettings" uid="uid://82ia0gjoygmy" path="res://Setts/Labels/GAMEOVER_WIN_SMALL.tres" id="4_r8jiw"]
 [ext_resource type="LabelSettings" uid="uid://c6magtbsbs2wv" path="res://Setts/Labels/GAMEOVER_LOSE_SMALL.tres" id="5_08kwg"]
@@ -33,7 +33,7 @@ texture = ExtResource("1_a5wb1")
 layout_mode = 0
 offset_right = 90.0
 offset_bottom = 43.0
-text = "hit Esc"
+text = "hit 7"
 label_settings = SubResource("LabelSettings_61hi8")
 
 [node name="YOU_WIN" type="Control" parent="."]
@@ -61,6 +61,7 @@ text = "WIN"
 label_settings = ExtResource("3_s5dcw")
 
 [node name="Wyou" type="Label" parent="YOU_WIN"]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1176.0
 offset_top = 23.0
@@ -71,6 +72,7 @@ text = "YOU"
 label_settings = ExtResource("4_r8jiw")
 
 [node name="Wbob" type="Label" parent="YOU_WIN"]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 432.0
 offset_top = 906.0
@@ -98,6 +100,7 @@ offset_right = 196.0
 offset_bottom = -75.0
 
 [node name="Lbob" type="Label" parent="YOU_LOSE"]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 980.0
 offset_top = 77.0
@@ -128,6 +131,7 @@ text = "LOSE"
 label_settings = ExtResource("7_fi2nm")
 
 [node name="Lyou" type="Label" parent="YOU_LOSE"]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 218.0
 offset_top = 980.0

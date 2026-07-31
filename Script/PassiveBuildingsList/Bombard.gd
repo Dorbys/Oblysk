@@ -7,6 +7,10 @@ func _ready():
 	get_parent().text_for_tooltip = "Round end: Deal " +str(DAMAGE) + " physical damage to a random enemy in a random lane"	
 	BUTTON.round_end_signal_list.append(self)
 	
+	projectile = load("uid://yqqb5b6leogi")
+	custom_projectile_texture = load("uid://d4grhtru4w1vf")
+	custom_projectile_speed = 3000
+	
 var DAMAGE = 50
 
 func round_end():
@@ -29,7 +33,7 @@ func round_end():
 		randolane = targetable_lanes[gamba]
 		
 		if Base.PLAYTEST == true:
-			shoot_at_random(randolane)
+			await shoot_at_random(randolane)
 	
 	else: 
 		print("no units in lane, cant bombard")
@@ -51,4 +55,6 @@ func shoot_at_random(lane):
 		var target = targs[gamba]
 		var expected_damage = DAMAGE - target.ArmorC
 		if expected_damage > 0:
-			target.take_damage(expected_damage)
+			await get_tree().create_timer(Base.camera_move_time_short).timeout
+			await projectile_animation(house.visual_center, target.get_visual_center())
+			await target.take_damage(expected_damage)

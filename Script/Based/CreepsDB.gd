@@ -17,7 +17,7 @@ var SPECIAL_DB = [["AlphaCreep", 4, 6, 1,false,0,0]]
 
 
 var CREEPS_DB = [
-["Golem", 1, 9,0,true,2,4],	
+["Golem", 1, 8,0,true,2,4],	
 ["Duelyst", 8, 9,0,true,1,5],
 ["Legionaire", 6, 8,2,false,0,3],
 ["Skelegone", 10, 10,2,true,1,4],

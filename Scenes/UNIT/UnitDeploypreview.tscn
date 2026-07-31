@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://clrltqfiak7yu"]
 
-[ext_resource type="Script" path="res://Script/UNITS/UnitDeployPreview.gd" id="1_65qft"]
+[ext_resource type="Script" uid="uid://bo2t3hyar1jj2" path="res://Script/UNITS/UnitDeployPreview.gd" id="1_65qft"]
 [ext_resource type="Texture2D" uid="uid://gdmro6xw1jr" path="res://Assets/CARDF.png" id="2_uk4d5"]
 [ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="3_6evxk"]
 [ext_resource type="LabelSettings" uid="uid://c6k6apdugj728" path="res://Setts/Labels/StatsPreview.tres" id="4_m07hc"]

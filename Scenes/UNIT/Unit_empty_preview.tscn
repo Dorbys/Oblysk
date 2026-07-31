@@ -1,0 +1,169 @@
+[gd_scene load_steps=13 format=3 uid="uid://dlw1m0ncyr2sg"]
+
+[ext_resource type="Script" uid="uid://6or044pt4lfb" path="res://Script/UNITS/UnitCihPreview.gd" id="1_psuus"]
+[ext_resource type="Texture2D" uid="uid://byp5tyg4fcg1r" path="res://Assets/SPELL.png" id="2_m1hcx"]
+[ext_resource type="LabelSettings" uid="uid://mk15hschwmro" path="res://Setts/Labels/Hero_name.tres" id="3_r083b"]
+[ext_resource type="LabelSettings" uid="uid://c6k6apdugj728" path="res://Setts/Labels/StatsPreview.tres" id="4_di43u"]
+[ext_resource type="LabelSettings" uid="uid://c0vgp6y2n46xr" path="res://Setts/Labels/StatsARMOR.tres" id="5_4mu8a"]
+[ext_resource type="Texture2D" uid="uid://ba3m2oqvqd43m" path="res://Assets/Textures/Missing_texture.png" id="6_6gd1t"]
+[ext_resource type="Texture2D" uid="uid://da11g0qs7vep1" path="res://icon.svg" id="7_4lsw6"]
+[ext_resource type="Texture2D" uid="uid://cebjpxdc1cwq7" path="res://Assets/CardsPNGS/CardUI/Ability_frame.png" id="8_n83st"]
+[ext_resource type="LabelSettings" uid="uid://cacnbuvsrroxp" path="res://Setts/Labels/SpellCost.tres" id="9_8ee0l"]
+[ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="10_u4tr5"]
+[ext_resource type="LabelSettings" uid="uid://ctfo46o3ttwir" path="res://Setts/Labels/SpellXP.tres" id="11_5r37m"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_udsvo"]
+font = ExtResource("10_u4tr5")
+font_size = 20
+font_color = Color(0, 0, 0, 1)
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+script = ExtResource("1_psuus")
+
+[node name="Slacksus" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -108.0
+offset_right = 108.0
+offset_bottom = 360.0
+mouse_filter = 2
+texture = ExtResource("2_m1hcx")
+expand_mode = 1
+
+[node name="Name_label" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 216.0
+offset_bottom = 38.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+text = "SLACKSUS"
+label_settings = ExtResource("3_r083b")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Attack_label" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 315.0
+offset_right = 53.0
+offset_bottom = 372.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("4_di43u")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Armor_label" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+offset_left = 81.0
+offset_top = 315.0
+offset_right = 134.0
+offset_bottom = 372.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "91"
+label_settings = ExtResource("5_4mu8a")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HP_label" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 161.0
+offset_top = 315.0
+offset_right = 216.0
+offset_bottom = 371.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("4_di43u")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Art_rect" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+show_behind_parent = true
+layout_mode = 2
+offset_left = -1.0
+offset_top = 38.0
+offset_right = 216.0
+offset_bottom = 303.0
+size_flags_vertical = 3
+size_flags_stretch_ratio = 16.0
+mouse_filter = 2
+texture = ExtResource("6_6gd1t")
+expand_mode = 1
+
+[node name="Ability1" type="TextureRect" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 5.0
+offset_top = 170.0
+offset_right = 67.0
+offset_bottom = 232.0
+scale = Vector2(0.7, 0.7)
+mouse_filter = 2
+texture = ExtResource("7_4lsw6")
+expand_mode = 1
+
+[node name="TextureRect" type="TextureRect" parent="Slacksus/Ability1"]
+show_behind_parent = true
+layout_mode = 0
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 67.0
+offset_bottom = 67.0
+mouse_filter = 2
+texture = ExtResource("8_n83st")
+expand_mode = 1
+
+[node name="Cost_label" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 47.0
+offset_bottom = 39.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("9_8ee0l")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Description_label" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 216.0
+offset_right = 216.0
+offset_bottom = 327.0
+text = "Lorem ipsum dolor sit amet"
+label_settings = SubResource("LabelSettings_udsvo")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="XP_label" type="Label" parent="Slacksus"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -2.0
+offset_top = 35.0
+offset_right = 38.0
+offset_bottom = 74.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+size_flags_stretch_ratio = 10.0
+text = "10"
+label_settings = ExtResource("11_5r37m")
+horizontal_alignment = 1
+vertical_alignment = 1

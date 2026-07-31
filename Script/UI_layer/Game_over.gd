@@ -6,10 +6,13 @@ extends Control
 @onready var l_player = $L_player
 
 
-var anima_duration = 1.2
-var over = false
+var anima_duration:float = 1.2
+var over:bool = false
 
 func YOU_WIN():
+	if Lobby.MULTIPLAYER == true:
+		%Wyou.text = Lobby.player_name
+		%Wbob.text = Lobby.opponent_name
 	print("YOU WIN")
 	audio_stream_player.stop()
 	w_player.play()
@@ -20,6 +23,8 @@ func YOU_WIN():
 	tween.tween_property(self,"modulate:a",1,anima_duration)
 	
 func YOU_LOSE():
+	%Lbob.text = Lobby.opponent_name
+	%Lyou.text = Lobby.player_name
 	print("YOU LOSE")
 	audio_stream_player.stop()
 	l_player.play()
@@ -28,3 +33,6 @@ func YOU_LOSE():
 	over = true
 	var tween = create_tween()
 	tween.tween_property(self,"modulate:a",1,anima_duration)
+
+func game_over_check():
+	return over

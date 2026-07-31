@@ -1,0 +1,98 @@
+extends Card_In_Hand
+
+
+
+@export var Scene: PackedScene
+@export var empty_preview_scene: PackedScene
+
+@export var Item_Name = "E"
+@export var Card_pfp = load("res://Assets/Textures/Missing_texture.png")
+var Item_cooldown = 11
+
+#var UNIT = 0
+#var SPELL = 1
+var TYPE = "upgrade" #2
+var ITEMM = 0
+#ITEMM stands for whether its weapon0 special1 or armor2
+#currently tring to play CARDTYPE 2 to be ITEMS
+#only deckbuilding uses 2 3 4
+var Identification = 3
+
+
+var showing = 0
+#to prevent making multiple CIH previews
+
+var Card_from_lvlup = false
+var Card_XP = 0
+var Card_Cost = -1
+#so that it doesnt trigger manaspending
+
+
+
+func _ready():
+	%NAME.text = Item_Name
+	
+#	%COST.text = str(Item_Cost)
+	#I've hidden the cost cuz no used
+	%WEAPON_JPEG.texture = Card_pfp
+	
+	%STATS.text = ItemsDB[str(Item_Name)+"_description"]
+
+	
+	new_lane()
+	
+
+
+
+
+		
+func _get_drag_data(_at_position):
+	var action_check
+	if Lobby.MULTIPLAYER == true:
+		action_check = does_player_have_action()
+	else:
+		action_check = true
+	if action_check == true:
+		Base.lock_pass_button()
+		#until preview is gone
+		var drag_preview = create_preview(Identification)
+	#	UI_layer.add_child(drag_preview)
+		set_drag_preview(drag_preview)
+		drag_preview.modulate.a = .5
+
+		arena_rect.an_item_is_being_dragged()
+		abarena_rect.an_item_is_being_dragged()
+		the_button.global_lets_hide_abilities_and_items()
+	#	arena.move_arena_to_front()
+	#	abarena.move_arena_to_front()
+		
+		
+		return [TYPE,Identification, self.get_index(), cross_lane]
+		
+	else: you_dont_have_action(self)
+	
+func create_preview(ID):
+	var preview = Scene.instantiate()
+	assign_stats(preview,ID)
+
+	return preview
+	
+func assign_stats(preview, ID):
+	preview.previewed_card = self
+	preview.card_DB = ItemsDB
+	preview.card_name = ItemsDB.ITEMS_DB[ID][ItemsDB.NAMEPOSITION]
+	preview.ITEMM = ItemsDB.ITEMS_DB[ID][ItemsDB.ITEMMPOSITION]
+	preview.card_art = Base.UPGRADE_TEXTURES[ID]
+#	preview.Item_Stat = ItemsDB.ITEMS_DB[ID][ItemsDB.STATPOSITION]
+	preview.card_cost = ItemsDB.ITEMS_DB[ID][ItemsDB.COSTPOSITION]
+	preview.Item_cooldown = ItemsDB.ITEMS_DB[ID][ItemsDB.COOLDOWNPOSITION]
+	
+	preview.Identification = ID
+
+
+func _on_texture_rect_mouse_entered():
+	create_empty_preview(self,Identification)
+
+
+func _on_texture_rect_mouse_exited():
+	remove_card_in_hand_preview(self)

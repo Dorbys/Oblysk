@@ -11,7 +11,7 @@ func _ready():
 	#check if I'm in abarena
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout 
 
-	if wielder.MYrena_rect.OP_identity == 0:
+	if wielder.MYrena_rect.MY_identity == "B":
 		c_angle = -c_angle
 		reposition_down()
 		

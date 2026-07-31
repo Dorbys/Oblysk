@@ -135,10 +135,12 @@ func collide_units(skip_target = -1, pretty = 1):
 			destination_Y = 0 + Y_OFFSET
 #			get_child(i).position.y = 0
 		if pretty == 1:
+			destination_X += global_position.x
+			destination_Y += global_position.y 
 			
 			
-			tween.tween_property(target,"position:x",destination_X,movement_time)
-			tween.tween_property(target,"position:y",destination_Y,movement_time)
+			tween.tween_property(target,"global_position:x",destination_X,movement_time)
+			tween.tween_property(target,"global_position:y",destination_Y,movement_time)
 #			tween.tween_property(target,"scale",Vector2(scale_down,scale_down),movement_time)
 			
 		else:

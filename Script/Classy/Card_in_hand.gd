@@ -83,12 +83,12 @@ func new_lane():
 	
 
 
-func create_card_in_hand_preview(source,ID):
+func create_empty_preview(source,ID):
 
-	if source.showing == 0 and Base.show_CIH_preview == true:
+	if source.showing == 0 and card_layer.card_preview_being_dragged == false and Base.show_CIH_preview == true:
 	#so that its not made multiple times
 #		if arena_rect.TargetingSpell == 0 and arena_rect.EquippingItem == 0:
-		var preview = source.PreviewScene.instantiate()
+		var preview = source.empty_preview_scene.instantiate()
 		source.assign_stats(preview,ID)
 		source.add_child(preview)
 		focus_on_me(preview)
@@ -123,16 +123,9 @@ func go_up(target):
 
 
 
-func action_and_caster_and_mana_available():
-	
-		
-		
-			
-	var action_check
-	if Lobby.MULTIPLAYER == true:
-		action_check = does_player_have_action()
-	else:
-		action_check = true
+func action_and_caster_and_mana_available():		
+	var action_check = does_player_have_action()
+
 	if action_check == true:
 		
 		var herocheck = arena_rect.is_there_a_hero_check()
@@ -159,7 +152,7 @@ func does_player_have_enough_mana(caller):
 		return false
 		
 func does_player_have_action():
-	if Base.granted_action == 1:
+	if UI_layer.does_player_have_action():
 		return true
 	else:
 		push_error("not your action :<")
@@ -167,15 +160,15 @@ func does_player_have_action():
 		
 func you_dont_have_action(caller):
 	var action_jumpscare = no_action_warning.instantiate()
-	caller.UI_layer.add_child(action_jumpscare)
+	UI_layer.add_child(action_jumpscare)
 		
 func not_enough_mana(caller):
 	var mana_jumpscare = no_mana_warning.instantiate()
-	caller.UI_layer.add_child(mana_jumpscare)
+	UI_layer.add_child(mana_jumpscare)
 	
 func no_hero_to_cast_this(caller):
 	var caster_jumpscare = no_caster_warning.instantiate()
-	caller.UI_layer.add_child(caster_jumpscare)
+	UI_layer.add_child(caster_jumpscare)
 	
 func check_XP_transparency(caller):
 	if caller.Card_XP == 0:

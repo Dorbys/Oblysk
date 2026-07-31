@@ -10,7 +10,7 @@ func refresh_aura(target,faction,wielder):
 		var house = get_child(i)
 		
 		if house.is_aura == true and house.do_I_affect_faction(faction) == true:
-			house.affect_unit(target,wielder)
+			await house.affect_unit(target,wielder)
 		await get_tree().create_timer(Base.MICRO_TIME).timeout
 
 #		else: print(house.is_aura)

@@ -1,0 +1,107 @@
+[gd_scene load_steps=7 format=3 uid="uid://b1kjxv075pgnh"]
+
+[ext_resource type="Script" uid="uid://lid4mubhmnxb" path="res://Script/UI_layer/Lvlup_cards_preview.gd" id="1_31a8a"]
+[ext_resource type="Texture2D" uid="uid://m2f5ywny4i2f" path="res://Assets/CardsSMALLS/Dorbys_small.png" id="2_mxlta"]
+[ext_resource type="PackedScene" uid="uid://damy2dodvfesh" path="res://Scenes/LVLUPS/Lvlup_spells/Lvlup_spell_empty_preview.tscn" id="3_lwgjc"]
+[ext_resource type="Texture2D" uid="uid://d3hoqqadbgcjc" path="res://Assets/Pics/Loďky 6.png" id="3_mxlta"]
+[ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="4_iybhw"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_gnfas"]
+font = ExtResource("4_iybhw")
+font_size = 64
+
+[node name="Lvlup_cards_preview" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_31a8a")
+lvlup_spell_scene = ExtResource("3_lwgjc")
+
+[node name="Shadr" type="TextureRect" parent="."]
+modulate = Color(0.0235294, 0.0235294, 0.0235294, 0.866667)
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1082.0
+texture = ExtResource("3_mxlta")
+
+[node name="HBoxContainer" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 300.0
+offset_top = 200.0
+offset_right = 1620.0
+offset_bottom = 880.0
+
+[node name="H0" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+offset_left = 85.0
+offset_right = 235.0
+offset_bottom = 213.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("2_mxlta")
+expand_mode = 1
+
+[node name="H1" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+offset_left = 335.0
+offset_right = 485.0
+offset_bottom = 213.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("2_mxlta")
+expand_mode = 1
+
+[node name="H2" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+offset_left = 585.0
+offset_right = 735.0
+offset_bottom = 213.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("2_mxlta")
+expand_mode = 1
+
+[node name="H3" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+offset_left = 835.0
+offset_right = 985.0
+offset_bottom = 213.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("2_mxlta")
+expand_mode = 1
+
+[node name="H4" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+offset_left = 1085.0
+offset_right = 1235.0
+offset_bottom = 213.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+size_flags_stretch_ratio = 2.0
+mouse_filter = 2
+texture = ExtResource("2_mxlta")
+expand_mode = 1
+
+[node name="CoverTop2" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 190.0
+color = Color(0, 0, 0, 0.521569)
+
+[node name="targeting_what" type="Label" parent="CoverTop2"]
+layout_mode = 0
+offset_left = 3.0
+offset_right = 1920.0
+offset_bottom = 190.0
+text = "Previewing LVLUP cards, \"L\" to hide"
+label_settings = SubResource("LabelSettings_gnfas")
+horizontal_alignment = 1
+vertical_alignment = 1

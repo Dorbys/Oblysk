@@ -1,9 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://bd5cypnf78qdj"]
+[gd_scene load_steps=18 format=3 uid="uid://bd5cypnf78qdj"]
 
+[ext_resource type="PackedScene" uid="uid://besfgi16wntbi" path="res://Scenes/Tower/Tower_damage_visual.tscn" id="2_2ecny"]
 [ext_resource type="Script" uid="uid://c6p5bu653dolh" path="res://Script/TOWER_HP_DISPLAY.gd" id="2_k0ois"]
 [ext_resource type="Texture2D" uid="uid://u6qf2spmmadb" path="res://Assets/Boardstuff/Towerr - kopie.jpg" id="2_pbq7b"]
 [ext_resource type="LabelSettings" uid="uid://5a0inadmx84s" path="res://Setts/Labels/TowerHP.tres" id="2_tff1w"]
 [ext_resource type="LabelSettings" uid="uid://h0cv0gkneiti" path="res://Setts/Labels/TowerMana.tres" id="4_i2uh8"]
+[ext_resource type="Texture2D" uid="uid://kfymxxsg8nw3" path="res://Assets/Effects/LVLUPEFFECT.png" id="5_2x6y2"]
 [ext_resource type="Script" uid="uid://6lj721lbpba2" path="res://Script/Max_mana.gd" id="5_bh4el"]
 [ext_resource type="Script" uid="uid://cdh8fqfjfv82p" path="res://Script/Current_mana.gd" id="6_m1brs"]
 [ext_resource type="FontFile" uid="uid://b2yhjqt5msu3e" path="res://Assets/Font source/Roboto-Black.ttf" id="7_iy82y"]
@@ -13,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://bu3k5c38wabyq" path="res://Assets/Textures/Red nothing.jpg" id="10_r06rs"]
 [ext_resource type="Texture2D" uid="uid://ddena70veefpp" path="res://Assets/Textures/Bright_green.png" id="11_7fx6u"]
 [ext_resource type="Texture2D" uid="uid://bi34yrgwk17g3" path="res://Assets/Textures/Gray nothing.jpg" id="13_2ecny"]
+[ext_resource type="AudioStream" uid="uid://dnsga5rytvoc2" path="res://Assets/Sounds/SFX/Crumbling_sfx.mp3" id="15_s4lo8"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_njhnx"]
 font = ExtResource("7_iy82y")
@@ -27,8 +30,10 @@ anchors_preset = 0
 offset_right = 174.0
 offset_bottom = 120.0
 script = ExtResource("2_k0ois")
+tower_damage_visual = ExtResource("2_2ecny")
 
 [node name="Tower_png" type="TextureRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.028
@@ -59,6 +64,18 @@ text = "16/16"
 label_settings = ExtResource("2_tff1w")
 horizontal_alignment = 1
 vertical_alignment = 2
+
+[node name="Fortification_shield" type="TextureRect" parent="Tower_png"]
+unique_name_in_owner = true
+visible = false
+self_modulate = Color(2, 2, 2, 0.372)
+layout_mode = 0
+offset_left = 0.227997
+offset_right = 120.228
+offset_bottom = 120.0
+mouse_filter = 2
+texture = ExtResource("5_2x6y2")
+expand_mode = 1
 
 [node name="Mana_display" type="ColorRect" parent="."]
 layout_mode = 1
@@ -133,5 +150,9 @@ fill_mode = 2
 nine_patch_stretch = true
 texture_over = ExtResource("10_dopm3")
 texture_progress = ExtResource("13_2ecny")
+
+[node name="Crumbling_sfx" type="AudioStreamPlayer2D" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("15_s4lo8")
 
 [connection signal="child_exiting_tree" from="Buildings" to="Buildings" method="_on_child_exiting_tree"]

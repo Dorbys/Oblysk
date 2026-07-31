@@ -58,10 +58,11 @@ func create_spell_preview():
 	return preview
 
 func assign_spell_stats(preview, ID):
-	preview.Card_name = SpellsDB.SPELLS_DB[ID][SpellsDB.NAMEPOSITION]
-	preview.Card_pfp = Base.SPELL_TEXTURES[ID]
-	preview.Card_Cost = SpellsDB.SPELLS_DB[ID][SpellsDB.COSTPOSITION]
-	preview.Card_XP = SpellsDB.SPELLS_DB[ID][SpellsDB.XPPOSITION]
+	preview.card_DB = SpellsDB
+	preview.card_name = SpellsDB.SPELLS_DB[ID][SpellsDB.NAMEPOSITION]
+	preview.card_art = Base.SPELL_TEXTURES[ID]
+	preview.card_cost = SpellsDB.SPELLS_DB[ID][SpellsDB.COSTPOSITION]
+	preview.card_xp = SpellsDB.SPELLS_DB[ID][SpellsDB.XPPOSITION]
 	preview.Targets = SpellsDB.SPELLS_DB[ID][SpellsDB.TARGPOSITION]
 	preview.cross_lane = SpellsDB.SPELLS_DB[ID][SpellsDB.CROSSLANEPOSITION]
 	preview.Identification = ID	
@@ -75,14 +76,15 @@ func create_unit_preview():
 	
 	
 func assign_unit_stats(preview, ID):
+	preview.card_DB = CreepsDB
 	var DB_slot = CreepsDB.CREEPS_DB[ID]
-	preview.Card_pfp = Base.CREEP_TEXTURES[ID]
-	preview.Unit_Name = DB_slot[CreepsDB.NAMEPOSITION]
+	preview.card_art = Base.CREEP_TEXTURES[ID]
+	preview.card_name = DB_slot[CreepsDB.NAMEPOSITION]
 	preview.Unit_Attack = DB_slot[CreepsDB.ATTACKPOSITION]
 	preview.Unit_Health = DB_slot[CreepsDB.HEALTHPOSITION]
 	preview.Unit_Armor = DB_slot[CreepsDB.ARMORPOSITION]
-	preview.Card_Cost = DB_slot[CreepsDB.COSTPOSITION]
-	preview.Card_XP = DB_slot[CreepsDB.XPPOSITION]
+	preview.card_cost = DB_slot[CreepsDB.COSTPOSITION]
+	preview.card_xp = DB_slot[CreepsDB.XPPOSITION]
 	preview.Identification = ID
 	
 	if DB_slot[CreepsDB.ABILITYPOSITION] == true:
@@ -101,10 +103,11 @@ func create_lvlup_spell_preview():
 	
 
 func assign_lvlup_spell_stats(preview, ID):
-	preview.Card_name = LvlupDB.LVLUPS_DB[ID][LvlupDB.NAMEPOSITION]
-	preview.Card_pfp = Base.LVLUP_SPELLS_TEXTURES[ID]
-	preview.Card_Cost = LvlupDB.LVLUPS_DB[ID][LvlupDB.COSTPOSITION]
-	preview.Card_XP = 0
+	preview.card_DB = LvlupDB
+	preview.card_name = LvlupDB.LVLUPS_DB[ID][LvlupDB.NAMEPOSITION]
+	preview.card_art = Base.LVLUP_SPELLS_TEXTURES[ID]
+	preview.card_cost = LvlupDB.LVLUPS_DB[ID][LvlupDB.COSTPOSITION]
+	preview.card_xp = 0
 	preview.Targets = LvlupDB.LVLUPS_DB[ID][LvlupDB.TARGPOSITION]
 	preview.cross_lane = LvlupDB.LVLUPS_DB[ID][LvlupDB.CROSSLANEPOSITION]
 	preview.Identification = ID
@@ -119,10 +122,11 @@ func create_building_preview():
 
 
 func assign_building_stats(preview, ID):
-	preview.Card_name = BuildDB.BUILD_DB[ID][BuildDB.NAMEPOSITION]
-	preview.Card_pfp = Base.BUILDING_TEXTURES[ID]
-	preview.Card_Cost = BuildDB.BUILD_DB[ID][BuildDB.COSTPOSITION]
-	preview.Card_XP = BuildDB.BUILD_DB[ID][BuildDB.XPPOSITION]
+	preview.card_DB = BuildDB
+	preview.card_name = BuildDB.BUILD_DB[ID][BuildDB.NAMEPOSITION]
+	preview.card_art = Base.BUILDING_TEXTURES[ID]
+	preview.card_cost = BuildDB.BUILD_DB[ID][BuildDB.COSTPOSITION]
+	preview.card_xp = BuildDB.BUILD_DB[ID][BuildDB.XPPOSITION]
 
 func create_upgrade_preview():
 	var preview = upgrade_preview.instantiate()
@@ -131,10 +135,11 @@ func create_upgrade_preview():
 	return preview
 	
 func assign_upgrade_stats(preview, ID):
-	preview.Item_Name = ItemsDB.ITEMS_DB[ID][ItemsDB.NAMEPOSITION]
+	preview.card_DB = ItemsDB
+	preview.card_name = ItemsDB.ITEMS_DB[ID][ItemsDB.NAMEPOSITION]
 	preview.ITEMM = ItemsDB.ITEMS_DB[ID][ItemsDB.ITEMMPOSITION]
-	preview.Card_pfp = Base.UPGRADE_TEXTURES[ID]
+	preview.card_art = Base.UPGRADE_TEXTURES[ID]
 #	preview.Item_Stat = ItemsDB.ITEMS_DB[ID][ItemsDB.STATPOSITION]
-	preview.Card_Cost = ItemsDB.ITEMS_DB[ID][ItemsDB.COSTPOSITION]
+	preview.card_cost = ItemsDB.ITEMS_DB[ID][ItemsDB.COSTPOSITION]
 	preview.Item_cooldown = ItemsDB.ITEMS_DB[ID][ItemsDB.COOLDOWNPOSITION]
 	preview.Identification = ID

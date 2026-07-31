@@ -15,6 +15,7 @@ extends ColorRect
 @onready var tower_layer2 = $"../../../../../Mid_lane/Tower_layer"
 @onready var tower_layer3 = $"../../../../../Last_lane/Tower_layer"
 
+@onready var hidden_cards: Control = %Hidden_cards
 
 var CardsDrawn = 0
 
@@ -142,8 +143,12 @@ func create_lvlup_spell(ID):
 	
 	return another
 
-func used_card(which:int):
-	var target = self.get_child(which)
+func used_card(which):
+	var target
+	if which is int:
+		target = self.get_child(which)
+	elif which is Node:
+		target = which
 	var cards_xp = target.Card_XP
 	var manacost = target.Card_Cost
 	XP_panel.increase_xp(cards_xp)
@@ -160,6 +165,8 @@ func used_card(which:int):
 		Base.pass_the_initiative()
 	await get_tree().create_timer(Base.FAKE_DELTA).timeout
 	collide_cards()
+	
+	
 	
 #var mid = 1920/2
 var compression = 0.8 * Base.CARD_WIDTH
@@ -209,7 +216,17 @@ func collide_cards():
 	else:
 		push_error("number of cards in hand is neither odd nor even")
 
-
+func hide_used_card(card_index:int):
+	var target = get_child(card_index)
+	target.reparent(hidden_cards)
+	collide_cards()
+	
+func consume_hidden_card():
+	if hidden_cards.get_child_count() < 1:
+		push_error("consume_hidden_card called without hidden card")
+	else:
+		used_card(hidden_cards.get_child(0))
+	
 
 	
 	

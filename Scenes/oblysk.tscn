@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://cak63fd13ipg1"]
+[gd_scene load_steps=38 format=3 uid="uid://cak63fd13ipg1"]
 
 [ext_resource type="Script" uid="uid://2l3t0uhs7xwh" path="res://Script/Based/INPUT_B.gd" id="1_kus8j"]
 [ext_resource type="PackedScene" uid="uid://b1u0py0ci1rgi" path="res://Scenes/Base.tscn" id="1_v73vy"]
@@ -9,8 +9,10 @@
 [ext_resource type="PackedScene" uid="uid://3hwcj8w7v8io" path="res://Scenes/UI/XP_panel.tscn" id="4_8bybo"]
 [ext_resource type="PackedScene" uid="uid://bx1fm7gym1b2x" path="res://Scenes/UI/The_button.tscn" id="5_51a31"]
 [ext_resource type="PackedScene" uid="uid://biouc223p35ra" path="res://Scenes/UI/Game_over.tscn" id="5_hdcg8"]
+[ext_resource type="Script" uid="uid://bt8ijhss53mfc" path="res://Script/UI_layer/UI_layer.gd" id="6_df8ep"]
 [ext_resource type="PackedScene" uid="uid://bpbmblkyxomck" path="res://Scenes/UI/Adding_button.tscn" id="6_xyuig"]
 [ext_resource type="Script" uid="uid://cln4s4n4n7p71" path="res://Script/UI_layer/DropdownButton.gd" id="7_inl2i"]
+[ext_resource type="PackedScene" uid="uid://1ii2eu8a2p22" path="res://Scenes/UI/No_action_warning.tscn" id="7_o1tx0"]
 [ext_resource type="Texture2D" uid="uid://c7sucoinxwaqc" path="res://Assets/PREUI/S_Button.jpg" id="9_3slyr"]
 [ext_resource type="PackedScene" uid="uid://dwwrxkxhppb77" path="res://Scenes/UI/spawner.tscn" id="10_86lln"]
 [ext_resource type="Script" uid="uid://c57b2tcf2ud03" path="res://Script/UI_layer/Camera2D.gd" id="10_b5mq6"]
@@ -21,11 +23,11 @@
 [ext_resource type="Texture2D" uid="uid://jeg0mn16qh8b" path="res://Assets/PREUI/Debug_status_indicator.jpg" id="13_oqncl"]
 [ext_resource type="Script" uid="uid://npqt0iqfq1m4" path="res://Script/UI_layer/Opponent_info/Turn_indicator.gd" id="13_rf5i7"]
 [ext_resource type="AudioStream" uid="uid://df011xt5nto82" path="res://Assets/Sounds/Rxm リム - LOOK AT ME! _ Phonk _ NCS - Copyright Free Music (320kbps).mp3" id="13_virw5"]
-[ext_resource type="Texture2D" uid="uid://dk807clcgvok8" path="res://Assets/Textures/FFA200.jpg" id="14_i0xot"]
 [ext_resource type="PackedScene" uid="uid://bhaer715oasq3" path="res://Scenes/UI/Player_mana_display.tscn" id="15_ywx2j"]
 [ext_resource type="PackedScene" uid="uid://c3lbr0mtr2ums" path="res://Scenes/UI/Opponent/OpponentHand.tscn" id="16_e8r2r"]
 [ext_resource type="FontFile" uid="uid://c01uqsojl0t5d" path="res://Assets/Font source/RobotoMono-Bold.ttf" id="17_iqa2t"]
 [ext_resource type="Texture2D" uid="uid://kfymxxsg8nw3" path="res://Assets/Effects/LVLUPEFFECT.png" id="17_p02hj"]
+[ext_resource type="Texture2D" uid="uid://dktscjf6ujudg" path="res://Assets/Gradients/Opponent_turn_indicator_gradient.tres" id="18_o1tx0"]
 [ext_resource type="Script" uid="uid://crw0sj3x11nva" path="res://Script/AudioStreamPlayer.gd" id="18_s0iln"]
 [ext_resource type="AudioStream" uid="uid://dsgvtftwjma2y" path="res://Assets/Sounds/Skibidi Bop cut Yes Yes Yes x Bloody Mary _ Wednesday Dance (320kbps).mp3" id="19_18oe3"]
 [ext_resource type="AudioStream" uid="uid://jdretbttic7c" path="res://Assets/Sounds/kyOresu - DORIME__ (loli cover) (320kbps).mp3" id="20_36a0s"]
@@ -33,6 +35,7 @@
 [ext_resource type="PackedScene" uid="uid://3au5ircxans" path="res://Scenes/Menu/Main_menu.tscn" id="25_ersvt"]
 [ext_resource type="PackedScene" uid="uid://bebg654ub0p52" path="res://Scenes/UI/History/History.tscn" id="28_musle"]
 [ext_resource type="PackedScene" uid="uid://chwge1hn36jor" path="res://Scenes/UI/Help2.tscn" id="30_amnc5"]
+[ext_resource type="PackedScene" uid="uid://b1kjxv075pgnh" path="res://Scenes/UI/Lvlup_cards_preview.tscn" id="33_o1tx0"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_qwlda"]
 font = ExtResource("17_iqa2t")
@@ -88,13 +91,19 @@ drag_right_margin = 0.0
 drag_bottom_margin = 0.0
 script = ExtResource("10_b5mq6")
 
+[node name="Effect_layer" type="Node2D" parent="."]
+
 [node name="UI_layer" type="CanvasLayer" parent="."]
+script = ExtResource("6_df8ep")
+no_action_warning = ExtResource("7_o1tx0")
+no_caster_warning = ExtResource("7_o1tx0")
+no_mana_warning = ExtResource("7_o1tx0")
 
 [node name="SCROLLH" parent="UI_layer" instance=ExtResource("2_olllb")]
 unique_name_in_owner = true
-offset_left = 360.0
+offset_left = 362.0
 offset_top = 591.0
-offset_right = 1560.0
+offset_right = 1562.0
 offset_bottom = 1311.0
 
 [node name="Graveyard_showcase" parent="UI_layer" instance=ExtResource("3_cxe43")]
@@ -136,10 +145,10 @@ offset_right = 1720.0
 offset_bottom = 184.0
 toggle_mode = false
 alignment = 1
-selected = 2
+selected = 0
 fit_to_longest_item = false
 allow_reselect = true
-item_count = 8
+item_count = 9
 popup/item_0/text = "Cheat units"
 popup/item_0/id = 0
 popup/item_1/text = "Remove units"
@@ -150,12 +159,14 @@ popup/item_3/text = "Hurt yourself"
 popup/item_3/id = 3
 popup/item_4/text = "Hurt opponent"
 popup/item_4/id = 4
-popup/item_5/text = "Monday phase"
+popup/item_5/text = "Monday"
 popup/item_5/id = 5
-popup/item_6/text = "-1HP target unit"
+popup/item_6/text = "Tuesday"
 popup/item_6/id = 6
-popup/item_7/text = "Reduce cooldowns"
+popup/item_7/text = "-1HP target unit"
 popup/item_7/id = 7
+popup/item_8/text = "Reduce cooldowns"
+popup/item_8/id = 8
 script = ExtResource("7_inl2i")
 
 [node name="Passing_status_indicator" type="TextureRect" parent="UI_layer/DevTools"]
@@ -192,7 +203,8 @@ scale = Vector2(0.66, 0.66)
 texture = ExtResource("12_n6u6b")
 expand_mode = 1
 script = ExtResource("13_rf5i7")
-active_texture = ExtResource("14_i0xot")
+rotation_speed = 3.5
+active_texture = ExtResource("18_o1tx0")
 inactive_texture = ExtResource("12_n6u6b")
 
 [node name="Opponent_SCROLLH" parent="UI_layer/Opponent_info" instance=ExtResource("16_e8r2r")]
@@ -223,6 +235,7 @@ offset_top = 565.0
 offset_right = 2006.0
 offset_bottom = 1015.0
 scale = Vector2(0.66, 0.66)
+disabled = true
 
 [node name="Player_HP" parent="UI_layer" instance=ExtResource("11_p1uyo")]
 unique_name_in_owner = true
@@ -239,7 +252,6 @@ offset_bottom = 829.0
 
 [node name="XP_Panel" parent="UI_layer" instance=ExtResource("4_8bybo")]
 unique_name_in_owner = true
-z_index = 1
 offset_left = 1759.0
 offset_top = 948.0
 offset_right = 1899.0
@@ -312,10 +324,17 @@ offset_bottom = 180.0
 unique_name_in_owner = true
 visible = false
 
+[node name="Lvlup_cards_preview" parent="UI_layer" instance=ExtResource("33_o1tx0")]
+unique_name_in_owner = true
+visible = false
+
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("13_virw5")
 volume_db = -30.905
 script = ExtResource("18_s0iln")
+
+[node name="Audio_global" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
 
 [node name="idk" type="AudioStreamPlayer" parent="."]
 unique_name_in_owner = true
